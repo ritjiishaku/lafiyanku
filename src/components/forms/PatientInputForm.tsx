@@ -1,0 +1,423 @@
+"use client";
+
+import { useForm, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MedicationRow } from "./MedicationRow";
+import { LanguageSelector } from "./LanguageSelector";
+
+const medicationSchema = z.object({
+  name: z.string().min(1, "Medication name is required"),
+  dosage: z.string().min(1, "Dosage is required"),
+  frequency: z.string().min(1, "Frequency is required"),
+  timing: z.string().optional(),
+  duration: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+const patientInputSchema = z
+  .object({
+    facilityName: z.string().min(1, "Facility name is required"),
+    facilityCode: z.string().optional(),
+    wardName: z.string().optional(),
+    admissionDate: z.string().min(1, "Admission date is required"),
+    dischargeDate: z.string().min(1, "Discharge date is required"),
+    patientName: z.string().min(1, "Patient name is required"),
+    age: z.coerce.number().int().min(0).max(130),
+    gender: z.enum(["Male", "Female", "Other"]),
+    hospitalNumber: z.string().min(1, "Hospital number is required"),
+    nhisNumber: z.string().optional(),
+    diagnosis: z.string().min(1, "Diagnosis is required"),
+    treatmentGiven: z.string().min(1, "Treatment summary is required"),
+    proceduresPerformed: z.string().optional(),
+    medications: z.array(medicationSchema).min(1, "At least one medication is required"),
+    followUpInstructions: z.string().optional(),
+    additionalNotes: z.string().optional(),
+    languageRequested: z.enum(["en", "ha", "yo", "ig"]).optional(),
+    dischargedBy: z.string().min(1, "Clinician name is required"),
+    clinicianLicenseNo: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.admissionDate || !data.dischargeDate) return true;
+      return new Date(data.dischargeDate) >= new Date(data.admissionDate);
+    },
+    {
+      message: "Discharge date must be on or after admission date",
+      path: ["dischargeDate"],
+    },
+  );
+
+export type PatientInputFormData = z.infer<typeof patientInputSchema>;
+
+interface PatientInputFormProps {
+  onSubmit: (data: PatientInputFormData) => void;
+  isGenerating?: boolean;
+}
+
+export function PatientInputForm({
+  onSubmit,
+  isGenerating = false,
+}: PatientInputFormProps) {
+  const form = useForm<PatientInputFormData>({
+    resolver: zodResolver(patientInputSchema) as unknown as Resolver<PatientInputFormData>,
+    defaultValues: {
+      facilityName: "",
+      facilityCode: "",
+      wardName: "",
+      admissionDate: "",
+      dischargeDate: "",
+      patientName: "",
+      age: undefined,
+      gender: undefined,
+      hospitalNumber: "",
+      nhisNumber: "",
+      diagnosis: "",
+      treatmentGiven: "",
+      proceduresPerformed: "",
+      medications: [{ name: "", dosage: "", frequency: "", timing: "", duration: "", notes: "" }],
+      followUpInstructions: "",
+      additionalNotes: "",
+      languageRequested: "en",
+      dischargedBy: "",
+      clinicianLicenseNo: "",
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="facilityName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Facility Name <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g. Lagos University Teaching Hospital" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="facilityCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-cool-grey">
+                  Facility Code <span className="text-xs">(optional)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. LUTH-001" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="wardName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-cool-grey">
+                  Ward Name <span className="text-xs">(optional)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. Medical Ward B" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="admissionDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Admission Date <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dischargeDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Discharge Date <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="patientName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Patient Name <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Full name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="age"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Age <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input type="number" min={0} max={130} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Gender <span className="text-red-500">*</span>
+                </FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="hospitalNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Hospital Number <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. LUTH/2024/00412" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nhisNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-cool-grey">
+                  NHIS Number <span className="text-xs">(optional)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. NHIS/0045231" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="diagnosis"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Diagnosis <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Primary diagnosis and secondary conditions"
+                  rows={3}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="treatmentGiven"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Treatment Given <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Summary of treatment during admission"
+                  rows={3}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="proceduresPerformed"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-cool-grey">
+                Procedures Performed <span className="text-xs">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="List procedures, one per line, or leave empty"
+                  rows={2}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <MedicationRow />
+
+        <FormField
+          control={form.control}
+          name="followUpInstructions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-cool-grey">
+                Follow-up Instructions <span className="text-xs">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Clinical follow-up recommendations"
+                  rows={2}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="additionalNotes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-cool-grey">
+                Additional Notes <span className="text-xs">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Supplementary clinical notes"
+                  rows={2}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="dischargedBy"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Discharged By <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Clinician full name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="clinicianLicenseNo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-cool-grey">
+                  MDCN Licence No. <span className="text-xs">(optional)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. MDCN/2015/07821" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <LanguageSelector />
+
+        <Button type="submit" disabled={isGenerating} className="w-full touch-target-min" size="lg">
+          {isGenerating ? "Generating..." : "Generate Discharge Summary"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
