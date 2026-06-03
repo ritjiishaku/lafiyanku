@@ -48,7 +48,7 @@ function resolve(ref) {
 const skipTypographyVars = new Set(['text-case', 'text-decoration', 'paragraph-indent', 'paragraph-spacing']);
 
 let css = `/* ========================================
-   CareFlow AI — Design Tokens
+   CareFlow — Design Tokens
    Auto-generated from token-colour.json
    and token-typography.json
    ======================================== */

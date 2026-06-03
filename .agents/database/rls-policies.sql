@@ -6,7 +6,7 @@
 # Purpose: Complete Supabase Row Level Security (RLS) policies — facility isolation, role-based access, audit log protection.
 
 -- ============================================
--- CareFlow AI — Row Level Security Policies
+-- CareFlow — Row Level Security Policies
 -- Stack: Supabase (PostgreSQL 15+)
 -- Migration ID: 20260602_rls_policies
 -- ============================================

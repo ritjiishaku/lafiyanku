@@ -1,4 +1,4 @@
-# CareFlow AI
+# CareFlow
 
 **AI-powered clinical discharge documentation for Nigerian hospitals.**
 
@@ -388,4 +388,4 @@ Internal use. Not for clinical distribution without verification.
 
 ---
 
-*CareFlow AI — Built for Nigerian hospitals, clinics, and telemedicine providers.*
+*CareFlow — Built for Nigerian hospitals, clinics, and telemedicine providers.*

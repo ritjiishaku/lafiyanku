@@ -212,4 +212,4 @@ This ensures the audit trail always reflects the exact state at finalisation.
 
 ---
 
-*CareFlow AI — Finalise Record Workflow v1.0*
+*CareFlow — Finalise Record Workflow v1.0*

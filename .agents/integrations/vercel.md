@@ -7,11 +7,11 @@
 
 # PRD reference: CFW-PRD-001 v1.0
 
-# Purpose: Complete Vercel deployment reference for CareFlow AI — vercel.json configuration, serverless function timeouts, environment variables, build settings, Edge vs Node.js runtime, preview deployments, custom domains, analytics, logging, and common deployment errors.
+# Purpose: Complete Vercel deployment reference for CareFlow — vercel.json configuration, serverless function timeouts, environment variables, build settings, Edge vs Node.js runtime, preview deployments, custom domains, analytics, logging, and common deployment errors.
 
 ## Overview
 
-CareFlow AI is deployed on **Vercel** using the Next.js framework preset. All API routes (including DeepSeek AI calls) run as serverless functions. The frontend is statically generated where possible, with dynamic routes for discharge records and audit logs.
+CareFlow is deployed on **Vercel** using the Next.js framework preset. All API routes (including DeepSeek AI calls) run as serverless functions. The frontend is statically generated where possible, with dynamic routes for discharge records and audit logs.
 
 ---
 
@@ -136,7 +136,7 @@ vercel --prod
 
 ## Serverless Function Timeouts
 
-| Plan         | Default Timeout | Maximum Timeout | CareFlow AI Setting |
+| Plan         | Default Timeout | Maximum Timeout | CareFlow Setting |
 | ------------ | --------------- | --------------- | ------------------- |
 | Hobby (Free) | 10s             | 60s             | 30s for AI routes   |
 | Pro          | 15s             | 300s            | 30s for AI routes   |
@@ -156,7 +156,7 @@ The Hobby plan has a **60-second hard limit**. Setting `maxDuration: 30` is safe
 
 ## Runtime: Node.js vs Edge Functions
 
-| Runtime      | Use Case                                          | CareFlow AI Usage                          |
+| Runtime      | Use Case                                          | CareFlow Usage                          |
 | ------------ | ------------------------------------------------- | ------------------------------------------ |
 | Node.js 20.x | Long-running tasks, AI calls, database operations | ✅ **All API routes**                      |
 | Edge         | Low-latency, simple responses, geolocation        | ❌ Not used (DeepSeek calls would timeout) |
@@ -310,7 +310,7 @@ export default nextConfig;
 
 Every pull request automatically gets a preview deployment.
 
-### Benefits for CareFlow AI:
+### Benefits for CareFlow:
 
 - Test AI generation with real DeepSeek API (use separate API key for preview)
 - Verify Supabase RLS policies with preview database
@@ -444,7 +444,7 @@ export async function POST(req: Request) {
 
 ## Performance Monitoring
 
-### Core Web Vitals Targets for CareFlow AI
+### Core Web Vitals Targets for CareFlow
 
 | Metric                         | Target | Measurement        |
 | ------------------------------ | ------ | ------------------ |

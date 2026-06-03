@@ -163,4 +163,4 @@ Every WhatsApp share must write an AuditLog entry.
 
 ---
 
-*CareFlow AI — WhatsApp Share Skill v1.0*
+*CareFlow — WhatsApp Share Skill v1.0*

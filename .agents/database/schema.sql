@@ -6,7 +6,7 @@
 # Purpose: Complete Postgres SQL migration file — all tables, enums, constraints, indexes, and audit log protection trigger.
 
 -- ============================================
--- CareFlow AI — Complete Database Schema
+-- CareFlow — Complete Database Schema
 -- Stack: Supabase (PostgreSQL 15+)
 -- Migration ID: 20260602_initial_schema
 -- ============================================

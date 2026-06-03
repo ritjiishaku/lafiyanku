@@ -186,7 +186,7 @@ Copy this to `.env.local` for local development:
 
 ```bash
 # ============================================
-# CareFlow AI — Local Development Environment
+# CareFlow — Local Development Environment
 # ============================================
 
 # Supabase (get from https://supabase.com/dashboard/project/_/settings/api)

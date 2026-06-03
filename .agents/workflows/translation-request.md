@@ -261,4 +261,4 @@ These rules apply in both trigger paths:
 
 ---
 
-*CareFlow AI — Translation Request Workflow v1.0*
+*CareFlow — Translation Request Workflow v1.0*

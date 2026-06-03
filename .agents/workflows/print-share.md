@@ -332,4 +332,4 @@ Return the DischargeRecord data as JSON:
 
 ---
 
-*CareFlow AI — Print and Share Workflow v1.0*
+*CareFlow — Print and Share Workflow v1.0*

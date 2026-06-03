@@ -9,7 +9,7 @@
 
 ## Overview
 
-This is the primary workflow in CareFlow AI. It covers everything from the
+This is the primary workflow in CareFlow. It covers everything from the
 clinician opening the form to the generated output being available for
 review. Every step that writes to the database is labelled [DB WRITE].
 
@@ -273,4 +273,4 @@ Finalisation is handled in the separate Finalise Record workflow:
 
 ---
 
-*CareFlow AI — New Discharge Workflow v1.0*
+*CareFlow — New Discharge Workflow v1.0*

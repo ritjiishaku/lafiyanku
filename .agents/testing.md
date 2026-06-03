@@ -7,11 +7,11 @@
 
 # PRD reference: CFW-PRD-001 v1.0
 
-# Purpose: Testing strategy and checklist for CareFlow AI — unit tests, integration tests, Supabase RLS tests, manual pilot test checklist, and performance/security testing requirements.
+# Purpose: Testing strategy and checklist for CareFlow — unit tests, integration tests, Supabase RLS tests, manual pilot test checklist, and performance/security testing requirements.
 
 ## Testing Overview
 
-CareFlow AI requires comprehensive testing across multiple layers:
+CareFlow requires comprehensive testing across multiple layers:
 
 - **Unit tests** (Jest + React Testing Library) — component logic and utilities
 - **Integration tests** (API routes) — end-to-end workflow validation

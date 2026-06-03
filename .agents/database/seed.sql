@@ -6,7 +6,7 @@
 # Purpose: Dev seed data for local testing — users, facilities, patient records, discharge records, translations, and audit logs.
 
 -- ============================================
--- CareFlow AI — Development Seed Data
+-- CareFlow — Development Seed Data
 -- IMPORTANT: Dev seed only. Never run in production.
 -- Run with: supabase db reset
 -- ============================================

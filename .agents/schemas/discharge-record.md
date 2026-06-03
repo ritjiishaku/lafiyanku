@@ -212,4 +212,4 @@ PatientInput (1)
 
 ---
 
-*CareFlow AI — DischargeRecord Schema Reference v1.0*
+*CareFlow — DischargeRecord Schema Reference v1.0*

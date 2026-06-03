@@ -198,4 +198,4 @@ Do not trigger AI generation until all required fields pass server-side validati
 
 ---
 
-*CareFlow AI — Patient Input Form Skill v1.0*
+*CareFlow — Patient Input Form Skill v1.0*

@@ -114,7 +114,7 @@ CFW_MAX_CONCURRENT_USERS
 ├── AGENTS.md
 ├── docs/
 │   ├── CareFlow_PRD_v1.0.md
-│   └── CareFlow_AI_System_Prompt_v2.md
+│   └── CareFlow_System_Prompt_v2.md
 ├── .agents/
 │   ├── architecture.md
 │   ├── code-style.md
@@ -386,5 +386,5 @@ They are for internal record-keeping and compliance only.
 
 ---
 
-*CareFlow AI — Code Style v1.0*
+*CareFlow — Code Style v1.0*
 *Internal use only.*

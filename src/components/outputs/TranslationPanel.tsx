@@ -22,7 +22,14 @@ export function TranslationPanel({
         <CardTitle className="text-deep-navy">
           Translation ({languageLabel})
           {confidence === "low" && (
-            <span className="ml-2 text-xs text-warm-amber">Low confidence</span>
+            <span className="ml-2 inline-flex items-center gap-1 rounded bg-warm-amber/10 px-2 py-0.5 text-xs text-warm-amber">
+              ⚠ Fallback — low confidence
+            </span>
+          )}
+          {confidence === "failed" && (
+            <span className="ml-2 inline-flex items-center gap-1 rounded bg-red-50 px-2 py-0.5 text-xs text-red-600">
+              ⚠ Translation failed — English shown
+            </span>
           )}
         </CardTitle>
       </CardHeader>

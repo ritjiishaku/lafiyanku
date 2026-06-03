@@ -242,4 +242,4 @@ be stored and displayed as two separate fields. A single `Date` or
 
 ---
 
-*CareFlow AI — PatientInput Schema Reference v1.0*
+*CareFlow — PatientInput Schema Reference v1.0*

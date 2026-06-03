@@ -234,5 +234,5 @@ When generating printable output (Mode 2 patient handout):
 
 ---
 
-*CareFlow AI — Design System v1.0*
+*CareFlow — Design System v1.0*
 *Internal use only.*

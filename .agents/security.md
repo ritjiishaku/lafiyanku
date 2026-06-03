@@ -229,5 +229,5 @@ from Hospital B.
 
 ---
 
-*CareFlow AI — Security Requirements v1.0*
+*CareFlow — Security Requirements v1.0*
 *Internal use only.*

@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow AI — Complete Database Schema
+-- CareFlow — Complete Database Schema
 -- Stack: Supabase (PostgreSQL 15+)
 -- Migration ID: 20260602_initial_schema
 -- ============================================
@@ -28,6 +28,35 @@ CREATE TYPE user_role_enum AS ENUM ('doctor', 'nurse', 'admin');
 
 -- Audit action enum
 CREATE TYPE audit_action_enum AS ENUM ('generate', 'edit', 'view', 'finalise', 'archive', 'print', 'export');
+
+-- ============================================
+-- TABLE: facilities
+-- Stores hospital/clinic facility information
+-- ============================================
+CREATE TABLE facilities (
+    facility_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    facility_name VARCHAR(300) NOT NULL,
+    facility_code VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ============================================
+-- TABLE: profiles
+-- Links Supabase auth.users to application user roles and facility
+-- ============================================
+CREATE TABLE profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255),
+    role user_role_enum NOT NULL DEFAULT 'nurse',
+    facility_id UUID REFERENCES facilities(facility_id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER update_profiles_updated_at
+    BEFORE UPDATE ON profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
 -- TABLE: patient_inputs
@@ -310,7 +339,7 @@ CREATE INDEX idx_patient_inputs_clinician_license ON patient_inputs(clinician_li
 -- SELECT tablename FROM pg_tables WHERE schemaname = 'public'
 -- ORDER BY tablename;
 
--- Expected tables: patient_inputs, discharge_records, translation_requests, audit_logs
+-- Expected tables: facilities, profiles, patient_inputs, discharge_records, translation_requests, audit_logs
 
 -- ============================================
 -- CONSTRAINTS FOR THIS FILE

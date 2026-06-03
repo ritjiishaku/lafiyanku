@@ -176,4 +176,4 @@ for NDPR compliance.
 
 ---
 
-*CareFlow AI — Export and Print Skill v1.0*
+*CareFlow — Export and Print Skill v1.0*

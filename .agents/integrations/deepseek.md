@@ -7,11 +7,11 @@
 
 # PRD reference: CFW-PRD-001 v1.0
 
-# Purpose: Complete DeepSeek API integration reference for CareFlow AI — API endpoint, models, authentication, parameters, prompt templates, error handling, rate limits, and data residency considerations.
+# Purpose: Complete DeepSeek API integration reference for CareFlow — API endpoint, models, authentication, parameters, prompt templates, error handling, rate limits, and data residency considerations.
 
 ## Overview
 
-CareFlow AI uses **DeepSeek API** for both AI generation (Mode 1 + Mode 2 discharge summaries) and translation (Hausa, Yoruba, Igbo). All calls are made directly from Next.js API routes using `fetch`. No third-party SDKs or orchestration layers are used.
+CareFlow uses **DeepSeek API** for both AI generation (Mode 1 + Mode 2 discharge summaries) and translation (Hausa, Yoruba, Igbo). All calls are made directly from Next.js API routes using `fetch`. No third-party SDKs or orchestration layers are used.
 
 ---
 
@@ -62,7 +62,7 @@ DEEPSEEK_API_KEY=sk-your-actual-api-key-here
 | `deepseek-chat`     | Generation + Translation (default)    | $0.14 / $0.28                     |
 | `deepseek-reasoner` | Complex clinical reasoning (fallback) | $0.14 / $0.28 (same pricing)      |
 
-**Recommendation:** Use `deepseek-chat` for all CareFlow AI calls. `deepseek-reasoner` may be used for pilot testing if more detailed reasoning is needed.
+**Recommendation:** Use `deepseek-chat` for all CareFlow calls. `deepseek-reasoner` may be used for pilot testing if more detailed reasoning is needed.
 
 ---
 

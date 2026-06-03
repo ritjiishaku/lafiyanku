@@ -176,4 +176,4 @@ When a translated output is available, display it as a third tab or panel:
 
 ---
 
-*CareFlow AI — Translation Skill v1.0*
+*CareFlow — Translation Skill v1.0*

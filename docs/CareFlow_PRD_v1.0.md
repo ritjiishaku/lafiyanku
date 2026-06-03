@@ -1,4 +1,4 @@
-# CareFlow AI — PRD Reference Card
+# CareFlow — PRD Reference Card
 # File: /docs/CareFlow_PRD_v1.0.md
 # Version: 1.0
 # Last Updated: June 2026
@@ -185,5 +185,5 @@
 
 ---
 
-*CareFlow AI — CFW-PRD-001 v1.0 Reference Card*
+*CareFlow — CFW-PRD-001 v1.0 Reference Card*
 *Internal use only.*

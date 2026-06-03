@@ -201,5 +201,5 @@ Full specification: `.agents/security.md`
 
 ---
 
-*CareFlow AI — Architecture Overview v1.0*
+*CareFlow — Architecture Overview v1.0*
 *Internal use only.*

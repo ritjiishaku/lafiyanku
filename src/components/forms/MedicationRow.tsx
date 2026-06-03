@@ -31,6 +31,7 @@ export function MedicationRow() {
           type="button"
           variant="outline"
           size="sm"
+          className="touch-target-min"
           onClick={() =>
             append({
               name: "",
@@ -91,7 +92,7 @@ export function MedicationRow() {
                     Dosage <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 5mg" />
+                    <Input {...field} placeholder="e.g. 5mg" inputMode="decimal" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

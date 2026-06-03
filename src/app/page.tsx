@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function LandingPage() {
+export default async function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-cool-off-white px-4">
       <div className="w-full max-w-lg text-center">

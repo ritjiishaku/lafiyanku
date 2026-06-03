@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow AI — Row Level Security Policies
+-- CareFlow — Row Level Security Policies
 -- Stack: Supabase (PostgreSQL 15+)
 -- Migration ID: 20260602_rls_policies
 -- ============================================

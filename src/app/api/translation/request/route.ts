@@ -2,19 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { translateText } from "@/services/ai-provider";
 import { createServiceClient } from "@/services/supabase-server";
 import { writeAuditLog } from "@/services/audit-log";
-import { AuditAction } from "@/types/schemas";
+import { AuditAction, UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
+import { auth } from "@/lib/auth";
+
+const VALID_LANGUAGES = ["ha", "yo", "ig"];
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { recordId, targetLanguage, userId, userRole } = body;
+    const session = await auth();
+    if (!session?.user?.id || !session?.user?.role) {
+      return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
+    }
 
-    if (!["ha", "yo", "ig"].includes(targetLanguage)) {
+    const role = session.user.role;
+    if (role !== UserRole.Doctor && role !== UserRole.Nurse) {
+      return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
+    }
+
+    const body = await request.json();
+    const { recordId, targetLanguage } = body;
+
+    if (!targetLanguage || !VALID_LANGUAGES.includes(targetLanguage)) {
       return NextResponse.json(
         apiError(ErrorCodes.INVALID_LANGUAGE, {
           provided: targetLanguage,
-          allowed: ["ha", "yo", "ig"],
+          allowed: VALID_LANGUAGES,
         }),
         { status: 400 },
       );
@@ -40,35 +53,19 @@ export async function POST(request: NextRequest) {
       targetLanguage,
     );
 
-    if (result.fallbackUsed) {
-      await writeAuditLog({
-        recordId,
-        userId,
-        userRole,
-      action: AuditAction.Edit,
-        ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
-        notes: `Translation to ${targetLanguage} had low confidence. Using English fallback.`,
-      });
+    await supabase.from("translation_requests").insert({
+      request_id: crypto.randomUUID(),
+      record_id: recordId,
+      source_text: record.patient_friendly_output,
+      target_language: targetLanguage,
+      output_text: result.confidence === "failed" ? null : result.translatedOutput,
+      confidence: result.confidence === "failed" ? null : result.confidence,
+      fallback_used: result.fallbackUsed ? "yes" : "no",
+      requested_at: new Date().toISOString(),
+      completed_at: result.confidence !== "failed" ? new Date().toISOString() : null,
+    });
 
-      return NextResponse.json({
-        success: true,
-        warning: {
-          code: "TRANSLATION_LOW_CONFIDENCE",
-          message: "Translation confidence is low. English version will be shown.",
-          details: {
-            targetLanguage,
-            confidence: result.confidence,
-            fallbackUsed: true,
-          },
-        },
-        data: {
-          translatedOutput: null,
-          patientFriendlyOutput: record.patient_friendly_output,
-        },
-      });
-    }
-
-    const { error: updateError } = await supabase
+    await supabase
       .from("discharge_records")
       .update({
         translated_output: result.translatedOutput,
@@ -77,21 +74,15 @@ export async function POST(request: NextRequest) {
       })
       .eq("record_id", recordId);
 
-    if (updateError) {
-      return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPDATE translation" }),
-        { status: 500 },
-      );
-    }
-
     await writeAuditLog({
       recordId,
-      userId,
-      userRole,
+      userId: session.user.id,
+      userRole: role as any,
       action: AuditAction.Edit,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
-      changesDiff: { translationLanguage: targetLanguage },
-      notes: `Translation completed for ${targetLanguage}`,
+      notes: result.fallbackUsed
+        ? `Translation to ${targetLanguage} had low confidence. English fallback used.`
+        : `Translation completed for ${targetLanguage}`,
     });
 
     return NextResponse.json({
@@ -100,7 +91,16 @@ export async function POST(request: NextRequest) {
         translatedOutput: result.translatedOutput,
         translationLanguage: targetLanguage,
         confidence: result.confidence,
+        fallbackUsed: result.fallbackUsed,
       },
+      ...(result.fallbackUsed
+        ? {
+            warning: {
+              code: "TRANSLATION_LOW_CONFIDENCE",
+              message: `Translation into ${targetLanguage === "ha" ? "Hausa" : targetLanguage === "yo" ? "Yoruba" : "Igbo"} could not be completed with sufficient confidence.`,
+            },
+          }
+        : {}),
     });
   } catch {
     return NextResponse.json(

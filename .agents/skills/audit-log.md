@@ -307,4 +307,4 @@ direct user API calls.
 
 ---
 
-*CareFlow AI — AuditLog Schema Reference v1.0*
+*CareFlow — AuditLog Schema Reference v1.0*

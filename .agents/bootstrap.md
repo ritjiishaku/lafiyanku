@@ -438,7 +438,7 @@ curl -X POST https://api.deepseek.com/v1/chat/completions \
 ```bash
 git init
 git add .
-git commit -m "chore: initial CareFlow AI setup with Next.js + Supabase + DeepSeek"
+git commit -m "chore: initial CareFlow setup with Next.js + Supabase + DeepSeek"
 ```
 
 ---

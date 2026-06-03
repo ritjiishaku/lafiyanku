@@ -12,7 +12,7 @@
 The Nigeria Data Protection Regulation (NDPR) 2019, issued by the National
 Information Technology Development Agency (NITDA), governs the processing of
 personal data of Nigerian citizens. Patient health data processed by
-CareFlow AI is sensitive personal data under NDPR and is subject to its
+CareFlow is sensitive personal data under NDPR and is subject to its
 highest level of protection.
 
 Non-compliance with NDPR can result in fines of up to 10 million naira or
@@ -23,7 +23,7 @@ that could end a hospital procurement relationship.
 
 ## 2. Lawful Basis for Processing
 
-CareFlow AI processes patient health data on the basis of **explicit consent**.
+CareFlow processes patient health data on the basis of **explicit consent**.
 
 ### Requirements
 
@@ -78,7 +78,7 @@ Collect only the data necessary to generate discharge documentation.
 
 ## 5. Data Subject Rights
 
-CareFlow AI must support the following rights for patients whose data is processed:
+CareFlow must support the following rights for patients whose data is processed:
 
 ### 5.1 Right of Access
 - A patient (or their authorised representative) can request a copy of all
@@ -143,7 +143,7 @@ CareFlow AI must support the following rights for patients whose data is process
 
 ## 8. Data Protection Officer (DPO)
 
-- CareFlow AI (as a data processor handling health data) must appoint a DPO
+- CareFlow (as a data processor handling health data) must appoint a DPO
 - The DPO must be registered with NITDA
 - DPO contact details must be displayed in the app's privacy policy
 - DPO must conduct an annual data protection audit
@@ -203,5 +203,5 @@ touching patient data is considered complete.
 
 ---
 
-*CareFlow AI — NDPR 2019 Compliance Reference v1.0*
+*CareFlow — NDPR 2019 Compliance Reference v1.0*
 *Internal use only.*

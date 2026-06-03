@@ -40,7 +40,7 @@ Public (no authentication required)
 
 ### Purpose
 
-Marketing/landing page for CareFlow AI. Redirects authenticated users to `/dashboard`. Shows hero section, features, and login CTA for unauthenticated users.
+Marketing/landing page for CareFlow. Redirects authenticated users to `/dashboard`. Shows hero section, features, and login CTA for unauthenticated users.
 
 ### Key Components
 

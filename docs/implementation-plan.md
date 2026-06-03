@@ -1,31 +1,32 @@
-# CareFlow AI — Implementation Plan
-# Document ID: CFW-PLAN-001 v1.0
+# CareFlow — 7-Day Implementation Plan
+# Document ID: CFW-PLAN-002 v1.0
 # PRD Reference: CFW-PRD-001 v1.0
-# Date: 2026-06-02
+# Date: 2026-06-03
 
 ---
 
 ## Build Order
 
-Build strictly per AGENTS.md milestones. Do not skip ahead.
-
-| Milestone | Scope | Phase(s) | Target |
-|-----------|-------|----------|--------|
-| M1 | System prompt locked; schemas approved; UI wireframes done | 0–2 | Week 2 |
-| M2 | PatientInput form + AI generation + output display; no auth | 4–6 | Week 4 |
-| M3 | Auth + roles + translation + audit + export/print | 3, 7–10 | Week 7 |
-| M4 | Pilot onboarding | 13 | Week 10 |
+| Day | Focus | Phases | Output |
+|-----|-------|--------|--------|
+| 1 | Bootstrap + Scaffold | 0–1 | Running Next.js app, all folders, schemas, error codes, UI components |
+| 2 | Data Layer + Auth | 2–3 | Supabase clients, audit service, env validation, NextAuth + middleware + login + role gate |
+| 3 | PatientInput Form + AI Engine | 4–5 | 19-field form with Zod, medication rows, language selector, offline cache, DeepSeek integration, generate route |
+| 4 | Output Display + Record Lifecycle | 6–7 | Side-by-side output viewer, inline editing, finalise/archive workflows, status badges, warning banners |
+| 5 | Translation + Export/Print | 8–9 | Translate/retranslate UI, browser print (patient handout), WhatsApp share, PDF export route |
+| 6 | Audit + Pages/Navigation | 10–11 | Audit log API + table, dashboard with search/filter, settings, detail page, role-aware sidebar |
+| 7 | Testing + Deployment + Bug Fixes | 12–13 | 4 unit test files (28 tests), vitest config, vercel.json, env var template, comprehensive bug audit fixes |
 
 ---
 
-## Phase 0 — Environment Bootstrap
+## Day 1 — Bootstrap + Scaffold
 
-### Step 0.1 — Create Next.js app
+### 1.1 Create Next.js app
 ```bash
 npx create-next-app@latest careflow --typescript --tailwind --app --eslint --src-dir --import-alias "@/*"
 ```
 
-### Step 0.2 — Install dependencies
+### 1.2 Install dependencies
 ```bash
 npx shadcn-ui@latest init -d
 npx shadcn-ui@latest add button card input label select textarea tabs dialog alert
@@ -38,39 +39,22 @@ npm install --save-dev @types/uuid
 npm install next-auth @auth/core
 npm install lucide-react next-themes
 npm install class-variance-authority clsx tailwind-merge
-npm install --save-dev @types/node @types/react @types/react-dom
-npm install --save-dev jest @testing-library/react @testing-library/jest-dom
-npm install --save-dev typescript eslint prettier
 ```
 
-### Step 0.3 — Set up Supabase locally
+### 1.3 Supabase init + migrations
 ```bash
 supabase init
 supabase start
-# Copy local API URL + anon key + service role key to .env.local
 ```
+- Create `supabase/migrations/{ts}_initial_schema.sql` with 6 tables + enums + triggers + indexes
+- Create `supabase/migrations/{ts}_rls_policies.sql` with RLS helper functions + policies
+- Create `supabase/seed.sql` with 3 facilities + 3 users (bcrypt)
 
-### Step 0.4 — Database migrations
-- Create `supabase/migrations/{timestamp}_initial_schema.sql` from `.agents/database/schema.sql`
-- Create `supabase/migrations/{timestamp}_rls_policies.sql` from `.agents/database/rls-policies.sql`
-- Create `supabase/seed.sql` from `.agents/database/seed.sql`
-- Run: `supabase db push` (x2) then `supabase db reset`
+### 1.4 Env vars + design tokens
+- Create `.env.local` with 15+ vars (Supabase URL/keys, DeepSeek key, AUTH_SECRET)
+- Update globals.css: Plus Jakarta Sans import, brand colour tokens (`clinicalTeal: #0B6E6E`, `deepNavy: #0D2B4E`, `warmAmber: #B45309`), `.touch-target-min` utility
 
-### Step 0.5 — Environment variables
-Create `.env.local` from template in `.agents/environment.md`. Add to `.gitignore`.
-
-### Step 0.6 — Design tokens
-- Update `tailwind.config.ts` with brand colours from `.agents/design-system.md`:
-  `clinicalTeal: "#0B6E6E"`, `deepNavy: "#0D2B4E"`, `warmAmber: "#B45309"`, etc.
-- Update `app/globals.css` with Plus Jakarta Sans import + M3 semantic tokens from `.tokens/tokens.css`
-- Add utility: `.touch-target-min { min-width: 44px; min-height: 44px; }`
-
----
-
-## Phase 1 — Project Scaffold
-
-### Step 1.1 — Create folder structure
-
+### 1.5 Create folder structure + schemas + error codes
 ```
 app/api/health/route.ts
 app/api/discharge/generate/route.ts
@@ -81,383 +65,334 @@ app/api/discharge/[id]/export/route.ts
 app/api/translation/request/route.ts
 app/api/audit/[recordId]/route.ts
 
-app/page.tsx                          # Landing page
-app/dashboard/page.tsx
-app/discharge/new/page.tsx
-app/discharge/[id]/page.tsx
-app/discharge/[id]/output/page.tsx
-app/audit/[recordId]/page.tsx
-app/auth/login/page.tsx
-app/settings/page.tsx
+app/page.tsx, /dashboard, /discharge/new, /discharge/[id], /discharge/[id]/output
+app/audit/[recordId], /auth/login, /settings
 
-src/components/forms/PatientInputForm.tsx
-src/components/forms/MedicationRow.tsx
-src/components/forms/LanguageSelector.tsx
-src/components/outputs/ClinicalSummaryPanel.tsx
-src/components/outputs/PatientInstructionsPanel.tsx
-src/components/outputs/TranslationPanel.tsx
-src/components/outputs/MissingFieldsBanner.tsx
-src/components/outputs/FlaggedIssuesBanner.tsx
-src/components/actions/GenerateButton.tsx
-src/components/actions/FinaliseButton.tsx
-src/components/actions/PrintButton.tsx
-src/components/actions/WhatsAppShareButton.tsx
-src/components/actions/ExportPDFButton.tsx
-src/components/layout/AppShell.tsx
-src/components/layout/Sidebar.tsx
-src/components/layout/TopNav.tsx
-src/components/layout/RoleGate.tsx
-src/components/shared/StatusBadge.tsx
-src/components/shared/AuditLogTable.tsx
-src/components/shared/ConfirmModal.tsx
-src/components/shared/OfflineBanner.tsx
-src/components/shared/LoadingSpinner.tsx
+src/components/forms/PatientInputForm, MedicationRow, LanguageSelector
+src/components/outputs/ClinicalSummaryPanel, PatientInstructionsPanel, TranslationPanel
+src/components/outputs/MissingFieldsBanner, FlaggedIssuesBanner
+src/components/actions/GenerateButton, FinaliseButton, PrintButton, WhatsAppShareButton
+src/components/layout/AppShell, Sidebar, TopNav, RoleGate
+src/components/shared/StatusBadge, AuditLogTable, ConfirmModal, OfflineBanner, LoadingSpinner
 
-src/services/ai-provider.ts
-src/services/supabase-client.ts
-src/services/supabase-server.ts
-src/services/audit-log.ts
-src/lib/env-validation.ts
-src/lib/utils.ts
-src/hooks/useOfflineDraft.ts
-src/hooks/useRole.ts
+src/services/ai-provider.ts, supabase-client.ts, supabase-server.ts, audit-log.ts
+src/lib/env-validation.ts, utils.ts, error-codes.ts
+src/hooks/useOfflineDraft.ts, useRole.ts
 src/types/schemas.ts
 ```
+- `src/types/schemas.ts`: 6 enums + 5 interfaces
+- `src/lib/error-codes.ts`: 22 error codes from `.agents/api/error-codes.md`
 
-### Step 1.2 — TypeScript types
-Create `src/types/schemas.ts` — interfaces mirroring every schema from `.agents/schemas/`:
-- `PatientInput` (camelCase, all fields + Medication sub-array)
-- `DischargeRecord`
-- `AuditLog`
-- `TranslationRequest`
-- `Medication` (sub-type)
-- Enums: `UserRole`, `RecordStatus`, `AuditAction`, `Language`, `TranslationConfidence`, `Gender`
-
-### Step 1.3 — Error codes
-Create a constants file `src/lib/error-codes.ts` mapping all 22 error codes from `.agents/api/error-codes.md`.
+### 1.6 Build verification
+```bash
+npm run build  # Must pass cleanly
+```
 
 ---
 
-## Phase 2 — Data Layer (Services)
+## Day 2 — Data Layer + Auth
 
-### Step 2.1 — Supabase clients
+### 2.1 Supabase clients
 - `src/services/supabase-client.ts`: `createBrowserClient()` from `@supabase/ssr`
-- `src/services/supabase-server.ts`: `createServerClient()` with service role key for server-side writes
+- `src/services/supabase-server.ts`: `createServiceClient()` with service role key for server-side writes
 
-### Step 2.2 — Audit log service
+### 2.2 Audit log service
 `src/services/audit-log.ts`:
 - `writeAuditLog(entry)` — always include `ipAddress`, always write before returning
-- Critical: if write fails, throw `AUDIT_LOG_WRITE_FAILED` — never proceed silently
-- `changesDiff` required for `edit`, `finalise`, `archive` actions; null otherwise
+- `getAuditLogs(recordId, { page, limit })` — paginated, ordered by timestamp desc
 
-### Step 2.3 — Env validation
-`src/lib/env-validation.ts`:
-- Check required server vars: `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
-- Check required public vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`
-- Call from `instrumentation.ts` or `middleware.ts` to fail fast
+### 2.3 Env validation
+`src/lib/env-validation.ts`: check required server + public env vars, fail fast
 
----
+### 2.4 NextAuth.js v5
+- `src/lib/auth.ts`: Credentials provider + Supabase Auth, session expiry 8 hours, rate limit (5 attempts/10 min)
+- `app/api/auth/[...nextauth]/route.ts` — thin wrapper exporting handlers
+- `src/middleware.ts` — protects `/dashboard`, `/discharge/*`, `/audit/*`, `/settings`, `/api/discharge/*`, `/api/audit/*`, `/api/translation/*`
 
-## Phase 3 — Authentication & Role System (M3)
+### 2.5 Auth fixes (from bug audit)
+- All API routes use `const session = await auth()` from NextAuth — never read userId/userRole from request body or headers
+- Removes client-side auth bypass vulnerability
 
-### Step 3.1 — NextAuth.js setup
-- `app/api/auth/[...nextauth]/route.ts` — Supabase adapter, credentials/email provider
-- Session expiry: 8 hours (one clinical shift)
-- Failed login rate limit: 5 attempts in 10 minutes → lockout
+### 2.6 Role gate + login page
+- `RoleGate.tsx`: allowedRoles prop, fallback render, server-side enforce via `auth()` everywhere
+- `AuthProvider.tsx`: SessionProvider wrapper
+- `app/auth/login/page.tsx` + `LoginForm.tsx`: email/password, NDPR consent, loading/error states
 
-### Step 3.2 — Middleware
-`middleware.ts`:
-- Refresh Supabase session on every request
-- Protect all `/dashboard`, `/discharge/*`, `/audit/*`, `/settings` routes
-- Redirect unauthenticated users to `/auth/login`
-
-### Step 3.3 — Role gate
-`src/components/layout/RoleGate.tsx`:
-- Props: `allowedRoles: UserRole[]`, `fallback?: ReactNode`
-- Server-side enforcement in every API route via `requireRole()` helper
-- Client-side: wraps UI elements for UX (never security boundary)
-
-### Step 3.4 — Login page
-`app/auth/login/page.tsx`:
-- NDPR consent notice
-- Email/password (with password reset)
-- Deep Navy heading, Clinical Teal primary button
+### 2.7 Build + verify
+```bash
+npm run build
+```
 
 ---
 
-## Phase 4 — Patient Input Form (M2, FR-01 to FR-08)
+## Day 3 — PatientInput Form + AI Engine
 
-### Step 4.1 — Form component
-`src/components/forms/PatientInputForm.tsx`:
-- 19 fields in exact order from `.agents/skills/patient-input-form.md`
-- `react-hook-form` + Zod resolver
-- Field-specific error messages on blur (red border `#C0392B`)
-- All errors shown simultaneously on Generate click → scroll to first error
-- Optional fields labelled `(optional)` in Cool Grey (`#64748B`)
-- Required fields marked with red `*`
+### 3.1 Zod schemas
+```
+medicationSchema: name, dosage, frequency (required) + timing, duration, notes (optional)
+patientInputSchema: 19 fields + .refine(dischargeDate >= admissionDate)
+```
 
-### Step 4.2 — Medication rows
-`src/components/forms/MedicationRow.tsx`:
-- Repeating rows: name, dosage, frequency (required) + timing, duration, notes (optional)
-- Add button: "＋ Add medication" — 44×44px tap target
-- Remove button per row (hidden on row 1 — min 1 row always present)
-- Tab order: all fields in row 1 → row 2 → ...
+### 3.2 PatientInputForm component
+- 19 fields in order: facilityName, facilityCode, wardName, admissionDate, dischargeDate, patientName, age, gender, hospitalNumber, nhisNumber, diagnosis, treatmentGiven, proceduresPerformed, medications[], followUpInstructions, additionalNotes, languageRequested, dischargedBy, clinicianLicenseNo
+- Field-specific errors on blur, all errors on Generate click, scroll to first error
+- Optional fields labelled `(optional)` in Cool Grey, required marked with red `*`
 
-### Step 4.3 — Language selector
-`src/components/forms/LanguageSelector.tsx`:
-- Label: "Output language for patient instructions"
-- Options: English (default), Hausa, Yoruba, Igbo
-- Stored as ISO code: `en` | `ha` | `yo` | `ig`
+### 3.3 MedicationRow + LanguageSelector
+- Repeating rows with Add/Remove (min 1), 44px tap targets
+- Language dropdown: English (default) / Hausa / Yoruba / Igbo
 
-### Step 4.4 — Offline caching
-`src/hooks/useOfflineDraft.ts`:
-- Cache form state debounced at 500ms per field change
-- Survives page reload (localStorage, scoped to user)
-- Amber banner when offline: "You are offline — your form is saved locally."
-- Block Generate button when offline
-- Restore cached draft on form load if available
+### 3.4 Offline draft (useOfflineDraft)
+- Debounced 500ms auto-save to localStorage
+- Online/offline detection via `navigator.onLine`
+- Amber OfflineBanner when offline, block Generate
+- Restore cached draft on mount
 
-### Step 4.5 — Save-as-draft (FR-07, Should have)
-- "Save draft" secondary button below form
-- No validation required — saves raw state
-- Success toast: "Draft saved successfully."
-
----
-
-## Phase 5 — AI Generation Engine (M2, FR-09 to FR-20)
-
-### Step 5.1 — AI provider service
+### 3.5 AI provider service
 `src/services/ai-provider.ts`:
-- `generateDischarge(input)` → calls DeepSeek with system prompt v2.0
-- `translateText(input)` → separate DeepSeek call at temperature 0.2
-- Timeout: AbortController at 25s server-side
-- Split response at "PATIENT DISCHARGE INSTRUCTIONS" marker into Mode 1 / Mode 2
-- Validate: Red Flag Warnings present, Discharged By present, When to return present
-- Error mapping per `.agents/api/error-codes.md`
-- Abstract interface — swap provider by changing one file
+- `generateDischarge(input)` → DeepSeek with system prompt v2.0, AbortController 25s timeout
+- `translateText(source, target)` → separate DeepSeek call at temperature 0.1
+- `validateInput()` — 11 required fields + medication dosage/frequency + date contradictions
+- `validateOutput()` — checks Red Flag Warnings, Discharged By, When to Return, Follow-Up Appointment present
 
-### Step 5.2 — Generate API route
+### 3.6 Generate API route
 `POST /api/discharge/generate`:
-1. Server-side validate all required PatientInput fields
-2. Call `generateDischarge()` (with translation if `languageRequested !== "en"`)
-3. Write `DischargeRecord` (status: `draft`)
-4. Write `TranslationRequest` row if translation was requested
-5. Write `AuditLog` entry (action: `generate`)
+1. Auth via `auth()` → role check Doctor/Nurse
+2. Validate `languageRequested` against `["en", "ha", "yo", "ig"]`
+3. Call `generateDischarge()`, then `translateText()` if requested
+4. Insert `discharge_records` first, then `translation_requests` (FK order)
+5. Write AuditLog (action: `generate`)
 6. Return output + missingFieldsLog + flaggedIssues
-7. On failure: no DB writes, return error code, re-enable form
 
-### Step 5.3 — Guardrails enforced
-- Never invent clinical data (FR-11)
-- Never generate diagnoses not provided (FR-12)
-- Never prescribe new medications or alter doses (FR-13)
-- Missing medication dosage/frequency → flag explicitly
-- Missing follow-up → state "No follow-up instructions provided."
-- Always include Red Flag Warnings and Discharged By (guardrails 7–8)
-- Generation metadata stored on record, never in patient-facing output
+### 3.7 Bug fix: generate route guardrails
+- `languageRequested` validated before use (fixes unhandled enum values)
+- `translation_requests` only written when confidence !== "failed" (matches CHECK constraint)
+
+### 3.8 Build + verify
+```bash
+npm run build
+```
 
 ---
 
-## Phase 6 — Output Display (M2, FR-21 to FR-22)
+## Day 4 — Output Display + Record Lifecycle
 
-### Step 6.1 — Output viewer page
+### 4.1 Output viewer page
 `app/discharge/[id]/output/page.tsx`:
-- Mode 1 (clinical) and Mode 2 (patient) as switchable tabs on mobile, side-by-side on desktop
-- Mode 1 gated: Admin cannot see (404 or hidden)
+- Mobile: Tabs (Clinical / Patient / Translation)
+- Desktop lg+: Side-by-side columns
+- Mode 1 gated from Admin (role check)
+- `GET /api/discharge/[id]` joins `patient_inputs` for patient/facility/clinician data
 
-### Step 6.2 — Output panels
-- `ClinicalSummaryPanel`: renders Mode 1 with all 9 sections per template from AGENTS.md
-- `PatientInstructionsPanel`: renders Mode 2 with all 6 sections
-- `TranslationPanel`: third tab when translation exists, amber `⚠ Fallback` badge if low confidence
+### 4.2 Output panels
+- `ClinicalSummaryPanel`: renders Mode 1 with pre wrapper
+- `PatientInstructionsPanel`: renders Mode 2
+- `TranslationPanel`: shows translated output with confidence badge (high/none, low ⚠ Fallback, failed ⚠ Translation failed)
+- `MissingFieldsBanner`: amber list of absent optional fields
+- `FlaggedIssuesBanner`: amber list of input inconsistencies
+- `LoadingSpinner`: centered spinner
 
-### Step 6.3 — Warning banners
-- `MissingFieldsBanner` — amber banner listing absent optional fields
-- `FlaggedIssuesBanner` — amber banner listing input inconsistencies
-- Both styled per `.agents/design-system.md`: amber bg `#FFF8E1`, amber left border `#B45309`
+### 4.3 Inline editing
+- Edit/Save/Cancel buttons
+- `PUT /api/discharge/[id]` — Doctor/Nurse only, blocks archived + finalised records, writes AuditLog with changesDiff
+- Bug fix: PUT no longer accepts `status` field in body (prevents bypassing finalise route)
 
-### Step 6.4 — Inline editing
-- Clinician can edit output text fields directly
-- On save: `PUT /api/discharge/[id]` → updates DischargeRecord + writes AuditLog with changesDiff
-- Doctor editing a finalised record → status reverts to `draft` automatically
+### 4.4 Finalise workflow
+`POST /api/discharge/[id]/finalise`:
+- Auth → Doctor only (via `auth()`, not body)
+- Status checks: must be `draft`, not `archived` or already `finalised`
+- Update status → `finalised`
+- AuditLog with notes (no changesDiff — constraint fix for non-edit actions)
+- `ConfirmModal` before execution
 
----
-
-## Phase 7 — Record Lifecycle (M3)
-
-### Step 7.1 — Finalise workflow
-`POST /api/discharge/[id]/finalise` (per `.agents/workflows/finalise-record.md`):
-- Server-side role check: Doctor only
-- Record existence + facility check
-- Status check: must be `draft`
-- Pre-finalisation completeness check: warn if sections incomplete, never hard-block
-- Confirmation modal before execution
-- Update status to `finalised`
-- Write AuditLog with changesDiff `{ status: { before: "draft", after: "finalised" } }`
-- Enable print/export/share buttons
-
-### Step 7.2 — Archive workflow
+### 4.5 Archive workflow
 `POST /api/discharge/[id]/archive`:
-- Doctor or Admin only
-- Terminal state: no transitions out of `archived`
+- Auth → Doctor or Admin only
+- Status check: not already `archived`
+- Update status → `archived`
+- AuditLog with notes (no changesDiff — constraint fix)
 
-### Step 7.3 — Status badge
-`StatusBadge` — amber (draft), green/success (finalised), grey (archived) per design system
+### 4.6 StatusBadge
+- Amber → Draft, Teal → Finalised, Cool Grey → Archived
+
+### 4.7 Build + verify
+```bash
+npm run build
+```
 
 ---
 
-## Phase 8 — Translation (M3, FR-18 to FR-19)
+## Day 5 — Translation + Export/Print
 
-### Step 8.1 — Translation API
+### 5.1 Translation API
 `POST /api/translation/request`:
-- Role check: Doctor or Nurse
-- Language validation: only `ha` | `yo` | `ig`
-- Call `translateText()` with the source Mode 2 text
-- Confidence heuristic: similarity + length checks
-- Update DischargeRecord + write TranslationRequest row + write AuditLog
+- Auth → Doctor/Nurse only
+- Language validated: `ha` | `yo` | `ig`
+- Calls `translateText()` with Mode 2 source text
+- Writes `translation_requests` row + updates `discharge_records`
+- Writes AuditLog with notes
+- Bug fix: `completed_at` set to null only when confidence is "failed" (matches CHECK constraint)
 
-### Step 8.2 — Translation UI
-- "Translate" button on output panel when no translation exists
-- "Retranslate" button when confidence was `low` or `failed`
-- Language selector modal (ha/yo/ig)
-- Amber warning banner on low confidence:
-  "Translation into [language] could not be completed with sufficient confidence."
+### 5.2 Translation UI
+- Language selector dropdown (Hausa / Yoruba / Igbo) on output page
+- "Translate" button (no translation exists) / "Retranslate" button (low/failed confidence)
+- Loading state while translating
+- Updates local state on success so TranslationPanel renders immediately
 
----
+### 5.3 PrintButton
+- Opens new window with print-optimised HTML
+- Facility header: name, patient name, discharge date, clinician (FR-27)
+- Mode 2 patient-friendly output only
+- Translated version below English when confidence is high or low (FR-26)
+- Low confidence: footnote "Please verify with a fluent speaker"
+- Failed translation: English only + failure message
+- Clean print CSS with clinical-teal headers, proper margins, `@page` rules
 
-## Phase 9 — Export & Print (M3, FR-24 to FR-27)
+### 5.4 WhatsAppShareButton
+- Mobile: `https://wa.me/?text=` deep link
+- Desktop: clipboard copy + green check toast
+- Strips separator lines, removes medication table rows
+- Truncates to 1500 chars preserving red flags as last section
+- Mode 2 only — never shares Mode 1
 
-### Step 9.1 — Browser print (patient handout)
-- `PrintButton` → builds print-optimised HTML with facility header (FR-27), Mode 2 only
-- Translated version below English if confidence high (FR-26)
-- If low confidence: English only + footnote
-- Calls `window.print()`
-
-### Step 9.2 — PDF export (clinical)
+### 5.5 Export API
 `GET /api/discharge/[id]/export`:
-- Doctor only for clinical PDF (Mode 1)
-- Nurse can export patient handout (Mode 2)
-- Server-side PDF generation (low-bandwidth: max 500KB, no large images)
-- Metadata in footer only (promptVersion, modelVersion, generatedAt, recordId)
-- File naming: `DischargeSummary_[patientName]_[dischargeDate].pdf`
+- Auth → Doctor/Nurse only
+- Joins `patient_inputs` for patient_name, facility_name, discharge_date, discharged_by
+- Status check: must be `finalised`
+- Returns export data object for PDF generation
+- Writes AuditLog (action: `export`)
 
-### Step 9.3 — WhatsApp share
-`WhatsAppShareButton` (per `.agents/skills/whatsapp-share.md`):
-- Mode 2 only — **never share Mode 1**
-- Strip separator lines (`──────`), convert medication tables to numbered list
-- Max 1500 characters, red flags always last section
-- Mobile: `https://wa.me/?text=[encoded]` deep link
-- Desktop: clipboard copy + toast
-- Write AuditLog (action: `export`)
+### 5.6 Build + verify
+```bash
+npm run build
+```
 
 ---
 
-## Phase 10 — Audit Log (M3)
+## Day 6 — Audit + Pages/Navigation
 
-### Step 10.1 — Audit log API
+### 6.1 Audit log API
 `GET /api/audit/[recordId]`:
-- Admin only (Doctor/Nurse get 403)
-- Paginated response per `.agents/api/route-map.md`
-- Returns: logId, recordId, userId, userRole, action, timestamp, ipAddress, changesDiff, notes
+- Auth → Admin only (via `auth()`)
+- Pagination via `?page=1&limit=20` (clamped max 50)
+- Returns `{ data, pagination: { page, limit, total, totalPages } }`
 
-### Step 10.2 — Audit log page
+### 6.2 Audit log page
 `app/audit/[recordId]/page.tsx`:
-- `AuditLogTable` — paginated, shows all entries for a record
-- Columns: Timestamp, User, Role, Action, IP Address, Changes, Notes
-- Read-only — no edit/delete actions (immutability enforced at DB level)
+- Client component: role check → non-Admin sees error
+- Fetches from API with pagination
+- Loading spinner, error state
+- Renders `AuditLogTable` component
+
+### 6.3 AuditLogTable component
+- Styled table columns: Timestamp (WAT), User (truncated UUID), Role badge, Action, IP Address, Changes (JSON), Notes
+- Alternating row backgrounds
+- Prev/Next pagination with "Page X of Y"
+- Empty state: "No audit log entries found"
+
+### 6.4 Dashboard
+`app/dashboard/page.tsx`:
+- Record list fetched from `GET /api/discharge` with search + status filter
+- "New Discharge" button (Doctor/Nurse only)
+- Cards showing patient name, facility, date, clinician, StatusBadge
+- View + detail arrow buttons
+- Empty state with contextual messages
+- Loading spinner
+
+### 6.5 Discharge list API
+`GET /api/discharge`:
+- Auth (any role)
+- `?search=` — two-step query (search patient_inputs by name, filter discharge_records by IDs)
+- `?status=` — draft/finalised/archived filter
+- Paginated response with `{ data, pagination }`
+
+### 6.6 Discharge detail page
+`app/discharge/[id]/page.tsx`:
+- Patient name + facility header, StatusBadge
+- Dates card (discharge date, generated at)
+- Clinician card (discharged by, record ID)
+- "View Full Output" + "Edit Record" buttons
+- Back to Dashboard link
+
+### 6.7 Settings page
+`app/settings/page.tsx`:
+- My Profile card (role, user ID — all roles)
+- Facility Management card (admin only)
+- NDPR Compliance card (admin only)
+
+### 6.8 Role-aware Sidebar
+- Converted to client component with `useRole()` + `usePathname()`
+- Links conditional on role: Dashboard (all), New Discharge (Doctor/Nurse), Audit Log (Admin), Settings (all)
+- Active state highlighting
+
+### 6.9 Profile table fix
+- `src/lib/auth.ts` queries `user_profiles` (not `profiles`) to match RLS migration
+
+### 6.10 Build + verify
+```bash
+npm run build
+```
 
 ---
 
-## Phase 11 — Pages & Navigation
+## Day 7 — Testing + Deployment + Bug Fixes
 
-| Route | Page | Role Access | Key Content |
-|-------|------|-------------|-------------|
-| `/` | Landing | All | Redirect to /dashboard if authed, /auth/login if not |
-| `/auth/login` | Login | Unauthenticated | Email/password form, NDPR consent notice |
-| `/dashboard` | Dashboard | Doctor, Nurse, Admin | Record list, search/filter, create-new button, role-aware actions |
-| `/discharge/new` | New Discharge | Doctor, Nurse | PatientInputForm |
-| `/discharge/[id]` | Record View | Doctor, Nurse, Admin | Summary header, status badge, output panels, action buttons |
-| `/discharge/[id]/output` | Output Viewer | Doctor, Nurse | Mode 1/2 tabs, translation tab, banners, inline edit |
-| `/audit/[recordId]` | Audit Log | Admin | AuditLogTable |
-| `/settings` | Settings | Doctor, Nurse, Admin | Facility profile, user management (role-dependent) |
+### 7.1 Install test dependencies
+```bash
+npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @vitejs/plugin-react
+```
 
----
+### 7.2 Vitest config
+- `vitest.config.ts` with jsdom environment, `@/` path alias, globals: true
+- `src/test-setup.ts` importing `@testing-library/jest-dom/vitest`
 
-## Phase 12 — Testing
+### 7.3 Unit tests (4 files, 28 tests)
 
-### Unit tests (Jest + React Testing Library)
 | File | Tests |
 |------|-------|
-| `src/services/__tests__/ai-provider.test.ts` | Response splitting, section validation, missing section rejection |
-| `src/components/forms/__tests__/PatientInputForm.test.tsx` | Required field validation, age range, date ordering, medication rows |
-| `src/components/layout/__tests__/RoleGate.test.tsx` | Allowed/denied rendering, fallback |
-| `src/components/shared/__tests__/StatusBadge.test.tsx` | Draft/finalised/archived styling |
+| `src/components/shared/__tests__/StatusBadge.test.tsx` | 3 — amber/teal/grey styling per status |
+| `src/components/layout/__tests__/RoleGate.test.tsx` | 5 — allowed, denied + fallback, denied without fallback, undefined role, multiple roles |
+| `src/services/__tests__/ai-provider.test.ts` | 9 — validateInput (valid, missing fields, missing follow-up, missing dosage, contradictory dates) + validateOutput (valid, missing red flags, missing discharged by, missing when to return, missing follow-up) |
+| `src/components/forms/__tests__/PatientInputForm.test.tsx` | 11 — Zod schema: valid data, empty facilityName, age bounds, invalid gender, date ordering, empty medications, missing dosage, optional fields, all language codes |
 
-### Integration tests
-| File | Tests |
-|------|-------|
-| `tests/api/discharge/generate.test.ts` | Valid input → 200, missing field → 400, admin → 403 |
-| `tests/api/discharge/finalise.test.ts` | Doctor → 200, Nurse → 403, already finalised → 400 |
-| `tests/api/audit/audit.test.ts` | Admin → 200 with data, Doctor → 403 |
+### 7.4 Verify
+```bash
+npm test  # 28 passed
+npm run build
+```
 
-### RLS tests
-`tests/database/rls.test.sql` — facility isolation, role-based access, audit log immutability
+### 7.5 Bug audit fixes (applied across Days 1–6)
 
-### Performance
-- AI generation < 15s on 4G simulation
-- k6 load test: 50 concurrent users, p95 < 20s
+| # | Severity | Bug | Fix |
+|---|----------|-----|-----|
+| 1–5 | Critical | Auth bypass via body/header userId/userRole | All routes use `auth()` from NextAuth |
+| 6 | Critical | FK violation: translation_request before discharge_record | Insert discharge_record first |
+| 7 | Critical | NOT NULL columns set to null | Accept null safely (patient_input_id, facility_id) |
+| 8–9 | Critical | `translation_requests` CHECK constraint violated | Only insert when confidence !== "failed" |
+| 10–11 | Critical | `changes_diff` on non-edit action violates constraint | Use `notes` instead of `changesDiff` for finalise/archive |
+| 12 | Critical | Export route queries columns on wrong table | Added join with `patient_inputs` |
+| 13 | Critical | `profiles` vs `user_profiles` table mismatch | auth.ts queries `user_profiles` |
+| 14–15 | High | Missing role checks on PUT + export routes | Added Doctor/Nurse requireRole |
+| 16 | High | Role from unverified body | Use `auth()` everywhere |
+| 17–18 | High | PUT allowed editing finalised records + status bypass | Block finalised edits, remove `status` from update |
+| 19 | High | Incorrect join filter syntax | Two-step query instead of dot-notation |
+| 20 | High | `languageRequested` not validated | Validate against `["en", "ha", "yo", "ig"]` |
+| 21–23 | High | Missing audit logs for GET, LIST, PUT | Added writeAuditLog calls |
+| 24–26 | Medium | Missing validation for userId, rate limiting, orphaned records | userId validated, rate limit already in auth.ts, insert order fixed |
 
----
-
-## Phase 13 — Deployment
-
-### Vercel configuration
+### 7.6 Vercel deployment config
 `vercel.json`:
 - Function maxDuration: 30s for AI routes, 10s for CRUD routes
 - Runtime: `nodejs20.x` on all API routes
 - Security headers: HSTS, X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
-- Redirect authenticated users from `/` to `/dashboard`
 
-### Environment variables
-Set in Vercel dashboard per `.agents/integrations/vercel.md` — 15 variables across 3 environments
+### 7.7 Environment variables (Vercel dashboard)
+Set 15 variables across 3 environments per `.agents/environment.md`
 
-### Domain
-- Custom domain: e.g. `careflow.ng` or `app.careflow.health`
+### 7.8 Domain
+- Custom domain (e.g. `careflow.ng` or `app.careflow.health`)
 - Auto SSL via Let's Encrypt (Vercel default)
-
----
-
-## Constraints Summary
-
-From `.agents/code-style.md`:
-- camelCase for all schema fields, lowercase string enums
-- Never snake_case
-- Client-side role checks are UX only — server always re-validates
-- Never swallow errors — every error surfaces to user + logged server-side
-- Never merge admissionDate and dischargeDate
-- Never expose generation metadata in patient-facing output
-- Never skip AuditLog entry — treat write failures as critical
-
-From `.agents/security.md`:
-- RBAC enforced server-side on every request
-- Never allow Nurse or Admin to finalise
-- Never allow Admin to view Mode 1
-- Never allow cross-facility data access
-- IP address logged on every AuditLog entry
-- All patient data encrypted at rest (AES-256) and in transit (TLS 1.3)
-
-From `.agents/design-system.md`:
-- Amber-only for clinical warnings; red only for form validation errors
-- Minimum body text: 14px; patient-facing output: 16px
-- Plus Jakarta Sans throughout
-- Focus ring: 3px `rgba(11,110,110,0.30)`
-- Minimum tap target: 44×44px
-
-From `.agents/ai-generation.md` and prompt v2.0:
-- Never invent clinical data
-- Never modify medication doses
-- Always include Red Flag Warnings and Discharged By
-- Status must always start as `draft`
-- Never use Edge runtime for AI routes — Node.js only
-- Never skip timeout handler (25s for generation, 10s for translation)
 
 ---
 
@@ -466,11 +401,11 @@ From `.agents/ai-generation.md` and prompt v2.0:
 | Document | ID | Path |
 |----------|----|------|
 | Product Requirements Document | CFW-PRD-001 v1.0 | `docs/CareFlow_PRD_v1.0.md` |
-| AI System Prompt | CFW-PROMPT-002 v2.0 | `docs/CareFlow_AI_System_Prompt_v2.md` |
+| AI System Prompt | CFW-PROMPT-002 v2.0 | `docs/CareFlow_System_Prompt_v2.md` |
 | Agent Workspace Context | CFW-AGENTS-001 v1.0 | `AGENTS.md` |
-| Implementation Plan | CFW-PLAN-001 v1.0 | `docs/implementation-plan.md` |
+| Implementation Plan | CFW-PLAN-002 v1.0 | `docs/implementation-plan.md` |
 
 ---
 
-*CareFlow AI — CFW-PLAN-001 v1.0*
-*For internal Antigravity agent use only. Not for clinical distribution.*
+*CareFlow — CFW-PLAN-002 v1.0*
+*7-Day Implementation Plan — For internal Antigravity agent use only.*

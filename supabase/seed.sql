@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow AI — Development Seed Data
+-- CareFlow — Development Seed Data
 -- IMPORTANT: Dev seed only. Never run in production.
 -- Run with: supabase db reset
 -- ============================================
@@ -12,7 +12,7 @@ TRUNCATE audit_logs CASCADE;
 TRUNCATE translation_requests CASCADE;
 TRUNCATE discharge_records CASCADE;
 TRUNCATE patient_inputs CASCADE;
-TRUNCATE user_profiles CASCADE;
+TRUNCATE profiles CASCADE;
 TRUNCATE facilities CASCADE;
 
 -- ============================================
@@ -26,37 +26,40 @@ INSERT INTO facilities (facility_id, facility_code, facility_name) VALUES
 
 -- ============================================
 -- AUTH USERS (Supabase Auth)
--- Note: These UUIDs must match auth.users entries.
--- For local dev, Supabase creates them automatically.
--- Use these fixed UUIDs for consistency.
+-- Default password for all seed users: CareFlow@2026
+-- In local dev, passwords use Supabase's `crypt` for bcrypt.
+-- Generate with: `supabase db reset && select crypt('CareFlow@2026', gen_salt('bf'));`
 -- ============================================
 
 -- Doctor: Dr. Emeka Okafor
-INSERT INTO auth.users (id, email, raw_user_meta_data, created_at, updated_at)
+INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'dr.emeka@careflow.dev',
     '{"full_name": "Dr. Emeka Okafor"}',
+    crypt('CareFlow@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Nurse: Nurse Fatima Bello
-INSERT INTO auth.users (id, email, raw_user_meta_data, created_at, updated_at)
+INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     'fatima.bello@careflow.dev',
     '{"full_name": "Nurse Fatima Bello"}',
+    crypt('CareFlow@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Admin: Mr. Chidi Okonkwo (Hospital Administrator)
-INSERT INTO auth.users (id, email, raw_user_meta_data, created_at, updated_at)
+INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'chidi.okonkwo@careflow.dev',
     '{"full_name": "Mr. Chidi Okonkwo"}',
+    crypt('CareFlow@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
@@ -65,13 +68,13 @@ VALUES (
 -- USER PROFILES
 -- ============================================
 
-INSERT INTO user_profiles (user_id, email, full_name, role, facility_id) VALUES
+INSERT INTO profiles (id, email, role, facility_id) VALUES
     -- Doctor
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.emeka@careflow.dev', 'Dr. Emeka Okafor', 'doctor', '11111111-1111-1111-1111-111111111111'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.emeka@careflow.dev', 'doctor', '11111111-1111-1111-1111-111111111111'),
     -- Nurse
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fatima.bello@careflow.dev', 'Nurse Fatima Bello', 'nurse', '11111111-1111-1111-1111-111111111111'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fatima.bello@careflow.dev', 'nurse', '11111111-1111-1111-1111-111111111111'),
     -- Admin
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'chidi.okonkwo@careflow.dev', 'Mr. Chidi Okonkwo', 'admin', '11111111-1111-1111-1111-111111111111');
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'chidi.okonkwo@careflow.dev', 'admin', '11111111-1111-1111-1111-111111111111');
 
 -- ============================================
 -- PATIENT INPUTS (Nigerian clinical example)
@@ -408,9 +411,9 @@ INSERT INTO audit_logs (
 -- UNION ALL SELECT 'discharge_records', COUNT(*) FROM discharge_records
 -- UNION ALL SELECT 'translation_requests', COUNT(*) FROM translation_requests
 -- UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs
--- UNION ALL SELECT 'user_profiles', COUNT(*) FROM user_profiles;
+-- UNION ALL SELECT 'profiles', COUNT(*) FROM profiles;
 
--- Expected counts: patient_inputs: 1, discharge_records: 1, translation_requests: 1, audit_logs: 3, user_profiles: 3
+-- Expected counts: patient_inputs: 1, discharge_records: 1, translation_requests: 1, audit_logs: 3, profiles: 3
 
 -- ============================================
 -- SEED DATA SUMMARY
@@ -420,7 +423,7 @@ INSERT INTO audit_logs (
 | Table              | Row Count | Purpose                          |
 |--------------------|-----------|----------------------------------|
 | facilities         | 3         | Hospital facilities              |
-| user_profiles      | 3         | Doctor, Nurse, Admin             |
+| profiles      | 3         | Doctor, Nurse, Admin             |
 | patient_inputs     | 1         | Mrs. Ngozi Okonkwo (LUTH)        |
 | discharge_records  | 1         | Draft record with full outputs   |
 | translation_requests| 1        | Hausa translation (high confidence)|

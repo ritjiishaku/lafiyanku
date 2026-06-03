@@ -7,7 +7,7 @@
 
 # PRD reference: CFW-PRD-001 v1.0
 
-# Purpose: Every UI component needed to build CareFlow AI — component name, file path, purpose, props interface, shadcn/ui primitives, design tokens, and clinical safety rules.
+# Purpose: Every UI component needed to build CareFlow — component name, file path, purpose, props interface, shadcn/ui primitives, design tokens, and clinical safety rules.
 
 ## Component Categories
 

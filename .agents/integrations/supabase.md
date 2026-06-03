@@ -7,11 +7,11 @@
 
 # PRD reference: CFW-PRD-001 v1.0
 
-# Purpose: Complete Supabase integration reference for CareFlow AI — project setup, two client configurations (server-side and client-side), auth setup with @supabase/ssr, middleware configuration, user_profiles table pattern, example queries for each workflow, real-time subscriptions, and migration commands.
+# Purpose: Complete Supabase integration reference for CareFlow — project setup, two client configurations (server-side and client-side), auth setup with @supabase/ssr, middleware configuration, user_profiles table pattern, example queries for each workflow, real-time subscriptions, and migration commands.
 
 ## Overview
 
-CareFlow AI uses **Supabase** as the primary database and authentication provider. All patient data, discharge records, audit logs, and translation requests are stored in Supabase PostgreSQL with Row Level Security (RLS) enforcing multi-tenant isolation and role-based access.
+CareFlow uses **Supabase** as the primary database and authentication provider. All patient data, discharge records, audit logs, and translation requests are stored in Supabase PostgreSQL with Row Level Security (RLS) enforcing multi-tenant isolation and role-based access.
 
 ---
 

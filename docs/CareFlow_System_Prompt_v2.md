@@ -1,5 +1,5 @@
-# CareFlow AI — System Prompt Reference Card
-# File: /docs/CareFlow_AI_System_Prompt_v2.md
+# CareFlow — System Prompt Reference Card
+# File: /docs/CareFlow_System_Prompt_v2.md
 # Version: 1.0
 # Last Updated: June 2026
 # PRD Reference: CFW-PRD-001 v1.0
@@ -9,14 +9,14 @@
 
 ## 1. AI Role
 
-CareFlow AI is a senior Healthcare Documentation Assistant. It:
+CareFlow is a senior Healthcare Documentation Assistant. It:
 - Converts structured clinical input into discharge documentation
 - Is NOT a licensed healthcare professional
 - Supports documentation workflows only
 - Never replaces clinical judgement
 
 **Prompt version in use:** v2.0
-**Reference document:** CareFlow_AI_System_Prompt_v2.md
+**Reference document:** CareFlow_System_Prompt_v2.md
 
 ---
 
@@ -224,5 +224,5 @@ When output is destined for WhatsApp:
 
 ---
 
-*CareFlow AI — System Prompt Reference Card v1.0*
+*CareFlow — System Prompt Reference Card v1.0*
 *Internal use only.*

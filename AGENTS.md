@@ -1,4 +1,4 @@
-# AGENTS.md — CareFlow AI
+# AGENTS.md — CareFlow
 # Antigravity Agent Workspace Context
 # Document ID: CFW-AGENTS-001 | Version: 1.0
 # PRD Reference: CFW-PRD-001 v1.0
@@ -7,7 +7,7 @@
 
 ## 1. What You Are Building
 
-CareFlow AI is an AI-powered clinical discharge documentation assistant built
+CareFlow is an AI-powered clinical discharge documentation assistant built
 for Nigerian hospitals, clinics, and telemedicine providers.
 
 It solves one specific problem: clinicians in Nigeria discharge patients under
@@ -32,7 +32,7 @@ The AI assists documentation — it never replaces clinical judgement.
 
 ## 2. Product Vision (One Sentence)
 
-> CareFlow AI exists so that every patient leaving a Nigerian hospital —
+> CareFlow exists so that every patient leaving a Nigerian hospital —
 > regardless of their language, literacy level, or the time pressure their
 > clinician is under — receives a discharge document they can understand and
 > act on.
@@ -470,10 +470,10 @@ Build in this order. Do not skip ahead.
 | Document                          | ID              | Location                        |
 |-----------------------------------|-----------------|---------------------------------|
 | Product Requirements Document     | CFW-PRD-001 v1.0 | `/docs/CareFlow_PRD_v1.0.md` |
-| AI System Prompt                  | CFW-PROMPT-002 v2.0 | `/docs/CareFlow_AI_System_Prompt_v2.md` |
+| AI System Prompt                  | CFW-PROMPT-002 v2.0 | `/docs/CareFlow_System_Prompt_v2.md` |
 | AGENTS.md (this file)             | CFW-AGENTS-001 v1.0 | `/AGENTS.md`                  |
 
 ---
 
-*CareFlow AI — CFW-AGENTS-001 v1.0*
+*CareFlow — CFW-AGENTS-001 v1.0*
 *For internal Antigravity agent use only. Not for clinical distribution.*

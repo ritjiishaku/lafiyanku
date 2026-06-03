@@ -9,9 +9,9 @@ export function FlaggedIssuesBanner({ issues }: FlaggedIssuesBannerProps) {
   if (issues.length === 0) return null;
 
   return (
-    <Alert variant="destructive">
-      <AlertTriangle className="h-4 w-4" />
-      <AlertTitle>Issues Detected</AlertTitle>
+    <Alert variant="default" className="border-warm-amber bg-warm-amber/5">
+      <AlertTriangle className="h-4 w-4 text-warm-amber" />
+      <AlertTitle className="text-warm-amber">Issues Detected</AlertTitle>
       <AlertDescription>
         <ul className="list-inside list-disc text-sm">
           {issues.map((issue, i) => (

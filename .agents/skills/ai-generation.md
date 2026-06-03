@@ -235,4 +235,4 @@ If the AI engine returns an error or times out (>15 seconds on 4G):
 
 ---
 
-*CareFlow AI — AI Generation Skill v1.0*
+*CareFlow — AI Generation Skill v1.0*

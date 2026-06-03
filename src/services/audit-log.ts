@@ -29,20 +29,33 @@ export async function writeAuditLog(entry: {
 
 export async function getAuditLogs(
   recordId: string,
-): Promise<AuditLog[]> {
+  options?: { page?: number; limit?: number },
+): Promise<{ logs: AuditLog[]; total: number }> {
   const supabase = createServiceClient();
+  const page = options?.page ?? 1;
+  const limit = options?.limit ?? 20;
+  const offset = (page - 1) * limit;
+
+  const { count, error: countError } = await supabase
+    .from("audit_logs")
+    .select("*", { count: "exact", head: true })
+    .eq("record_id", recordId);
+
+  if (countError) throw new Error("SUPABASE_ERROR");
 
   const { data, error } = await supabase
     .from("audit_logs")
     .select("*")
     .eq("record_id", recordId)
-    .order("timestamp", { ascending: false });
+    .order("timestamp", { ascending: false })
+    .range(offset, offset + limit - 1);
 
-  if (error) {
-    throw new Error("SUPABASE_ERROR");
-  }
+  if (error) throw new Error("SUPABASE_ERROR");
 
-  return (data ?? []).map(mapAuditLog);
+  return {
+    logs: (data ?? []).map(mapAuditLog),
+    total: count ?? 0,
+  };
 }
 
 function mapAuditLog(raw: Record<string, unknown>): AuditLog {

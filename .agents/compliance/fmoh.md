@@ -11,7 +11,7 @@
 
 The Nigerian Federal Ministry of Health (FMOH) sets standards for patient
 records and clinical documentation across all accredited hospitals, clinics,
-and healthcare facilities in Nigeria. CareFlow AI generates discharge
+and healthcare facilities in Nigeria. CareFlow generates discharge
 documentation that must comply with these standards to be acceptable for
 hospital records, insurance claims, referrals, and medicolegal purposes.
 
@@ -239,5 +239,5 @@ considered complete.
 
 ---
 
-*CareFlow AI — FMOH Patient Record Standards Compliance Reference v1.0*
+*CareFlow — FMOH Patient Record Standards Compliance Reference v1.0*
 *Internal use only.*
