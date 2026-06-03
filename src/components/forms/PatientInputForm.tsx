@@ -25,8 +25,8 @@ import { MedicationRow } from "./MedicationRow";
 import { LanguageSelector } from "./LanguageSelector";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOfflineDraft } from "@/hooks/useOfflineDraft";
-import { useEffect, useCallback } from "react";
-import { Save, AlertCircle } from "lucide-react";
+import { useEffect, useCallback, useState } from "react";
+import { Save, AlertCircle, RefreshCw, X } from "lucide-react";
 
 const medicationSchema = z.object({
   name: z.string().min(1, "Medication name is required"),
@@ -108,24 +108,35 @@ export function PatientInputForm({
     },
   });
 
+  const [restoredFromDraft, setRestoredFromDraft] = useState(false);
+  const [dismissRestore, setDismissRestore] = useState(false);
+
   const { draft, isOffline, lastSavedAt, autoSave, clearDraft, saveDraft } =
     useOfflineDraft(DRAFT_KEY);
 
   useEffect(() => {
-    if (draft?.data && form.formState.isSubmitSuccessful === false) {
+    if (draft?.data && !dismissRestore && form.formState.isSubmitSuccessful === false) {
       const hasValues = Object.values(form.getValues()).some(
         (v) => v !== "" && v !== undefined && !(Array.isArray(v) && v.length === 1),
       );
       if (!hasValues) {
         form.reset(draft.data as PatientInputFormData);
+        setRestoredFromDraft(true);
       }
     }
-  }, []);
+  }, [draft, dismissRestore]);
 
-  const watchedValues = form.watch();
+  function handleDismissRestore() {
+    setDismissRestore(true);
+    setRestoredFromDraft(false);
+  }
+
   useEffect(() => {
-    autoSave(watchedValues);
-  }, [watchedValues, autoSave]);
+    const sub = form.watch((values) => {
+      autoSave(values);
+    });
+    return () => sub.unsubscribe();
+  }, [form, autoSave]);
 
   const handleSaveDraft = useCallback(() => {
     saveDraft(form.getValues());
@@ -134,6 +145,62 @@ export function PatientInputForm({
   return (
     <>
       <OfflineBanner />
+      {restoredFromDraft && !dismissRestore && (
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-clinical-teal/20 bg-clinical-teal/5 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-clinical-teal">
+            <RefreshCw className="h-4 w-4" />
+            <span>
+              Draft restored from{" "}
+              {draft?.savedAt
+                ? new Date(draft.savedAt).toLocaleString("en-NG", {
+                    timeZone: "Africa/Lagos",
+                  })
+                : "previous session"}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setDismissRestore(true); setRestoredFromDraft(false); }}
+            className="touch-target-min rounded p-1 text-clinical-teal/60 transition-colors hover:text-clinical-teal"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+      {!restoredFromDraft && draft?.data && !dismissRestore && (
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-500/20 bg-amber-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-amber-700">
+            <AlertCircle className="h-4 w-4" />
+            <span>
+              Unsaved draft from{" "}
+              {draft?.savedAt
+                ? new Date(draft.savedAt).toLocaleString("en-NG", {
+                    timeZone: "Africa/Lagos",
+                  })
+                : "previous session"}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                form.reset(draft.data as PatientInputFormData);
+                setRestoredFromDraft(true);
+              }}
+              className="touch-target-min rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-amber-600"
+            >
+              Restore
+            </button>
+            <button
+              type="button"
+              onClick={handleDismissRestore}
+              className="touch-target-min rounded-md border border-amber-500/30 px-3 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {lastSavedAt && (
@@ -152,7 +219,7 @@ export function PatientInputForm({
                   Facility Name <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="e.g. Lagos University Teaching Hospital" />
+                  <Input className="h-11" {...field} placeholder="e.g. Lagos University Teaching Hospital" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -169,7 +236,7 @@ export function PatientInputForm({
                     Facility Code <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. LUTH-001" />
+                    <Input className="h-11" {...field} placeholder="e.g. LUTH-001" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -184,7 +251,7 @@ export function PatientInputForm({
                     Ward Name <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. Medical Ward B" />
+                    <Input className="h-11" {...field} placeholder="e.g. Medical Ward B" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +269,7 @@ export function PatientInputForm({
                     Admission Date <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input className="h-11" type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -217,7 +284,7 @@ export function PatientInputForm({
                     Discharge Date <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input className="h-11" type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -235,7 +302,7 @@ export function PatientInputForm({
                     Patient Name <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Full name" />
+                    <Input className="h-11" {...field} placeholder="Full name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -250,14 +317,7 @@ export function PatientInputForm({
                     Age <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={130}
-                      inputMode="numeric"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
+                    <Input className="h-11" type="number" min={0} max={130} inputMode="numeric" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -273,7 +333,7 @@ export function PatientInputForm({
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                     </FormControl>
@@ -299,7 +359,7 @@ export function PatientInputForm({
                     Hospital Number <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. LUTH/2024/00412" />
+                    <Input className="h-11" {...field} placeholder="e.g. LUTH/2024/00412" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -314,7 +374,7 @@ export function PatientInputForm({
                     NHIS Number <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. NHIS/0045231" inputMode="numeric" />
+                    <Input className="h-11" {...field} placeholder="e.g. NHIS/0045231" inputMode="numeric" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -434,7 +494,7 @@ export function PatientInputForm({
                     Discharged By <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Clinician full name" />
+                    <Input className="h-11" {...field} placeholder="Clinician full name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -449,7 +509,7 @@ export function PatientInputForm({
                     MDCN Licence No. <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. MDCN/2015/07821" />
+                    <Input className="h-11" {...field} placeholder="e.g. MDCN/2015/07821" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

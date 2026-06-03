@@ -12,7 +12,7 @@ TRUNCATE audit_logs CASCADE;
 TRUNCATE translation_requests CASCADE;
 TRUNCATE discharge_records CASCADE;
 TRUNCATE patient_inputs CASCADE;
-TRUNCATE profiles CASCADE;
+TRUNCATE user_profiles CASCADE;
 TRUNCATE facilities CASCADE;
 
 -- ============================================
@@ -68,13 +68,13 @@ VALUES (
 -- USER PROFILES
 -- ============================================
 
-INSERT INTO profiles (id, email, role, facility_id) VALUES
+INSERT INTO user_profiles (user_id, email, full_name, role, facility_id) VALUES
     -- Doctor
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.emeka@careflow.dev', 'doctor', '11111111-1111-1111-1111-111111111111'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.emeka@careflow.dev', 'Dr. Emeka Okafor', 'doctor', '11111111-1111-1111-1111-111111111111'),
     -- Nurse
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fatima.bello@careflow.dev', 'nurse', '11111111-1111-1111-1111-111111111111'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'fatima.bello@careflow.dev', 'Nurse Fatima Bello', 'nurse', '11111111-1111-1111-1111-111111111111'),
     -- Admin
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'chidi.okonkwo@careflow.dev', 'admin', '11111111-1111-1111-1111-111111111111');
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'chidi.okonkwo@careflow.dev', 'Mr. Chidi Okonkwo', 'admin', '11111111-1111-1111-1111-111111111111');
 
 -- ============================================
 -- PATIENT INPUTS (Nigerian clinical example)
@@ -319,7 +319,7 @@ INSERT INTO translation_requests (
 What happened
 You have high blood pressure and diabetes...',
     'ha',
-    'UMARNOMAR FITAR DA KA'AN KA
+    'UMARNOMAR FITAR DA KA''AN KA
 
 Me ya kawo ka asibiti?
 Kana da hawan jini da ciwon sukari...',
@@ -411,9 +411,9 @@ INSERT INTO audit_logs (
 -- UNION ALL SELECT 'discharge_records', COUNT(*) FROM discharge_records
 -- UNION ALL SELECT 'translation_requests', COUNT(*) FROM translation_requests
 -- UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs
--- UNION ALL SELECT 'profiles', COUNT(*) FROM profiles;
+        -- UNION ALL SELECT 'user_profiles', COUNT(*) FROM user_profiles;
 
--- Expected counts: patient_inputs: 1, discharge_records: 1, translation_requests: 1, audit_logs: 3, profiles: 3
+-- Expected counts: patient_inputs: 1, discharge_records: 1, translation_requests: 1, audit_logs: 3, user_proiles: 3
 
 -- ============================================
 -- SEED DATA SUMMARY
@@ -423,7 +423,7 @@ INSERT INTO audit_logs (
 | Table              | Row Count | Purpose                          |
 |--------------------|-----------|----------------------------------|
 | facilities         | 3         | Hospital facilities              |
-| profiles      | 3         | Doctor, Nurse, Admin             |
+| user_profiles | 3         | Doctor, Nurse, Admin             |
 | patient_inputs     | 1         | Mrs. Ngozi Okonkwo (LUTH)        |
 | discharge_records  | 1         | Draft record with full outputs   |
 | translation_requests| 1        | Hausa translation (high confidence)|

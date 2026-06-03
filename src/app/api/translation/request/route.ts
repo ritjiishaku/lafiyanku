@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       target_language: targetLanguage,
       output_text: result.confidence === "failed" ? null : result.translatedOutput,
       confidence: result.confidence === "failed" ? null : result.confidence,
-      fallback_used: result.fallbackUsed ? "yes" : "no",
+      fallback_used: result.fallbackUsed,
       requested_at: new Date().toISOString(),
       completed_at: result.confidence !== "failed" ? new Date().toISOString() : null,
     });
@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
       userRole: role as any,
       action: AuditAction.Edit,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
+      changesDiff: { translationLanguage: targetLanguage, confidence: result.confidence },
       notes: result.fallbackUsed
         ? `Translation to ${targetLanguage} had low confidence. English fallback used.`
         : `Translation completed for ${targetLanguage}`,

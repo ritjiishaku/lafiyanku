@@ -31,7 +31,7 @@ export function LanguageSelector() {
           </FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger>
+              <SelectTrigger className="h-11">
                 <SelectValue placeholder="Select language (default: English)" />
               </SelectTrigger>
             </FormControl>

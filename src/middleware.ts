@@ -1,23 +1,32 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
+const publicPaths = [
+  "/_next",
+  "/favicon",
+  "/og-image",
+  "/auth",
+  "/api/auth",
+  "/api/register",
+  "/api/facilities",
+  "/api/contact",
+  "/api/demo",
+  "/api/health",
+  "/pricing",
+  "/contact",
+  "/demo",
+  "/",
+];
+
 export default auth((req) => {
+  const path = req.nextUrl.pathname;
+  if (publicPaths.some((p) => path === p || path.startsWith(p))) {
+    return NextResponse.next();
+  }
   if (!req.auth) {
-    const url = new URL("/auth/login", req.url);
+    const url = new URL("/auth", req.url);
     url.searchParams.set("callbackUrl", req.url);
     return NextResponse.redirect(url);
   }
   return NextResponse.next();
 });
-
-export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/discharge/:path*",
-    "/audit/:path*",
-    "/settings/:path*",
-    "/api/discharge/:path*",
-    "/api/audit/:path*",
-    "/api/translation/:path*",
-  ],
-};

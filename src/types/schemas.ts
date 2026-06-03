@@ -74,6 +74,7 @@ export interface PatientInput {
 export interface DischargeRecord {
   recordId: string;
   patientInputId: string;
+  facilityId?: string | null;
   generatedAt: string;
   generatedByUserId: string;
   promptVersion: string;

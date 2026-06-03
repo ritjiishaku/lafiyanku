@@ -34,27 +34,36 @@ CREATE TYPE audit_action_enum AS ENUM ('generate', 'edit', 'view', 'finalise', '
 -- Stores hospital/clinic facility information
 -- ============================================
 CREATE TABLE facilities (
-    facility_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    facility_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     facility_name VARCHAR(300) NOT NULL,
     facility_code VARCHAR(50),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ============================================
--- TABLE: profiles
+-- TABLE: user_profiles
 -- Links Supabase auth.users to application user roles and facility
 -- ============================================
-CREATE TABLE profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email VARCHAR(255),
+CREATE TABLE user_profiles (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    full_name VARCHAR(200) NOT NULL DEFAULT '',
     role user_role_enum NOT NULL DEFAULT 'nurse',
     facility_id UUID REFERENCES facilities(facility_id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER update_profiles_updated_at
-    BEFORE UPDATE ON profiles
+    BEFORE UPDATE ON user_profiles
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -64,7 +73,7 @@ CREATE TRIGGER update_profiles_updated_at
 -- ============================================
 CREATE TABLE patient_inputs (
     -- Primary key
-    patient_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    patient_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Facility information
     facility_id UUID NOT NULL REFERENCES facilities(facility_id),
@@ -112,15 +121,6 @@ CREATE INDEX idx_patient_inputs_admission_date ON patient_inputs(admission_date)
 CREATE INDEX idx_patient_inputs_discharge_date ON patient_inputs(discharge_date);
 CREATE INDEX idx_patient_inputs_patient_name ON patient_inputs(patient_name);
 
--- Trigger to update updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE TRIGGER update_patient_inputs_updated_at
     BEFORE UPDATE ON patient_inputs
     FOR EACH ROW
@@ -136,7 +136,7 @@ COMMENT ON COLUMN patient_inputs.procedures_performed IS 'Array of procedure nam
 -- ============================================
 CREATE TABLE discharge_records (
     -- Primary key
-    record_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    record_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Foreign key to patient_inputs
     patient_input_id UUID NOT NULL REFERENCES patient_inputs(patient_id) ON DELETE RESTRICT,
@@ -170,8 +170,7 @@ CREATE TABLE discharge_records (
     
     -- Constraints
     CONSTRAINT discharge_records_status_check CHECK (
-        (status = 'draft' AND last_edited_at IS NULL AND last_edited_by_user_id IS NULL) OR
-        (status IN ('draft', 'finalised', 'archived'))
+        status IN ('draft', 'finalised', 'archived')
     ),
     CONSTRAINT discharge_records_translation_confidence_check CHECK (
         (translation_language IS NULL AND translation_confidence IS NULL) OR
@@ -200,7 +199,7 @@ COMMENT ON COLUMN discharge_records.flagged_issues IS 'Contradictions or warning
 -- ============================================
 CREATE TABLE translation_requests (
     -- Primary key
-    request_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    request_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Foreign key to discharge_records
     record_id UUID NOT NULL REFERENCES discharge_records(record_id) ON DELETE CASCADE,
@@ -238,7 +237,7 @@ COMMENT ON COLUMN translation_requests.fallback_used IS 'True if translation con
 -- ============================================
 CREATE TABLE audit_logs (
     -- Primary key
-    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Foreign key to discharge_records
     record_id UUID NOT NULL REFERENCES discharge_records(record_id) ON DELETE RESTRICT,
@@ -258,10 +257,9 @@ CREATE TABLE audit_logs (
     -- Optional notes
     notes TEXT,
     
-    -- Constraint: changes_diff must be null for non-edit actions (enforced by application, optional here)
+    -- Constraint: changes_diff should only be set on edit actions
     CONSTRAINT audit_logs_changes_diff_check CHECK (
-        (action = 'edit' AND changes_diff IS NOT NULL) OR
-        (action != 'edit' AND changes_diff IS NULL)
+        changes_diff IS NULL OR action = 'edit'
     )
 );
 

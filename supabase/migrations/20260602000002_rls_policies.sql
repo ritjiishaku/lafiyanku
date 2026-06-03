@@ -64,21 +64,10 @@ $$;
 
 -- ============================================
 -- TABLE: user_profiles
--- Stores role and facility_id for each Supabase Auth user
--- This table must be populated via a trigger when new users sign up
+-- RLS policies for role and facility isolation
+-- Table is created in 20260602000001_initial_schema.sql
 -- ============================================
 
-CREATE TABLE IF NOT EXISTS user_profiles (
-    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email VARCHAR(255) NOT NULL,
-    full_name VARCHAR(200) NOT NULL,
-    role user_role_enum NOT NULL DEFAULT 'nurse',
-    facility_id UUID NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Enable RLS on user_profiles
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Users can read their own profile
@@ -105,6 +94,7 @@ CREATE POLICY user_profiles_update_admin
     USING (is_admin());
 
 -- Trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
 CREATE TRIGGER update_user_profiles_updated_at
     BEFORE UPDATE ON user_profiles
     FOR EACH ROW
@@ -272,16 +262,10 @@ CREATE POLICY audit_logs_insert_system
 -- This enforces NDPR 2019 Article 2.6 (data integrity and immutability)
 
 -- ============================================
--- TABLE: facilities (optional, for multi-tenant isolation)
--- Simple lookup table for facility codes
+-- TABLE: facilities
+-- RLS policies for facility access
+-- Table is created in 20260602000001_initial_schema.sql
 -- ============================================
-
-CREATE TABLE IF NOT EXISTS facilities (
-    facility_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    facility_code VARCHAR(50) UNIQUE NOT NULL,
-    facility_name VARCHAR(300) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
 
 ALTER TABLE facilities ENABLE ROW LEVEL SECURITY;
 

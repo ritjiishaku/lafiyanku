@@ -61,13 +61,13 @@ export function AuditLogTable({
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate/10 bg-cool-off-white">
-              <th className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">User</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">Role</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">Action</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">Changes</th>
-              <th className="px-4 py-3 font-semibold text-deep-navy">Notes</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">User</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Action</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Changes</th>
+              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -125,6 +125,7 @@ export function AuditLogTable({
             className="touch-target-min"
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
+            aria-label="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -137,6 +138,7 @@ export function AuditLogTable({
             className="touch-target-min"
             disabled={page >= totalPages}
             onClick={() => onPageChange(page + 1)}
+            aria-label="Next page"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

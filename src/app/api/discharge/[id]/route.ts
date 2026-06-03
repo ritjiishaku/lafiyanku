@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !session?.user?.role) {
     return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
   }
 
@@ -31,6 +31,11 @@ export async function GET(
       apiError(ErrorCodes.RECORD_NOT_FOUND, { recordId: id }),
       { status: 404 },
     );
+  }
+
+  if (session.user.role === UserRole.Admin) {
+    const { clinical_summary, ...rest } = data;
+    return NextResponse.json({ success: true, data: rest });
   }
 
   return NextResponse.json({ success: true, data });

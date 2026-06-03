@@ -45,7 +45,7 @@ export const HttpStatus: Record<ErrorCode, number> = {
   [ErrorCodes.TRANSLATION_FAILED]: 500,
   [ErrorCodes.AUDIT_LOG_WRITE_FAILED]: 500,
   [ErrorCodes.SUPABASE_ERROR]: 500,
-  [ErrorCodes.DEEPSEEK_RATE_LIMITED]: 500,
+  [ErrorCodes.DEEPSEEK_RATE_LIMITED]: 429,
   [ErrorCodes.DEEPSEEK_AUTH_FAILED]: 500,
   [ErrorCodes.INTERNAL_SERVER_ERROR]: 500,
 };

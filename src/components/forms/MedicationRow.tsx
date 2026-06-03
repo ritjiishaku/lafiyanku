@@ -61,6 +61,7 @@ export function MedicationRow() {
                 size="sm"
                 onClick={() => remove(index)}
                 className="text-red-500"
+                aria-label={`Remove medication #${index + 1}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -77,7 +78,7 @@ export function MedicationRow() {
                     Name <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. Amlodipine" />
+                    <Input className="h-11" {...field} placeholder="e.g. Amlodipine" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,7 +93,7 @@ export function MedicationRow() {
                     Dosage <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 5mg" inputMode="decimal" />
+                    <Input className="h-11" {...field} placeholder="e.g. 5mg" inputMode="decimal" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +108,7 @@ export function MedicationRow() {
                     Frequency <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. once daily" />
+                    <Input className="h-11" {...field} placeholder="e.g. once daily" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +126,7 @@ export function MedicationRow() {
                     Timing <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. with food" />
+                    <Input className="h-11" {...field} placeholder="e.g. with food" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -140,7 +141,7 @@ export function MedicationRow() {
                     Duration <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 7 days" />
+                    <Input className="h-11" {...field} placeholder="e.g. 7 days" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -155,7 +156,7 @@ export function MedicationRow() {
                     Notes <span className="text-xs">(optional)</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. Avoid alcohol" />
+                    <Input className="h-11" {...field} placeholder="e.g. Avoid alcohol" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

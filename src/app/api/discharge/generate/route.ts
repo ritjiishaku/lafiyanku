@@ -59,7 +59,42 @@ export async function POST(request: NextRequest) {
     const generationResult = await generateDischarge(patientInput);
 
     const supabase = createServiceClient();
+    const patientId = crypto.randomUUID();
     const recordId = crypto.randomUUID();
+
+    const DEFAULT_FACILITY_ID = "11111111-1111-1111-1111-111111111111";
+    const facilityId = session.user.facilityId ?? (patientInput.facilityId as string) ?? DEFAULT_FACILITY_ID;
+
+    const { error: patientInsertError } = await supabase.from("patient_inputs").insert({
+      patient_id: patientId,
+      facility_id: facilityId,
+      facility_name: patientInput.facilityName as string,
+      facility_code: (patientInput.facilityCode as string) ?? null,
+      ward_name: (patientInput.wardName as string) ?? null,
+      admission_date: patientInput.admissionDate as string,
+      discharge_date: patientInput.dischargeDate as string,
+      patient_name: patientInput.patientName as string,
+      age: patientInput.age as number,
+      gender: patientInput.gender as string,
+      hospital_number: patientInput.hospitalNumber as string,
+      nhis_number: (patientInput.nhisNumber as string) ?? null,
+      diagnosis: patientInput.diagnosis as string,
+      treatment_given: patientInput.treatmentGiven as string,
+      procedures_performed: (patientInput.proceduresPerformed as string[]) ?? [],
+      medications: patientInput.medications as unknown as string,
+      follow_up_instructions: (patientInput.followUpInstructions as string) ?? null,
+      additional_notes: (patientInput.additionalNotes as string) ?? null,
+      language_requested: (patientInput.languageRequested as string) ?? "en",
+      discharged_by: patientInput.dischargedBy as string,
+      clinician_license_no: (patientInput.clinicianLicenseNo as string) ?? null,
+    });
+
+    if (patientInsertError) {
+      return NextResponse.json(
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "INSERT patient_inputs" }),
+        { status: 500 },
+      );
+    }
 
     let translatedOutput: string | null = null;
     let translationLanguage: string | null = null;
@@ -87,8 +122,8 @@ export async function POST(request: NextRequest) {
 
     const { error: insertError } = await supabase.from("discharge_records").insert({
       record_id: recordId,
-      patient_input_id: patientInput.patientId ?? null,
-      facility_id: patientInput.facilityId ?? null,
+      patient_input_id: patientId,
+      facility_id: facilityId,
       generated_at: new Date().toISOString(),
       generated_by_user_id: userId,
       prompt_version: getPromptVersion(),
@@ -118,7 +153,7 @@ export async function POST(request: NextRequest) {
         target_language: langRequested,
         output_text: translatedOutput,
         confidence: translationConfidence === "low" ? TranslationConfidence.Low : TranslationConfidence.High,
-        fallback_used: translationConfidence === "low" ? "yes" : "no",
+        fallback_used: translationConfidence === "low",
         requested_at: new Date().toISOString(),
         completed_at: new Date().toISOString(),
       });
