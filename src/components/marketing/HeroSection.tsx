@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Shield, Activity, Users, Menu, X } from "lucide-react";
+import { ArrowRight, Shield, Activity, Users } from "lucide-react";
 import Link from "next/link";
 
 export function HeroSection() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
   return (
     <section className="relative bg-deep-navy min-h-dvh flex flex-col text-white">
       {/* Background layers */}
@@ -14,58 +11,15 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(11,110,110,0.08),transparent_50%)]" />
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-      {/* ── Nav bar ── */}
-      <nav className="relative z-20">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-lg font-bold tracking-tight text-white sm:text-2xl hover:text-clinical-teal transition-colors shrink-0">
-            CareFlow
-          </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/auth" className="text-sm font-medium text-slate-300 hover:text-clinical-teal transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/register-facility"
-              className="inline-flex items-center gap-2 rounded-lg bg-clinical-teal px-5 py-2.5 text-sm font-bold text-white hover:bg-clinical-teal/90 transition-all duration-150 shadow-lg shadow-clinical-teal/20"
-            >
-              Register facility
-            </Link>
-          </div>
-          <button
-            type="button"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((prev) => !prev)}
-            className="md:hidden flex items-center justify-center h-10 w-10 rounded-md text-slate-300 hover:text-clinical-teal hover:bg-white/5 transition-colors"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-        {mobileOpen && (
-          <div className="md:hidden border-t border-slate-800 bg-deep-navy/95 backdrop-blur-md">
-            <div className="flex flex-col gap-3 px-4 py-5">
-              <Link
-                href="/auth"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 hover:text-clinical-teal hover:bg-white/5 transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register-facility"
-                onClick={() => setMobileOpen(false)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-clinical-teal px-4 py-3 text-sm font-bold text-white hover:bg-clinical-teal/90 transition-all"
-              >
-                Register facility
-              </Link>
-            </div>
-          </div>
-        )}
-      </nav>
-
       {/* ── Hero content ── */}
       <div className="flex-1 flex items-center">
         <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 py-8 lg:py-12">
+          {/* Logo */}
+          <div className="mb-6 lg:mb-10">
+            <Link href="/" className="text-lg font-bold tracking-tight text-white sm:text-2xl hover:text-clinical-teal transition-colors">
+              CareFlow
+            </Link>
+          </div>
           <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
 
             {/* Left — Text */}
