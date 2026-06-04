@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section className="relative bg-deep-navy h-dvh flex flex-col text-white overflow-hidden">
+    <section className="relative bg-deep-navy min-h-dvh flex flex-col text-white">
       {/* Background layers */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(11,110,110,0.15),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(11,110,110,0.08),transparent_50%)]" />
