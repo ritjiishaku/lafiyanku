@@ -13,7 +13,7 @@ export async function GET() {
     const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("demo_requests")
-      .select("*")
+      .select("id, full_name, role, facility_name, whatsapp_number, email, state, created_at")
       .order("created_at", { ascending: false });
 
     if (error) throw error;

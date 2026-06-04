@@ -41,3 +41,11 @@ export const clinicianUpdateSchema = z.object({
   role: z.enum(["doctor", "nurse", "admin"]).optional(),
   password: passwordSchema.optional(),
 });
+
+export function isNigerianPhone(value: string): boolean {
+  return /^(\+234|0)\d{10}$/.test(value);
+}
+
+export function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}

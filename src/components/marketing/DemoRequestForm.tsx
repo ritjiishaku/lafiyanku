@@ -1,20 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building, Phone, MapPin, User, CheckCircle, ArrowRight } from "lucide-react";
+import { Building, Phone, Mail, User, CheckCircle, ArrowRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { isNigerianPhone, isValidEmail } from "@/lib/validations";
 import { toast } from "sonner";
 
 const NIGERIAN_STATES = [
-  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", 
-  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT - Abuja", "Gombe", 
-  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", 
-  "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", 
-  "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
+  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT - Abuja", "Gombe",
+  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
+  "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau",
+  "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
 ];
 
 const ROLES = [
@@ -26,28 +27,76 @@ const ROLES = [
   { value: "other", label: "Other" },
 ];
 
+type FieldName = "fullName" | "role" | "facilityName" | "whatsappNumber" | "email" | "state";
+type FieldErrors = Partial<Record<FieldName, string>>;
+
+const FIELD_LABELS: Record<FieldName, string> = {
+  fullName: "Full name",
+  role: "Role",
+  facilityName: "Facility name",
+  whatsappNumber: "WhatsApp number",
+  email: "Email",
+  state: "State",
+};
+
+function validateField(name: FieldName, value: string): string | undefined {
+  if (name === "whatsappNumber") {
+    if (!value.trim()) return "WhatsApp number is required";
+    const digits = value.replace(/\s+/g, "");
+    if (!isNigerianPhone(digits)) return "Enter a valid Nigerian number (e.g. +2348031234567)";
+    return;
+  }
+  if (name === "email") {
+    if (!value.trim()) return "Email is required";
+    if (!isValidEmail(value.trim())) return "Enter a valid email address";
+    return;
+  }
+  if (!value.trim()) return `${FIELD_LABELS[name]} is required`;
+}
+
 export function DemoRequestForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [ndprConsent, setNdprConsent] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formData, setFormData] = useState({
     fullName: "",
     role: "",
     facilityName: "",
     whatsappNumber: "",
+    email: "",
     state: "",
   });
 
+  const updateField = useCallback((name: FieldName, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => {
+      const err = validateField(name, value);
+      return err ? { ...prev, [name]: err } : { ...prev, [name]: undefined };
+    });
+  }, []);
+
+  const handleBlur = useCallback((name: FieldName) => {
+    setFieldErrors((prev) => {
+      const err = validateField(name, formData[name]);
+      return err ? { ...prev, [name]: err } : { ...prev, [name]: undefined };
+    });
+  }, [formData]);
+
+  const validate = useCallback((): FieldErrors => {
+    const errors: FieldErrors = {};
+    for (const name of Object.keys(FIELD_LABELS) as FieldName[]) {
+      const err = validateField(name, formData[name]);
+      if (err) errors[name] = err;
+    }
+    return errors;
+  }, [formData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.role || !formData.facilityName || !formData.whatsappNumber || !formData.state) {
-      toast.error("Please fill in all fields.");
-      return;
-    }
-    if (!ndprConsent) {
-      toast.error("Please confirm your consent to continue.");
-      return;
-    }
+    const errors = validate();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     setLoading(true);
     try {
@@ -58,12 +107,15 @@ export function DemoRequestForm() {
         body: JSON.stringify({ ...formData, role: roleLabel }),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Something went wrong. Please try again.");
+      }
 
       setSuccess(true);
       toast.success("Demo request submitted!");
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,19 +159,29 @@ export function DemoRequestForm() {
                 <Label htmlFor="fullName" className="text-sm font-medium text-slate">Full name</Label>
                 <div className="relative">
                   <User className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
-                  <Input id="fullName" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} placeholder="Dr. Chidi Obi" required className="pl-10 h-11" />
+                  <Input
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => updateField("fullName", e.target.value)}
+                    onBlur={() => handleBlur("fullName")}
+                    placeholder="Dr. Chidi Obi"
+                    className="pl-10 h-11"
+                    aria-invalid={!!fieldErrors.fullName}
+                  />
                 </div>
+                {fieldErrors.fullName && <p className="text-xs text-warm-amber mt-1">{fieldErrors.fullName}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="role" className="text-sm font-medium text-slate">Your role</Label>
-                <Select onValueChange={(val) => setFormData({ ...formData, role: val as string })}>
-                  <SelectTrigger id="role" className="h-11"><SelectValue placeholder="Select role" /></SelectTrigger>
+                <Select onValueChange={(val) => updateField("role", val as string)}>
+                  <SelectTrigger id="role" className="h-11" data-invalid={!!fieldErrors.role}><SelectValue placeholder="Select role" /></SelectTrigger>
                   <SelectContent>
                     {ROLES.map((r) => (
                       <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {fieldErrors.role && <p className="text-xs text-warm-amber mt-1">{fieldErrors.role}</p>}
               </div>
             </div>
 
@@ -128,30 +190,66 @@ export function DemoRequestForm() {
                 <Label htmlFor="facilityName" className="text-sm font-medium text-slate">Facility name</Label>
                 <div className="relative">
                   <Building className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
-                  <Input id="facilityName" value={formData.facilityName} onChange={(e) => setFormData({ ...formData, facilityName: e.target.value })} placeholder="Lagos University Teaching Hospital" required className="pl-10 h-11" />
+                  <Input
+                    id="facilityName"
+                    value={formData.facilityName}
+                    onChange={(e) => updateField("facilityName", e.target.value)}
+                    onBlur={() => handleBlur("facilityName")}
+                    placeholder="Lagos University Teaching Hospital"
+                    className="pl-10 h-11"
+                    aria-invalid={!!fieldErrors.facilityName}
+                  />
                 </div>
+                {fieldErrors.facilityName && <p className="text-xs text-warm-amber mt-1">{fieldErrors.facilityName}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="whatsappNumber" className="text-sm font-medium text-slate">WhatsApp number</Label>
                 <div className="relative">
                   <Phone className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
-                  <Input id="whatsappNumber" type="tel" value={formData.whatsappNumber} onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })} placeholder="+234 803 123 4567" required className="pl-10 h-11" />
+                  <Input
+                    id="whatsappNumber"
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => updateField("whatsappNumber", e.target.value)}
+                    onBlur={() => handleBlur("whatsappNumber")}
+                    placeholder="+234 803 123 4567"
+                    className="pl-10 h-11"
+                    aria-invalid={!!fieldErrors.whatsappNumber}
+                  />
                 </div>
+                {fieldErrors.whatsappNumber && <p className="text-xs text-warm-amber mt-1">{fieldErrors.whatsappNumber}</p>}
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="state" className="text-sm font-medium text-slate">State</Label>
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60 z-10" />
-                <Select onValueChange={(val) => setFormData({ ...formData, state: val as string })}>
-                  <SelectTrigger id="state" className="h-11 pl-10"><SelectValue placeholder="Select your state" /></SelectTrigger>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium text-slate">Email</Label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => updateField("email", e.target.value)}
+                    onBlur={() => handleBlur("email")}
+                    placeholder="chidi.obi@luth.gov.ng"
+                    className="pl-10 h-11"
+                    aria-invalid={!!fieldErrors.email}
+                  />
+                </div>
+                {fieldErrors.email && <p className="text-xs text-warm-amber mt-1">{fieldErrors.email}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="state" className="text-sm font-medium text-slate">State</Label>
+                <Select onValueChange={(val) => updateField("state", val as string)}>
+                  <SelectTrigger id="state" className="h-11" data-invalid={!!fieldErrors.state}><SelectValue placeholder="Select your state" /></SelectTrigger>
                   <SelectContent>
                     {NIGERIAN_STATES.map((state) => (
                       <SelectItem key={state} value={state}>{state}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {fieldErrors.state && <p className="text-xs text-warm-amber mt-1">{fieldErrors.state}</p>}
               </div>
             </div>
 
