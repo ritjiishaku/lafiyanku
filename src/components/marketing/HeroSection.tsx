@@ -15,7 +15,7 @@ export function HeroSection() {
       <div className="flex-1 flex items-center min-h-0">
         <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 py-4 lg:py-6">
           {/* Logo */}
-          <div className="mb-3 lg:mb-4">
+          <div className="mb-5 lg:mb-7">
             <Link href="/" className="text-base font-bold tracking-tight text-white sm:text-lg hover:text-clinical-teal transition-colors">
               CareFlow
             </Link>
