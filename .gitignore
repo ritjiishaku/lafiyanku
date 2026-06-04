@@ -3,6 +3,9 @@
 docs/
 AGENTS.md
 
+# Scripts (may contain secrets)
+scripts/
+
 # Environment
 .env
 .env.local

@@ -30,6 +30,10 @@ export const facilityRegisterSchema = z.object({
   adminName: fullNameSchema,
   adminEmail: emailSchema,
   adminPassword: passwordSchema,
+  adminConfirmPassword: passwordSchema,
+}).refine((data) => data.adminPassword === data.adminConfirmPassword, {
+  message: "Passwords do not match.",
+  path: ["adminConfirmPassword"],
 });
 
 export const clinicianUpdateSchema = z.object({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -8,34 +8,125 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Building, User, Mail, Lock, CheckCircle, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Building, User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft,
+  Eye, EyeOff, Check,
+} from "lucide-react";
 
-function Field({ label, id, children }: { label: string; id: string; children: React.ReactNode }) {
+const STEPS = [
+  { num: 1, label: "Facility details" },
+  { num: 2, label: "Admin account" },
+];
+
+function Field({ label, id, error, children }: { label: string; id: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <Label htmlFor={id} className="text-sm font-medium text-slate/90">{label}</Label>
       {children}
+      {error && <p className="text-[11px] text-warm-amber mt-0.5">{error}</p>}
+    </div>
+  );
+}
+
+function ProgressIndicator({ currentStep }: { currentStep: number }) {
+  return (
+    <div className="flex items-center justify-center gap-0 mb-8">
+      {STEPS.map((s, i) => (
+        <div key={s.num} className="flex items-center">
+          <div className="flex flex-col items-center">
+            <div
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
+                currentStep > s.num
+                  ? "bg-clinical-teal text-white"
+                  : currentStep === s.num
+                  ? "bg-clinical-teal text-white ring-4 ring-clinical-teal/20"
+                  : "bg-slate-100 text-cool-grey",
+              )}
+            >
+              {currentStep > s.num ? <Check className="h-4 w-4" /> : s.num}
+            </div>
+            <span
+              className={cn(
+                "mt-1.5 text-[11px] font-semibold whitespace-nowrap transition-colors duration-300",
+                currentStep >= s.num ? "text-deep-navy" : "text-cool-grey",
+              )}
+            >
+              {s.label}
+            </span>
+          </div>
+          {i < STEPS.length - 1 && (
+            <div className="mx-3 mb-5 h-0.5 w-16 sm:w-28 rounded-full bg-slate-200 overflow-hidden">
+              <div
+                className={cn("h-full rounded-full bg-clinical-teal transition-all duration-500")}
+                style={{ width: currentStep > i + 1 ? "100%" : currentStep === i + 1 ? "50%" : "0%" }}
+              />
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
 
 export default function RegisterFacilityPage() {
   const router = useRouter();
+
+  const [step, setStep] = useState(1);
   const [facilityName, setFacilityName] = useState("");
   const [facilityCode, setFacilityCode] = useState("");
   const [adminName, setAdminName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  function clearError() { setError(null); setFieldErrors({}); }
+
+  function validateStep1(): boolean {
+    const errs: Record<string, string> = {};
+    if (!facilityName.trim()) errs.facilityName = "Facility name is required.";
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  function validateStep2(): boolean {
+    const errs: Record<string, string> = {};
+    if (!adminName.trim()) errs.adminName = "Admin full name is required.";
+    if (!adminEmail.trim()) errs.adminEmail = "Admin email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) errs.adminEmail = "Enter a valid email address.";
+    if (!adminPassword) errs.adminPassword = "Password is required.";
+    else if (adminPassword.length < 8) errs.adminPassword = "At least 8 characters.";
+    if (!adminConfirmPassword) errs.adminConfirmPassword = "Confirm your password.";
+    else if (adminPassword !== adminConfirmPassword) errs.adminConfirmPassword = "Passwords do not match.";
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  const handleNext = useCallback(() => {
+    clearError();
+    if (validateStep1()) setStep(2);
+  }, [facilityName]);
+
+  const handleBack = useCallback(() => {
+    setStep(1);
+    setFieldErrors({});
+    setError(null);
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+    clearError();
+    if (!validateStep2()) return;
 
+    setIsLoading(true);
     try {
       const res = await fetch("/api/facilities/register", {
         method: "POST",
@@ -46,6 +137,7 @@ export default function RegisterFacilityPage() {
           adminName,
           adminEmail,
           adminPassword,
+          adminConfirmPassword,
         }),
       });
 
@@ -88,10 +180,15 @@ export default function RegisterFacilityPage() {
 
   return (
     <AuthShell variant="facility">
-        <div className="rounded-2xl bg-pure-white px-7 py-8 shadow-xl shadow-slate-200/50 border border-slate-100">
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="rounded-2xl bg-pure-white px-7 py-8 shadow-xl shadow-slate-200/50 border border-slate-100">
 
-            <Field label="Facility name" id="facilityName">
+        <ProgressIndicator currentStep={step} />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* ── Step 1: Facility details ── */}
+          <div className={cn("space-y-4", step !== 1 && "hidden")}>
+            <Field label="Facility name" id="facilityName" error={fieldErrors.facilityName}>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Building className="h-4 w-4 text-cool-grey/60" />
@@ -101,7 +198,7 @@ export default function RegisterFacilityPage() {
                   type="text"
                   placeholder="e.g. Kano General Hospital"
                   value={facilityName}
-                  onChange={(e) => setFacilityName(e.target.value)}
+                  onChange={(e) => { setFacilityName(e.target.value); clearError(); }}
                   required
                   autoComplete="organization"
                   enterKeyHint="next"
@@ -123,9 +220,32 @@ export default function RegisterFacilityPage() {
               />
             </Field>
 
-            <hr className="border-slate/10" />
+            <div className="pt-2">
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="w-full h-11 rounded-lg bg-clinical-teal text-white text-sm font-bold hover:bg-clinical-teal/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150"
+              >
+                <span className="inline-flex items-center gap-2">
+                  Next step
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Button>
+            </div>
+          </div>
 
-            <Field label="Admin full name" id="adminName">
+          {/* ── Step 2: Admin account ── */}
+          <div className={cn("space-y-4", step !== 2 && "hidden")}>
+            <div className="rounded-xl bg-clinical-teal/5 border border-clinical-teal/10 px-4 py-3">
+              <p className="text-xs font-medium text-clinical-teal/80">
+                <span className="inline-flex items-center gap-1.5">
+                  <Building className="h-3.5 w-3.5" />
+                  {facilityName || "Your facility"}
+                </span>
+              </p>
+            </div>
+
+            <Field label="Admin full name" id="adminName" error={fieldErrors.adminName}>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <User className="h-4 w-4 text-cool-grey/60" />
@@ -144,7 +264,7 @@ export default function RegisterFacilityPage() {
               </div>
             </Field>
 
-            <Field label="Admin email" id="adminEmail">
+            <Field label="Admin email" id="adminEmail" error={fieldErrors.adminEmail}>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Mail className="h-4 w-4 text-cool-grey/60" />
@@ -165,7 +285,7 @@ export default function RegisterFacilityPage() {
               </div>
             </Field>
 
-            <Field label="Admin password" id="adminPassword">
+            <Field label="Admin password" id="adminPassword" error={fieldErrors.adminPassword}>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Lock className="h-4 w-4 text-cool-grey/60" />
@@ -179,7 +299,7 @@ export default function RegisterFacilityPage() {
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  enterKeyHint="done"
+                  enterKeyHint="next"
                   className="pl-10 pr-10 h-11"
                 />
                 <button
@@ -194,50 +314,89 @@ export default function RegisterFacilityPage() {
               </div>
             </Field>
 
+            <Field label="Confirm admin password" id="adminConfirmPassword" error={fieldErrors.adminConfirmPassword}>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Lock className="h-4 w-4 text-cool-grey/60" />
+                </div>
+                <Input
+                  id="adminConfirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Re-enter your password"
+                  value={adminConfirmPassword}
+                  onChange={(e) => setAdminConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  enterKeyHint="done"
+                  className="pl-10 pr-10 h-11"
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey/60 hover:text-cool-grey transition-colors"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </Field>
+
             {error && (
               <Alert variant="destructive" className="rounded-lg border-red-200 bg-red-50 text-red-700 py-2.5">
                 <AlertDescription className="text-xs">{error}</AlertDescription>
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-11 rounded-lg bg-clinical-teal text-white text-sm font-bold hover:bg-clinical-teal/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0"
-            >
-              {isLoading ? (
+            <div className="flex gap-3 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                disabled={isLoading}
+                className="h-11 rounded-lg text-sm font-medium flex-1"
+              >
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Registering facility...
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
                 </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  Register facility
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              )}
-            </Button>
-          </form>
-        </div>
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-11 rounded-lg bg-clinical-teal text-white text-sm font-bold hover:bg-clinical-teal/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0 flex-[2]"
+              >
+                {isLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Registering...
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    Register facility
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
 
-        <div className="mt-5 space-y-2 text-center text-sm text-cool-grey">
-          <p>
-            Already registered?{" "}
-            <Link href="/auth" className="font-medium text-clinical-teal hover:text-clinical-teal/80 transition-colors">
-              Sign in
-            </Link>
-          </p>
-          <p>
-            Part of an existing facility?{" "}
-            <Link href="/auth" className="font-medium text-clinical-teal hover:text-clinical-teal/80 transition-colors">
-              Sign in
-            </Link>
-          </p>
-        </div>
+        </form>
+      </div>
 
-        <p className="mt-5 text-xs text-warm-amber leading-relaxed text-center">
-          By continuing, you consent to the processing of patient data in accordance with NDPR 2019.
+      <div className="mt-5 space-y-2 text-center text-sm text-cool-grey">
+        <p>
+          Already registered?{" "}
+          <Link href="/auth" className="font-medium text-clinical-teal hover:text-clinical-teal/80 transition-colors">
+            Sign in
+          </Link>
         </p>
+      </div>
+
+      <p className="mt-5 text-xs text-warm-amber leading-relaxed text-center">
+        By continuing, you consent to the processing of patient data in accordance with NDPR 2019.
+      </p>
     </AuthShell>
   );
 }
