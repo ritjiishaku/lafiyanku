@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRole } from "@/hooks/useRole";
 
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   FilePlus,
@@ -162,9 +163,9 @@ export function Sidebar({ onClose }: SidebarProps) {
               Settings
             </Link>
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (window.confirm("Sign out of CareFlow?")) {
-                  window.location.href = "/api/auth/signout";
+                  await signOut({ callbackUrl: "/auth" });
                 }
               }}
               className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
