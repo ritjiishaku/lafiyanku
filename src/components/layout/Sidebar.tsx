@@ -164,7 +164,8 @@ export function Sidebar({ onClose }: SidebarProps) {
             <button
               onClick={async () => {
                 if (window.confirm("Sign out of CareFlow?")) {
-                  await signOut({ callbackUrl: "/auth" });
+                  await signOut({ redirect: false });
+                  window.location.href = "/auth";
                 }
               }}
               className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
