@@ -10,14 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { isNigerianPhone, isValidEmail } from "@/lib/validations";
 import { toast } from "sonner";
 
-const NIGERIAN_STATES = [
-  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
-  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT - Abuja", "Gombe",
-  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
-  "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau",
-  "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
-];
-
 const ROLES = [
   { value: "medical-director", label: "Medical Director" },
   { value: "it-lead", label: "IT Lead / Director" },
@@ -27,7 +19,7 @@ const ROLES = [
   { value: "other", label: "Other" },
 ];
 
-type FieldName = "fullName" | "role" | "facilityName" | "whatsappNumber" | "email" | "state";
+type FieldName = "fullName" | "role" | "facilityName" | "whatsappNumber" | "email";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
 const FIELD_LABELS: Record<FieldName, string> = {
@@ -36,7 +28,6 @@ const FIELD_LABELS: Record<FieldName, string> = {
   facilityName: "Facility name",
   whatsappNumber: "WhatsApp number",
   email: "Email",
-  state: "State",
 };
 
 function validateField(name: FieldName, value: string): string | undefined {
@@ -65,7 +56,6 @@ export function ContactForm() {
     facilityName: "",
     whatsappNumber: "",
     email: "",
-    state: "",
   });
 
   const updateField = useCallback((name: FieldName, value: string) => {
@@ -202,34 +192,22 @@ export function ContactForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-sm font-medium text-slate">Email</Label>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => updateField("email", e.target.value)}
-              onBlur={() => handleBlur("email")}
-              placeholder="chidi.obi@luth.gov.ng"
-              className="pl-10 h-11"
-              aria-invalid={!!fieldErrors.email}
-            />
-          </div>
-          {fieldErrors.email && <p className="text-xs text-warm-amber mt-1">{fieldErrors.email}</p>}
+      <div className="space-y-1.5">
+        <Label htmlFor="email" className="text-sm font-medium text-slate">Email</Label>
+        <div className="relative">
+          <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            onBlur={() => handleBlur("email")}
+            placeholder="chidi.obi@luth.gov.ng"
+            className="pl-10 h-11"
+            aria-invalid={!!fieldErrors.email}
+          />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="state" className="text-sm font-medium text-slate">State</Label>
-          <Select onValueChange={(val) => updateField("state", val as string)}>
-            <SelectTrigger id="state" className="h-11" data-invalid={!!fieldErrors.state}><SelectValue placeholder="Select your state" /></SelectTrigger>
-            <SelectContent>
-              {NIGERIAN_STATES.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
-            </SelectContent>
-          </Select>
-          {fieldErrors.state && <p className="text-xs text-warm-amber mt-1">{fieldErrors.state}</p>}
-        </div>
+        {fieldErrors.email && <p className="text-xs text-warm-amber mt-1">{fieldErrors.email}</p>}
       </div>
 
       <div className="flex items-start gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3">
