@@ -17,7 +17,7 @@ const publicPaths = [
   "/",
 ];
 
-export default auth((req) => {
+export const proxy = auth((req) => {
   const path = req.nextUrl.pathname;
   if (publicPaths.some((p) => path === p || path.startsWith(p))) {
     return NextResponse.next();

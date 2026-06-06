@@ -5,6 +5,7 @@ import { verifyFacilityAccess } from "@/services/facility-access";
 import { AuditAction, UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
+import { renderDischargePdfToBuffer } from "@/components/pdf/DischargePdf";
 
 export async function GET(
   request: NextRequest,
@@ -58,14 +59,14 @@ export async function GET(
     const pi = data.patient_input as Record<string, unknown> | undefined;
 
     const exportData = {
-      facilityName: pi?.facility_name ?? "",
-      patientName: pi?.patient_name ?? "",
-      dischargeDate: pi?.discharge_date ?? "",
-      clinicianName: pi?.discharged_by ?? "",
-      clinicalSummary: data.clinical_summary,
-      patientFriendlyOutput: data.patient_friendly_output,
-      translatedOutput: data.translated_output,
-      translationLanguage: data.translation_language,
+      facilityName: String(pi?.facility_name ?? ""),
+      patientName: String(pi?.patient_name ?? ""),
+      dischargeDate: String(pi?.discharge_date ?? ""),
+      clinicianName: String(pi?.discharged_by ?? ""),
+      clinicalSummary: String(data.clinical_summary ?? ""),
+      patientFriendlyOutput: String(data.patient_friendly_output ?? ""),
+      translatedOutput: data.translated_output ? String(data.translated_output) : null,
+      translationLanguage: data.translation_language ? String(data.translation_language) : null,
     };
 
     await writeAuditLog({
@@ -76,6 +77,18 @@ export async function GET(
       facilityId: session.user.facilityId,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
     });
+
+    const format = request.nextUrl.searchParams.get("format");
+    if (format === "pdf") {
+      const pdfBuffer = await renderDischargePdfToBuffer(exportData);
+      return new NextResponse(new Uint8Array(pdfBuffer), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="discharge-${id}.pdf"`,
+        },
+      });
+    }
 
     return NextResponse.json({ success: true, data: exportData });
   } catch (err) {
