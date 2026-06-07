@@ -38,7 +38,7 @@ function parseSections(text: string): Record<string, string> {
 
 const SEPARATOR_RE = /─{10,}/;
 
-function renderWithDividers(text: string): React.ReactNode[] {
+function renderWithDividers(text: string, dividerColor = "#E2E8F0"): React.ReactNode[] {
   const parts = text.split(SEPARATOR_RE);
   const nodes: React.ReactNode[] = [];
   parts.forEach((part, i) => {
@@ -50,7 +50,7 @@ function renderWithDividers(text: string): React.ReactNode[] {
       nodes.push(<span key={`t-${i}`}>{trimmed}</span>);
     }
     if (i < parts.length - 1) {
-      nodes.push(<hr key={`hr-${i}`} style={{ border: "none", borderTop: "1px solid #E2E8F0", margin: "12px 0" }} />);
+      nodes.push(<hr key={`hr-${i}`} style={{ border: "none", borderTop: `1.5px solid ${dividerColor}`, margin: "16px 0", opacity: 0.6 }} />);
     }
   });
   return nodes.length > 0 ? nodes : [text];
@@ -277,7 +277,7 @@ export function TranslationPanel({
               </span>
             </div>
             <div style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.7, marginLeft: 34 }}>
-              {renderWithDividers(sections["What happened"])}
+              {renderWithDividers(sections["What happened"], "#0B6E6E")}
             </div>
           </div>
         )}
@@ -291,7 +291,7 @@ export function TranslationPanel({
               </span>
             </div>
             <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 34 }}>
-              {renderWithDividers(sections["Treatment you received"])}
+              {renderWithDividers(sections["Treatment you received"], "#0B6E6E")}
             </div>
           </div>
         )}
@@ -310,7 +310,7 @@ export function TranslationPanel({
                 if (meds.length === 0) {
                   return (
                     <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>
-                      {renderWithDividers(sections["Your medications"])}
+                      {renderWithDividers(sections["Your medications"], "#0B6E6E")}
                     </div>
                   );
                 }
@@ -407,7 +407,7 @@ export function TranslationPanel({
                 </span>
               </div>
               <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.7, marginLeft: 0 }}>
-                {renderWithDividers(sections["When to return to the hospital"])}
+                {renderWithDividers(sections["When to return to the hospital"], "#0B6E6E")}
               </div>
             </div>
           </div>
@@ -430,7 +430,7 @@ export function TranslationPanel({
                 </span>
               </div>
               <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 0 }}>
-                {renderWithDividers(sections["Your follow-up appointment"])}
+                {renderWithDividers(sections["Your follow-up appointment"], "#0B6E6E")}
               </div>
             </div>
           </div>
