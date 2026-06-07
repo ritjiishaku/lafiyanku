@@ -194,7 +194,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
   const canSeeClinical = role === "doctor" || role === "nurse";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 p-4 pb-20 sm:p-6 sm:pb-6">
+    <div className="mx-auto max-w-6xl space-y-4 p-4 pb-4 sm:p-6 sm:pb-6">
       <button type="button" onClick={() => onNavigate({ name: "list" })} className="inline-flex items-center gap-1.5 text-sm text-cool-grey hover:text-deep-navy transition-colors mb-2">
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
@@ -250,18 +250,20 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         </div>
       )}
 
-      <div className="rounded-lg border border-slate/20 bg-white p-4">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="rounded-lg border border-slate/20 bg-white p-3 sm:p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
           <span className="text-sm font-medium text-slate">Translate to:</span>
-          <select value={translateLang} onChange={(e) => setTranslateLang(e.target.value)} className="touch-target-min rounded-md border border-slate/30 bg-white px-3 py-1.5 text-sm text-slate shadow-sm">
-            <option value="">Select language</option>
-            <option value="ha">Hausa</option>
-            <option value="yo">Yoruba</option>
-            <option value="ig">Igbo</option>
-          </select>
-          <Button size="sm" variant="outline" className="touch-target-min" onClick={() => handleTranslate()} disabled={translating || !translateLang}>
-            {translating ? "Translating..." : record.translationConfidence === "low" || record.translationConfidence === "failed" ? "Retranslate" : "Translate"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <select value={translateLang} onChange={(e) => setTranslateLang(e.target.value)} className="touch-target-min rounded-md border border-slate/30 bg-white px-3 py-1.5 text-sm text-slate shadow-sm">
+              <option value="">Select language</option>
+              <option value="ha">Hausa</option>
+              <option value="yo">Yoruba</option>
+              <option value="ig">Igbo</option>
+            </select>
+            <Button size="sm" variant="outline" className="touch-target-min" onClick={() => handleTranslate()} disabled={translating || !translateLang}>
+              {translating ? "Translating..." : record.translationConfidence === "low" || record.translationConfidence === "failed" ? "Retranslate" : "Translate"}
+            </Button>
+          </div>
           {record.translationLanguage && (
             <span className="text-xs text-cool-grey">
               {record.translationLanguage === "ha" ? "Hausa" : record.translationLanguage === "yo" ? "Yoruba" : "Igbo"}
@@ -276,15 +278,15 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
           <button
             type="button"
             onClick={() => setActiveMode("clinical")}
-            className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:py-2.5 sm:text-sm ${
               activeMode === "clinical"
                 ? "bg-clinical-teal text-white shadow-sm"
                 : "bg-transparent text-slate hover:text-deep-navy"
             }`}
           >
-            <span className="flex items-center justify-center gap-2">
-              Clinical Discharge Summary
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+            <span className="flex flex-col items-center gap-0.5 sm:flex-row sm:gap-2">
+              <span className="leading-tight sm:leading-normal">Clinical Summary</span>
+              <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider sm:px-2 sm:text-[10px] ${
                 activeMode === "clinical"
                   ? "bg-white/20 text-white"
                   : "bg-clinical-teal/10 text-clinical-teal"
@@ -297,15 +299,15 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         <button
           type="button"
           onClick={() => setActiveMode("patient")}
-          className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:py-2.5 sm:text-sm ${
             activeMode === "patient"
               ? "bg-clinical-teal text-white shadow-sm"
               : "bg-transparent text-slate hover:text-deep-navy"
           }`}
         >
-          <span className="flex items-center justify-center gap-2">
-            Patient Discharge Instructions
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+          <span className="flex flex-col items-center gap-0.5 sm:flex-row sm:gap-2">
+            <span className="leading-tight sm:leading-normal">Patient Instructions</span>
+            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider sm:px-2 sm:text-[10px] ${
               activeMode === "patient"
                 ? "bg-white/20 text-white"
                 : "bg-warm-amber/10 text-warm-amber"
