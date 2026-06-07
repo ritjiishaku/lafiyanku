@@ -200,7 +200,7 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
   function renderSection(name: string, children: React.ReactNode, style?: React.CSSProperties) {
     const sectionText = sections[name] ?? "";
     return (
-      <div style={{ position: "relative", ...style }}>
+      <div style={{ position: "relative", paddingRight: 60, ...style }}>
         <div
           style={{
             position: "absolute",
