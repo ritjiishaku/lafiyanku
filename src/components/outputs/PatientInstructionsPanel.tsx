@@ -289,7 +289,7 @@ export function PatientInstructionsPanel({
         </div>
       </div>
 
-      <div style={{ padding: "16px 20px" }}>
+      <div style={{ padding: "16px 20px", overflowWrap: "break-word", wordBreak: "break-word" }}>
 
         {sections["What happened"] && (
           <div style={sectionStyle}>
@@ -449,7 +449,7 @@ export function PatientInstructionsPanel({
                   Your follow-up appointment
                 </span>
               </div>
-              <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 0 }}>
+              <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 0, overflowWrap: "break-word", wordBreak: "break-word" }}>
                 {sections["Your follow-up appointment"]}
               </div>
             </div>
