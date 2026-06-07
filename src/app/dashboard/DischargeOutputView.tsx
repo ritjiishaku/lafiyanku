@@ -166,11 +166,13 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
     }
   }
 
-  async function handleTranslate() {
+  async function handleTranslate(lang?: string) {
     if (!record) return;
+    const targetLang = lang ?? translateLang;
+    if (!targetLang) return;
     setTranslating(true);
     try {
-      const res = await fetch("/api/translation/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordId: record.recordId, targetLanguage: translateLang, userId, userRole: role }) });
+      const res = await fetch("/api/translation/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordId: record.recordId, targetLanguage: targetLang, userId, userRole: role }) });
       const json = await res.json();
       if (json.success) {
         setRecord((prev) => prev ? { ...prev, translatedOutput: json.data.translatedOutput, translationLanguage: json.data.translationLanguage, translationConfidence: json.data.confidence } : prev);
@@ -201,32 +203,16 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         <div className="flex items-center gap-4">
           <div>
             <h1 className="text-xl font-bold text-deep-navy sm:text-2xl">Discharge Output</h1>
-            <StatusBadge status={record.status as "draft" | "finalised" | "archived"} />
+            <StatusBadge status={record.status as "draft" | "finalised" | "archived"} size="lg" />
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {record.status !== "archived" && canEdit && !isEditing && (
             <Button variant="outline" size="sm" className="touch-target-min" onClick={() => setIsEditing(true)}><Edit className="mr-1 h-4 w-4" />Edit</Button>
           )}
-          {record.status === "finalised" && (
-            <>
-              <PrintButton patientName={record.patientName} facilityName={record.facilityName} dischargeDate={record.dischargeDate} clinicianName={record.dischargedBy} patientFriendlyOutput={record.patientFriendlyOutput} translatedOutput={record.translatedOutput} translationLanguage={record.translationLanguage} translationConfidence={record.translationConfidence} />
-              <WhatsAppShareButton patientFriendlyOutput={record.patientFriendlyOutput} />
-            </>
-          )}
           {record.status === "draft" && role === "doctor" && (
             <Button size="sm" className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => { setConfirmAction("finalise"); setConfirmOpen(true); }}>
               <CheckCircle className="mr-1 h-4 w-4" />Finalise
-            </Button>
-          )}
-          {record.status !== "archived" && (role === "doctor" || role === "admin") && (
-            <Button variant="outline" size="sm" className="touch-target-min text-red-500" onClick={() => { setConfirmAction("archive"); setConfirmOpen(true); }}>
-              <Archive className="mr-1 h-4 w-4" />Archive
-            </Button>
-          )}
-          {record.status === "archived" && (role === "doctor" || role === "admin") && (
-            <Button variant="outline" size="sm" className="touch-target-min" onClick={() => { setConfirmAction("unarchive"); setConfirmOpen(true); }}>
-              <Archive className="mr-1 h-4 w-4" />Unarchive
             </Button>
           )}
           {isEditing && (
@@ -238,30 +224,54 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         </div>
       </div>
 
-      {record.missingFieldsLog && record.missingFieldsLog.length > 0 && <MissingFieldsBanner fields={record.missingFieldsLog} />}
-      {record.flaggedIssues && record.flaggedIssues.length > 0 && <FlaggedIssuesBanner issues={record.flaggedIssues} />}
-
-      <div className="flex flex-wrap items-center gap-2 py-3">
-        <span className="text-sm font-medium text-slate">Translate to:</span>
-        <select value={translateLang} onChange={(e) => setTranslateLang(e.target.value)} className="touch-target-min rounded-md border border-slate/30 bg-white px-3 py-1.5 text-sm text-slate shadow-sm">
-          <option value="">Select language</option>
-          <option value="ha">Hausa</option>
-          <option value="yo">Yoruba</option>
-          <option value="ig">Igbo</option>
-        </select>
-        <Button size="sm" variant="outline" className="touch-target-min" onClick={handleTranslate} disabled={translating || !translateLang}>
-          {translating ? "Translating..." : record.translationConfidence === "low" || record.translationConfidence === "failed" ? "Retranslate" : "Translate"}
-        </Button>
-        {record.translationLanguage && (
-          <span className="text-xs text-cool-grey">
-            {record.translationLanguage === "ha" ? "Hausa" : record.translationLanguage === "yo" ? "Yoruba" : "Igbo"}
-            {record.translationConfidence && (record.translationConfidence === "low" ? " (low confidence)" : record.translationConfidence === "failed" ? " (failed)" : "")}
-          </span>
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {record.status === "finalised" && (
+          <>
+            <PrintButton patientName={record.patientName} facilityName={record.facilityName} dischargeDate={record.dischargeDate} clinicianName={record.dischargedBy} patientFriendlyOutput={record.patientFriendlyOutput} translatedOutput={record.translatedOutput} translationLanguage={record.translationLanguage} translationConfidence={record.translationConfidence} />
+            <WhatsAppShareButton patientFriendlyOutput={record.patientFriendlyOutput} />
+          </>
+        )}
+        {record.status !== "archived" && (role === "doctor" || role === "admin") && (
+          <Button variant="outline" size="sm" className="touch-target-min shrink-0 text-red-500" onClick={() => { setConfirmAction("archive"); setConfirmOpen(true); }}>
+            <Archive className="mr-1 h-4 w-4" />Archive
+          </Button>
+        )}
+        {record.status === "archived" && (role === "doctor" || role === "admin") && (
+          <Button variant="outline" size="sm" className="touch-target-min shrink-0" onClick={() => { setConfirmAction("unarchive"); setConfirmOpen(true); }}>
+            <Archive className="mr-1 h-4 w-4" />Unarchive
+          </Button>
         )}
       </div>
 
+      {record.flaggedIssues && record.flaggedIssues.length > 0 && (
+        <div className="sticky top-0 z-10">
+          <FlaggedIssuesBanner issues={record.flaggedIssues} />
+        </div>
+      )}
+
+      <div className="rounded-lg border border-slate/20 bg-white p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium text-slate">Translate to:</span>
+          <select value={translateLang} onChange={(e) => setTranslateLang(e.target.value)} className="touch-target-min rounded-md border border-slate/30 bg-white px-3 py-1.5 text-sm text-slate shadow-sm">
+            <option value="">Select language</option>
+            <option value="ha">Hausa</option>
+            <option value="yo">Yoruba</option>
+            <option value="ig">Igbo</option>
+          </select>
+          <Button size="sm" variant="outline" className="touch-target-min" onClick={() => handleTranslate()} disabled={translating || !translateLang}>
+            {translating ? "Translating..." : record.translationConfidence === "low" || record.translationConfidence === "failed" ? "Retranslate" : "Translate"}
+          </Button>
+          {record.translationLanguage && (
+            <span className="text-xs text-cool-grey">
+              {record.translationLanguage === "ha" ? "Hausa" : record.translationLanguage === "yo" ? "Yoruba" : "Igbo"}
+              {record.translationConfidence && (record.translationConfidence === "low" ? " (low confidence)" : record.translationConfidence === "failed" ? " (failed)" : "")}
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="lg:hidden">
-        <Tabs defaultValue={canSeeClinical ? "clinical" : "patient"} className="w-full">
+        <Tabs defaultValue="patient" className="w-full">
           <TabsList className="w-full">
             {canSeeClinical && <TabsTrigger value="clinical" className="flex-1">Clinical Summary</TabsTrigger>}
             <TabsTrigger value="patient" className="flex-1">Patient Instructions</TabsTrigger>
@@ -269,28 +279,88 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
           </TabsList>
           {canSeeClinical && (
             <TabsContent value="clinical">
-              {isEditing ? <textarea className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} /> : <ClinicalSummaryPanel content={record.clinicalSummary} />}
+              {isEditing ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
+                    <span className="text-xs text-slate">
+                      Words: {editClinical.split(/\s+/).filter(Boolean).length} · Characters: {editClinical.length}
+                    </span>
+                  </div>
+                  <textarea className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
+                </div>
+              ) : (
+                <ClinicalSummaryPanel content={record.clinicalSummary} missingFieldsLog={record.missingFieldsLog} />
+              )}
             </TabsContent>
           )}
           <TabsContent value="patient">
-            {isEditing ? <textarea className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} /> : <PatientInstructionsPanel content={record.patientFriendlyOutput} />}
+            {isEditing ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
+                  <span className="text-xs text-slate">
+                    Words: {editPatient.split(/\s+/).filter(Boolean).length} · Characters: {editPatient.length}
+                  </span>
+                </div>
+                <textarea className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
+              </div>
+            ) : (
+              <PatientInstructionsPanel content={record.patientFriendlyOutput} />
+            )}
           </TabsContent>
           {record.translatedOutput && (
-            <TabsContent value="translation"><TranslationPanel content={record.translatedOutput} language={record.translationLanguage ?? null} confidence={record.translationConfidence ?? null} /></TabsContent>
+            <TabsContent value="translation">
+              <TranslationPanel
+                content={record.translatedOutput}
+                language={record.translationLanguage ?? null}
+                confidence={record.translationConfidence ?? null}
+                onRetranslate={record.translationLanguage ? () => handleTranslate(record.translationLanguage!) : undefined}
+              />
+            </TabsContent>
           )}
         </Tabs>
       </div>
 
       <div className="hidden space-y-6 lg:block">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-[45%_55%] gap-6">
           {canSeeClinical && (
-            <div>{isEditing ? <textarea className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} /> : <ClinicalSummaryPanel content={record.clinicalSummary} />}</div>
+            <div>
+              {isEditing ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
+                    <span className="text-xs text-slate">
+                      Words: {editClinical.split(/\s+/).filter(Boolean).length} · Characters: {editClinical.length}
+                    </span>
+                  </div>
+                  <textarea className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
+                </div>
+              ) : (
+                <ClinicalSummaryPanel content={record.clinicalSummary} missingFieldsLog={record.missingFieldsLog} />
+              )}
+            </div>
           )}
           <div className={canSeeClinical ? "" : "col-span-2"}>
-            {isEditing ? <textarea className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} /> : <PatientInstructionsPanel content={record.patientFriendlyOutput} />}
+            {isEditing ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
+                  <span className="text-xs text-slate">
+                    Words: {editPatient.split(/\s+/).filter(Boolean).length} · Characters: {editPatient.length}
+                  </span>
+                </div>
+                <textarea className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
+              </div>
+            ) : (
+              <PatientInstructionsPanel content={record.patientFriendlyOutput} />
+            )}
           </div>
         </div>
-        {record.translatedOutput && <TranslationPanel content={record.translatedOutput} language={record.translationLanguage ?? null} confidence={record.translationConfidence ?? null} />}
+        {record.translatedOutput && (
+          <TranslationPanel
+            content={record.translatedOutput}
+            language={record.translationLanguage ?? null}
+            confidence={record.translationConfidence ?? null}
+            onRetranslate={record.translationLanguage ? () => handleTranslate(record.translationLanguage!) : undefined}
+          />
+        )}
       </div>
 
       <ConfirmModal
