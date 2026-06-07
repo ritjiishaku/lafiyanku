@@ -49,8 +49,8 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
   const [saving, setSaving] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<"finalise" | "archive" | "unarchive" | null>(null);
-  const [translateLang, setTranslateLang] = useState<string>("");
   const [translating, setTranslating] = useState(false);
+  const [translateLang, setTranslateLang] = useState<string>("");
   const [activeMode, setActiveMode] = useState<"clinical" | "patient">("patient");
 
   useEffect(() => {
@@ -250,26 +250,42 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         </div>
       )}
 
-      <div className="rounded-lg border border-slate/20 bg-white p-3 sm:p-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-          <span className="text-sm font-medium text-slate">Translate to:</span>
-          <div className="flex flex-wrap items-center gap-2">
-            <select value={translateLang} onChange={(e) => setTranslateLang(e.target.value)} className="touch-target-min rounded-md border border-slate/30 bg-white px-3 py-1.5 text-sm text-slate shadow-sm">
-              <option value="">Select language</option>
-              <option value="ha">Hausa</option>
-              <option value="yo">Yoruba</option>
-              <option value="ig">Igbo</option>
-            </select>
-            <Button size="sm" variant="outline" className="touch-target-min" onClick={() => handleTranslate()} disabled={translating || !translateLang}>
-              {translating ? "Translating..." : record.translationConfidence === "low" || record.translationConfidence === "failed" ? "Retranslate" : "Translate"}
-            </Button>
-          </div>
-          {record.translationLanguage && (
-            <span className="text-xs text-cool-grey">
-              {record.translationLanguage === "ha" ? "Hausa" : record.translationLanguage === "yo" ? "Yoruba" : "Igbo"}
-              {record.translationConfidence && (record.translationConfidence === "low" ? " (low confidence)" : record.translationConfidence === "failed" ? " (failed)" : "")}
-            </span>
-          )}
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate/20 bg-white p-3 sm:p-4">
+        <span className="text-xs font-medium text-slate sm:text-sm">Translate to:</span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {(["ha", "yo", "ig"] as const).map((lang) => {
+            const label = lang === "ha" ? "Hausa" : lang === "yo" ? "Yoruba" : "Igbo";
+            const isActive = record.translationLanguage === lang;
+            const isPending = translateLang === lang && !record.translationLanguage;
+            return (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => {
+                  setTranslateLang(lang);
+                  handleTranslate(lang);
+                }}
+                disabled={translating}
+                className={`touch-target-min inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors sm:px-4 sm:py-2 sm:text-sm ${
+                  translating && isPending
+                    ? "animate-pulse bg-clinical-teal/20 text-clinical-teal"
+                    : isActive
+                    ? record.translationConfidence === "low" || record.translationConfidence === "failed"
+                      ? "bg-warm-amber/10 text-warm-amber"
+                      : "bg-clinical-teal/10 text-clinical-teal"
+                    : "bg-slate/10 text-slate hover:bg-slate/20"
+                }`}
+              >
+                {label}
+                {isActive && record.translationConfidence === "low" && (
+                  <span className="text-[9px] opacity-70 sm:text-[10px]">(low)</span>
+                )}
+                {isActive && record.translationConfidence === "failed" && (
+                  <span className="text-[9px] opacity-70 sm:text-[10px]">(failed)</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
