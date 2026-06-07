@@ -200,15 +200,8 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
   function renderSection(name: string, children: React.ReactNode, style?: React.CSSProperties) {
     const sectionText = sections[name] ?? "";
     return (
-      <div style={{ position: "relative", paddingRight: 60, ...style }}>
-        <div
-          style={{
-            position: "absolute",
-            top: 4,
-            right: 0,
-            zIndex: 1,
-          }}
-        >
+      <div style={{ ...style }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4, minHeight: 28 }}>
           <CopyButton text={sectionText} label={name} />
         </div>
         {children}
