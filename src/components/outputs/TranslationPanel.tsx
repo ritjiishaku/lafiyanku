@@ -1,21 +1,167 @@
 "use client";
 
-import { parseSections, parseMedicationLines, renderWithDividers, SectionBadge } from "@/lib/output-utils";
-
-const PATIENT_HEADERS = [
-  "What happened",
-  "Treatment you received",
-  "Your medications",
-  "Important home care instructions",
-  "When to return to the hospital",
-  "Your follow-up appointment",
-];
+import { SEPARATOR_RE } from "@/lib/output-utils";
 
 interface TranslationPanelProps {
   content: string | null;
   language: string | null;
   confidence: string | null;
   onRetranslate?: () => void;
+}
+
+function isSeparatorLine(line: string): boolean {
+  return SEPARATOR_RE.test(line.trim()) || /^[─━—–\-*]{5,}$/.test(line.trim());
+}
+
+function renderDocumentContent(text: string) {
+  const blocks = text.split(/\n{2,}/);
+  const nodes: React.ReactNode[] = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    const raw = blocks[i].trim();
+    if (!raw) continue;
+
+    const lines = raw.split("\n").filter((l) => {
+      const t = l.trim();
+      return t && !isSeparatorLine(t) && !/^translated discharge instructions/i.test(t) && !/^language:/i.test(t);
+    });
+
+    if (lines.length === 0) continue;
+
+    const allBullets = lines.every((l) => /^[-•*]\s/.test(l.trim()));
+
+    if (allBullets) {
+      nodes.push(
+        <div key={`b-${i}`} style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 20 }}>
+          {lines.map((l, j) => (
+            <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>
+              <span style={{ color: "#0B6E6E", fontSize: 18, lineHeight: 1.4 }}>•</span>
+              <span>{l.replace(/^[-•*]\s*/, "")}</span>
+            </div>
+          ))}
+        </div>,
+      );
+      continue;
+    }
+
+    const joined = lines.join(" ").trim();
+    const isShort = joined.length < 100 && lines.length <= 2;
+
+    if (isShort) {
+      nodes.push(
+        <div key={`h-${i}`} style={{ fontSize: 16, fontWeight: 700, color: "#0D2B4E", marginBottom: 12, marginTop: i > 0 ? 4 : 0 }}>
+          {joined}
+        </div>,
+      );
+    } else {
+      const meds = parseTranslationMedications(raw);
+      if (meds.length > 0) {
+        nodes.push(
+          <div key={`m-${i}`} style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+            {meds.map((med, j) => (
+              <div
+                key={j}
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  padding: 12,
+                }}
+              >
+                {med.name && (
+                  <div style={{ fontWeight: 700, color: "#1E293B", fontSize: 14, marginBottom: 4 }}>
+                    {med.name}
+                  </div>
+                )}
+                {(med.dosage || med.frequency) && (
+                  <div style={{ color: "#0B6E6E", fontSize: 13, marginBottom: 4 }}>
+                    {[med.dosage, med.frequency].filter(Boolean).join(" — ")}
+                  </div>
+                )}
+                {(med.timing || med.duration) && (
+                  <div style={{ color: "#64748B", fontSize: 12, marginBottom: 2 }}>
+                    {[med.timing, med.duration].filter(Boolean).join(" · ")}
+                  </div>
+                )}
+                {med.notes && (
+                  <div style={{ color: "#64748B", fontStyle: "italic", fontSize: 12 }}>
+                    {med.notes}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>,
+        );
+      } else {
+        nodes.push(
+          <div key={`p-${i}`} style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.7, marginBottom: 20 }}>
+            {joined}
+          </div>,
+        );
+      }
+    }
+  }
+
+  return nodes.length > 0 ? nodes : <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>{text}</div>;
+}
+
+function parseTranslationMedications(text: string): Array<{ name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string }> {
+  const lines = text.split("\n").filter((l) => {
+    const t = l.trim();
+    return t && !isSeparatorLine(t);
+  });
+  const meds: Array<{ name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string }> = [];
+  let current: { name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string } | null = null;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const dashMatch = trimmed.match(/^[-•*]\s*(.+)/);
+    const content = dashMatch ? dashMatch[1].trim() : trimmed;
+
+    const colonIdx = content.indexOf(":");
+    if (colonIdx > 0) {
+      const key = content.slice(0, colonIdx).trim().toLowerCase();
+      const val = content.slice(colonIdx + 1).trim();
+
+      if (key.includes("medication") || key.includes("name") || key === "take" || key === "use") {
+        if (current) meds.push(current);
+        current = { name: val, dosage: "", frequency: "", timing: "", duration: "", notes: "" };
+      } else if (current) {
+        if (key.includes("dose") || key.includes("dosa")) current.dosage = val;
+        else if (key.includes("freq") || key.includes("how often")) current.frequency = val;
+        else if (key.includes("tim") || key.includes("when")) current.timing = val;
+        else if (key.includes("dur") || key.includes("how long")) current.duration = val;
+        else if (key.includes("note")) current.notes = val;
+      }
+    } else {
+      if (current) {
+        if (!current.name) current.name = content;
+        else if (!current.dosage) current.dosage = content;
+        else if (!current.frequency) current.frequency = content;
+      }
+    }
+  }
+
+  if (current) meds.push(current);
+
+  if (meds.length === 0 && lines.length > 0) {
+    const firstLine = lines[0].trim();
+    if (firstLine) {
+      meds.push({ name: firstLine, dosage: "", frequency: "", timing: "", duration: "", notes: "" });
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+          const last = meds[meds.length - 1];
+          if (!last.dosage) last.dosage = line;
+          else if (!last.frequency) last.frequency = line;
+        }
+      }
+    }
+  }
+
+  return meds;
 }
 
 export function TranslationPanel({
@@ -26,22 +172,8 @@ export function TranslationPanel({
 }: TranslationPanelProps) {
   if (!content) return null;
 
-  const sections = parseSections(content, PATIENT_HEADERS);
-  const hasSections = Object.keys(sections).length > 1;
-
   const languageLabel =
     language === "ha" ? "Hausa" : language === "yo" ? "Yoruba" : language === "ig" ? "Igbo" : language ?? "";
-
-  const sectionStyle: React.CSSProperties = {
-    marginBottom: 20,
-  };
-
-  const sectionHeadingStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 8,
-  };
 
   function renderHeader() {
     return (
@@ -138,180 +270,6 @@ export function TranslationPanel({
     );
   }
 
-  function renderParsedContent() {
-    return (
-      <div style={{ padding: "16px 20px" }}>
-        {sections["What happened"] && (
-          <div style={sectionStyle}>
-            <div style={sectionHeadingStyle}>
-              <SectionBadge num="1" />
-              <span style={{ fontSize: 15, fontWeight: 600, color: "#0D2B4E" }}>
-                What happened
-              </span>
-            </div>
-            <div style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.7, marginLeft: 34 }}>
-              {renderWithDividers(sections["What happened"], "#0B6E6E", "1.5px", "16px 0", 0.6)}
-            </div>
-          </div>
-        )}
-
-        {sections["Treatment you received"] && (
-          <div style={sectionStyle}>
-            <div style={sectionHeadingStyle}>
-              <SectionBadge num="2" />
-              <span style={{ fontSize: 15, fontWeight: 600, color: "#0D2B4E" }}>
-                Treatment you received
-              </span>
-            </div>
-            <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 34 }}>
-              {renderWithDividers(sections["Treatment you received"], "#0B6E6E", "1.5px", "16px 0", 0.6)}
-            </div>
-          </div>
-        )}
-
-        {sections["Your medications"] && (
-          <div style={sectionStyle}>
-            <div style={sectionHeadingStyle}>
-              <SectionBadge num="3" />
-              <span style={{ fontSize: 15, fontWeight: 600, color: "#0D2B4E" }}>
-                Your medications
-              </span>
-            </div>
-            <div style={{ marginLeft: 34, display: "flex", flexDirection: "column", gap: 8 }}>
-              {(() => {
-                const meds = parseMedicationLines(sections["Your medications"]);
-                if (meds.length === 0) {
-                  return (
-                    <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>
-                      {renderWithDividers(sections["Your medications"], "#0B6E6E", "1.5px", "16px 0", 0.6)}
-                    </div>
-                  );
-                }
-                return meds.map((med, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      background: "#FFFFFF",
-                      border: "1px solid #E2E8F0",
-                      borderRadius: 8,
-                      padding: 12,
-                    }}
-                  >
-                    {med.name && (
-                      <div style={{ fontWeight: 700, color: "#1E293B", fontSize: 14, marginBottom: 4 }}>
-                        {med.name}
-                      </div>
-                    )}
-                    {(med.dosage || med.frequency) && (
-                      <div style={{ color: "#0B6E6E", fontSize: 13, marginBottom: 4 }}>
-                        {[med.dosage, med.frequency].filter(Boolean).join(" — ")}
-                      </div>
-                    )}
-                    {(med.timing || med.duration) && (
-                      <div style={{ color: "#64748B", fontSize: 12, marginBottom: 2 }}>
-                        {[med.timing, med.duration].filter(Boolean).join(" · ")}
-                      </div>
-                    )}
-                    {med.notes && (
-                      <div style={{ color: "#64748B", fontStyle: "italic", fontSize: 12 }}>
-                        {med.notes}
-                      </div>
-                    )}
-                  </div>
-                ));
-              })()}
-            </div>
-          </div>
-        )}
-
-        {sections["Important home care instructions"] && (
-          <div style={sectionStyle}>
-            <div style={sectionHeadingStyle}>
-              <SectionBadge num="4" />
-              <span style={{ fontSize: 15, fontWeight: 600, color: "#0D2B4E" }}>
-                Important home care instructions
-              </span>
-            </div>
-            <div style={{ marginLeft: 34 }}>
-              {(() => {
-                const text = sections["Important home care instructions"];
-                const hasBreaks = text.includes("\n");
-                if (hasBreaks) {
-                  const bullets = text.split("\n").filter((l) => l.trim() && !/^─{10,}$/.test(l.trim()));
-                  if (bullets.length === 0) {
-                    return null;
-                  }
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      {bullets.map((b, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>
-                          <span style={{ color: "#0B6E6E", fontSize: 18, lineHeight: 1.4 }}>•</span>
-                          <span>{b.replace(/^[-•*]\s*/, "")}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                }
-                return (
-                  <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>
-                    {renderWithDividers(text, "#E2E8F0", "1.5px", "16px 0", 0.6)}
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
-
-        {sections["When to return to the hospital"] && (
-          <div style={{ ...sectionStyle }}>
-            <div
-              style={{
-                background: "#FFF8E1",
-                borderLeft: "4px solid #B45309",
-                padding: 16,
-                borderRadius: 6,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <SectionBadge num="5" />
-                <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 15, fontWeight: 700, color: "#B45309" }}>
-                  <span role="img" aria-label="warning">⚠</span>
-                  When to return to the hospital
-                </span>
-              </div>
-              <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.7, marginLeft: 0 }}>
-                {renderWithDividers(sections["When to return to the hospital"], "#0B6E6E", "1.5px", "16px 0", 0.6)}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {sections["Your follow-up appointment"] && (
-          <div style={sectionStyle}>
-            <div
-              style={{
-                background: "#E0F2F2",
-                borderLeft: "3px solid #0B6E6E",
-                padding: 16,
-                borderRadius: 6,
-              }}
-            >
-              <div style={sectionHeadingStyle}>
-                <SectionBadge num="6" />
-                <span style={{ fontSize: 15, fontWeight: 600, color: "#0D2B4E" }}>
-                  Your follow-up appointment
-                </span>
-              </div>
-              <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, marginLeft: 0 }}>
-                {renderWithDividers(sections["Your follow-up appointment"], "#0B6E6E", "1.5px", "16px 0", 0.6)}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div
       style={{
@@ -323,15 +281,11 @@ export function TranslationPanel({
     >
       {renderHeader()}
       {renderConfidenceBanners()}
-      {hasSections ? (
-        renderParsedContent()
-      ) : (
-        <div style={{ padding: 20 }}>
-          <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, overflowWrap: "break-word", wordBreak: "break-word" }}>
-            {renderWithDividers(content, "#0B6E6E", "1.5px", "16px 0", 0.6)}
-          </div>
+      <div style={{ padding: 20 }}>
+        <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, overflowWrap: "break-word", wordBreak: "break-word" }}>
+          {renderDocumentContent(content)}
         </div>
-      )}
+      </div>
     </div>
   );
 }
