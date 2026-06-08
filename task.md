@@ -1,6 +1,0 @@
-- [ ] Create database migration for `demo_requests`
-- [ ] Build marketing UI components under `src/components/marketing/`
-- [ ] Create marketing page routes: landing, pricing, contact, demo
-- [ ] Implement demo request and demo generate API routes
-- [ ] Build FHIR integration foundation (fhir-adapter.ts + test route)
-- [ ] Configure Vercel, SEO, loading state, global error boundary
