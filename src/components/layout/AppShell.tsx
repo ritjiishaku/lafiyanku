@@ -48,7 +48,7 @@ export function AppShell({ children, hideSidebar }: AppShellProps) {
       )}
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <TopNav onToggleSidebar={hideSidebar ? undefined : () => setSidebarOpen(!sidebarOpen)} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
