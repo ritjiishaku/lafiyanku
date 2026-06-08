@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateDischarge, translateText, getPromptVersion, getModelVersion } from "@/services/ai-provider";
 import { createServiceClient } from "@/services/supabase-server";
-import { AuditAction, UserRole } from "@/types/schemas";
+import { UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
 

@@ -15,7 +15,7 @@ describe("PatientInstructionsPanel", () => {
   });
 
   it("renders empty content without error", () => {
-    const { container } = render(<PatientInstructionsPanel content="" />);
-    expect(container.querySelector("pre")).toBeInTheDocument();
+    render(<PatientInstructionsPanel content="" />);
+    expect(screen.getByText("Patient Discharge Instructions")).toBeInTheDocument();
   });
 });

@@ -90,13 +90,6 @@ export default function RegisterFacilityPage() {
 
   function clearError() { setError(null); setFieldErrors({}); }
 
-  function validateStep1(): boolean {
-    const errs: Record<string, string> = {};
-    if (!facilityName.trim()) errs.facilityName = "Facility name is required.";
-    setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
-  }
-
   function validateStep2(): boolean {
     const errs: Record<string, string> = {};
     if (!adminName.trim()) errs.adminName = "Admin full name is required.";
@@ -112,7 +105,10 @@ export default function RegisterFacilityPage() {
 
   const handleNext = useCallback(() => {
     clearError();
-    if (validateStep1()) setStep(2);
+    const errs: Record<string, string> = {};
+    if (!facilityName.trim()) errs.facilityName = "Facility name is required.";
+    setFieldErrors(errs);
+    if (Object.keys(errs).length === 0) setStep(2);
   }, [facilityName]);
 
   const handleBack = useCallback(() => {

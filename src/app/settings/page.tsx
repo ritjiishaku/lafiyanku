@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { useRole } from "@/hooks/useRole";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,12 +15,10 @@ function notifyAvatarChange() {
 }
 
 function ProfileAvatar() {
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem(AVATAR_KEY) : null,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setSrc(localStorage.getItem(AVATAR_KEY));
-  }, []);
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
@@ -36,7 +35,7 @@ function ProfileAvatar() {
           onClick={() => inputRef.current?.click()}
         >
           {src ? (
-            <img src={src} alt="Avatar" className="h-full w-full object-cover" />
+            <Image src={src} alt="Avatar" width={96} height={96} className="h-full w-full object-cover" />
           ) : (
             <Camera className="h-10 w-10 text-slate-400" />
           )}

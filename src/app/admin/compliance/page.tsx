@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,21 +62,21 @@ export default function CompliancePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/compliance");
-      const json = await res.json();
-      if (json.success) setData(json.data);
-      else setError("Failed to load compliance data");
-    } catch {
-      setError("Failed to load compliance data");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/admin/compliance");
+        const json = await res.json();
+        if (json.success) setData(json.data);
+        else setError("Failed to load compliance data");
+      } catch {
+        setError("Failed to load compliance data");
+      } finally {
+        setLoading(false);
+      }
     }
+    load();
   }, []);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
 
   if (role !== "admin") {
     return (

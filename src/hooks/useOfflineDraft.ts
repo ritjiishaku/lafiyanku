@@ -9,24 +9,22 @@ interface OfflineDraft {
 }
 
 export function useOfflineDraft(storageKey: string) {
-  const [draft, setDraft] = useState<OfflineDraft | null>(null);
-  const [isOffline, setIsOffline] = useState(false);
+  const [draft, setDraft] = useState<OfflineDraft | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const stored = localStorage.getItem(storageKey);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isOffline, setIsOffline] = useState(() =>
+    typeof navigator !== "undefined" ? !navigator.onLine : false,
+  );
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        setDraft(JSON.parse(stored));
-      }
-    } catch {
-      // ignore parse errors
-    }
-  }, [storageKey]);
-
-  useEffect(() => {
-    setIsOffline(!navigator.onLine);
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ClinicalSummaryPanel } from "@/components/outputs/ClinicalSummaryPanel";
 import { PatientInstructionsPanel } from "@/components/outputs/PatientInstructionsPanel";
 import { TranslationPanel } from "@/components/outputs/TranslationPanel";
-import { MissingFieldsBanner } from "@/components/outputs/MissingFieldsBanner";
 import { FlaggedIssuesBanner } from "@/components/outputs/FlaggedIssuesBanner";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";

@@ -240,7 +240,7 @@ export interface FHIRProcedure {
 // Used by /api/fhir/convert to build a FHIR Bundle
 // ============================================
 
-export function fhirPatient(input: Record<string, unknown>, patientId: string): FHIRPatient {
+export function fhirPatient(input: Record<string, unknown>): FHIRPatient {
   return {
     resourceType: "Patient",
     name: [{ text: input.patientName as string }],
@@ -254,7 +254,7 @@ export function fhirPatient(input: Record<string, unknown>, patientId: string): 
   };
 }
 
-export function fhirEncounter(input: Record<string, unknown>, patientRef: string): FHIREncounter {
+export function fhirEncounter(input: Record<string, unknown>): FHIREncounter {
   return {
     resourceType: "Encounter",
     period: {
@@ -267,7 +267,7 @@ export function fhirEncounter(input: Record<string, unknown>, patientRef: string
   };
 }
 
-export function fhirCondition(input: Record<string, unknown>, patientRef: string, encounterRef: string): FHIRCondition {
+export function fhirCondition(input: Record<string, unknown>): FHIRCondition {
   return {
     resourceType: "Condition",
     code: { text: input.diagnosis as string },
@@ -277,8 +277,6 @@ export function fhirCondition(input: Record<string, unknown>, patientRef: string
 
 export function fhirMedicationRequests(
   medications: Array<Record<string, unknown>>,
-  patientRef: string,
-  encounterRef: string,
 ): FHIRMedicationRequest[] {
   return medications.map((med) => ({
     resourceType: "MedicationRequest",
@@ -310,12 +308,8 @@ export function fhirProcedures(
 }
 
 export function fhirDischargeSummary(
-  input: Record<string, unknown>,
   clinicalSummary: string,
   patientRef: string,
-  encounterRef: string,
-  practitionerRef: string,
-  recordId: string,
 ): FHIRDocumentReference {
   return {
     resourceType: "DocumentReference",

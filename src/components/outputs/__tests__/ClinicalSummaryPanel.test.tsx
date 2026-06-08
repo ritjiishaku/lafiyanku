@@ -16,7 +16,7 @@ describe("ClinicalSummaryPanel", () => {
   });
 
   it("renders empty content without error", () => {
-    const { container } = render(<ClinicalSummaryPanel content="" />);
-    expect(container.querySelector("pre")).toBeInTheDocument();
+    render(<ClinicalSummaryPanel content="" />);
+    expect(screen.getByText("Clinical Discharge Summary")).toBeInTheDocument();
   });
 });

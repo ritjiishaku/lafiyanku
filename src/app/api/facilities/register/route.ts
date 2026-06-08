@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       facility_id: facility.facility_id,
       facility_name: facility.facility_name,
     }, { status: 201 });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       apiError(ErrorCodes.INTERNAL_SERVER_ERROR),
       { status: 500 },

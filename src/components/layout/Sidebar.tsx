@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useRole } from "@/hooks/useRole";
 
 import { signOut } from "next-auth/react";
@@ -22,7 +23,7 @@ function AvatarDisplay({ src, name }: { src: string | null; name?: string | null
   return (
     <div className="h-10 w-10 rounded-full overflow-hidden bg-slate-600 flex items-center justify-center ring-2 ring-white/10 shrink-0">
       {src ? (
-        <img src={src} alt="Avatar" className="h-full w-full object-cover" />
+        <Image src={src} alt="Avatar" width={40} height={40} className="h-full w-full object-cover" />
       ) : (
         <span className="text-sm font-bold text-slate-400">{initial}</span>
       )}
@@ -49,10 +50,11 @@ export function Sidebar({ onClose }: SidebarProps) {
   const router = useRouter();
   const currentPath = pathname.split("?")[0];
   const currentView = searchParams.get("view");
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem(AVATAR_KEY) : null,
+  );
 
   useEffect(() => {
-    setAvatarSrc(localStorage.getItem(AVATAR_KEY));
     function handleChange() {
       setAvatarSrc(localStorage.getItem(AVATAR_KEY));
     }

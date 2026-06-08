@@ -45,6 +45,7 @@ export async function GET(
 
     if (session.user.role === UserRole.Admin) {
       const { clinical_summary, ...rest } = data;
+      void clinical_summary;
       return NextResponse.json({ success: true, data: rest });
     }
 
@@ -134,7 +135,7 @@ export async function PUT(
     await writeAuditLog({
       recordId: id,
       userId: session.user.id,
-      userRole: role as any,
+      userRole: role as UserRole,
       action: AuditAction.Edit,
       facilityId: session.user.facilityId,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,

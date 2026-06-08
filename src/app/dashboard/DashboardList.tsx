@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useRole } from "@/hooks/useRole";
 import { Plus, Search, FileText, Eye, ChevronLeft, ChevronRight, FileCheck, Clock, Archive } from "lucide-react";
 
@@ -36,40 +35,41 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 300);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [search]);
 
-  useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter]);
-
-  const fetchRecords = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [recordsRes, metricsRes] = await Promise.all([
-        fetch(`/api/discharge?${new URLSearchParams({ ...(debouncedSearch && { search: debouncedSearch }), ...(statusFilter !== "all" && { status: statusFilter }), page: String(page) })}`),
-        fetch("/api/dashboard/metrics"),
-      ]);
-      const recordsJson = await recordsRes.json();
-      const metricsJson = await metricsRes.json();
-      if (recordsJson.success) {
-        setRecords(recordsJson.data ?? []);
-        setTotalPages(recordsJson.pagination?.totalPages ?? 0);
-      } else {
-        setError(recordsJson.error?.detail ?? recordsJson.error?.message ?? "Failed to load records.");
+  useEffect(() => {
+    async function load() {
+      setError(null);
+      try {
+        const [recordsRes, metricsRes] = await Promise.all([
+          fetch(`/api/discharge?${new URLSearchParams({ ...(debouncedSearch && { search: debouncedSearch }), ...(statusFilter !== "all" && { status: statusFilter }), page: String(page) })}`),
+          fetch("/api/dashboard/metrics"),
+        ]);
+        const recordsJson = await recordsRes.json();
+        const metricsJson = await metricsRes.json();
+        if (recordsJson.success) {
+          setRecords(recordsJson.data ?? []);
+          setTotalPages(recordsJson.pagination?.totalPages ?? 0);
+        } else {
+          setError(recordsJson.error?.detail ?? recordsJson.error?.message ?? "Failed to load records.");
+        }
+        if (metricsJson.success) {
+          setMetrics(metricsJson.data);
+        }
+      } catch (e) {
+        console.error("Dashboard fetch error:", e);
+        setError("Network error. Please check your connection.");
+      } finally {
+        setLoading(false);
       }
-      if (metricsJson.success) {
-        setMetrics(metricsJson.data);
-      }
-    } catch (e) {
-      console.error("Dashboard fetch error:", e);
-      setError("Network error. Please check your connection.");
-    } finally {
-      setLoading(false);
     }
+    load();
   }, [debouncedSearch, statusFilter, page]);
-
-  useEffect(() => { fetchRecords(); }, [fetchRecords]);
 
   const canCreate = role === "doctor" || role === "nurse";
 
@@ -138,7 +138,10 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+          }}
           aria-label="Filter by status"
           className="touch-target-min rounded-lg border border-slate/30 bg-white px-3.5 text-sm text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal h-11"
         >

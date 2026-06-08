@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { MissingFieldsBanner } from "./MissingFieldsBanner";
+import { parseSections, renderWithDividers, CopyButton } from "@/lib/output-utils";
 
 const CLINICAL_HEADERS = [
   "Facility",
@@ -14,33 +14,6 @@ const CLINICAL_HEADERS = [
   "Red flag warnings",
   "Discharged by",
 ];
-
-function parseSections(text: string): Record<string, string> {
-  const sections: Record<string, string> = {};
-  let remaining = text;
-
-  for (let i = 0; i < CLINICAL_HEADERS.length; i++) {
-    const header = CLINICAL_HEADERS[i];
-    const idx = remaining.indexOf(header);
-    if (idx === -1) continue;
-
-    const start = idx + header.length;
-    const nextHeaders = CLINICAL_HEADERS.slice(i + 1);
-    let end = remaining.length;
-    for (const nh of nextHeaders) {
-      const ni = remaining.indexOf(nh, start);
-      if (ni !== -1) {
-        end = ni;
-        break;
-      }
-    }
-
-    sections[header] = remaining.slice(start, end).trim();
-    remaining = remaining.slice(0, idx) + remaining.slice(end);
-  }
-
-  return sections;
-}
 
 function parseKeyValue(text: string): Record<string, string> {
   const kv: Record<string, string> = {};
@@ -83,73 +56,13 @@ function parseMedicationTable(text: string): Array<Record<string, string>> {
   return rows;
 }
 
-function CopyButton({ text, label }: { text: string; label: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [text]);
-
-  return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      aria-label={`Copy ${label}`}
-      style={{
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        fontSize: 12,
-        color: "#64748B",
-        padding: "4px 8px",
-        borderRadius: 4,
-        minWidth: 44,
-        minHeight: 44,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 4,
-      }}
-    >
-      {copied ? (
-        <span style={{ color: "#0B6E6E", fontWeight: 500 }}>Copied</span>
-      ) : (
-        <span role="img" aria-label="copy">📋</span>
-      )}
-    </button>
-  );
-}
-
 interface ClinicalSummaryPanelProps {
   content: string;
   missingFieldsLog?: string[] | null;
 }
 
-const SEPARATOR_RE = /[─━—–\-]{10,}/;
-
-function renderWithDividers(text: string): React.ReactNode[] {
-  const parts = text.split(SEPARATOR_RE);
-  const nodes: React.ReactNode[] = [];
-  parts.forEach((part, i) => {
-    const trimmed = part.trim();
-    if (trimmed) {
-      if (nodes.length > 0) {
-        nodes.push(<br key={`br-${i}`} />);
-      }
-      nodes.push(<span key={`t-${i}`}>{trimmed}</span>);
-    }
-    if (i < parts.length - 1) {
-      nodes.push(<hr key={`hr-${i}`} style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box", border: "none", borderTop: "1px solid #E2E8F0", margin: "12px 0" }} />);
-    }
-  });
-  return nodes.length > 0 ? nodes : [text];
-}
-
 export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSummaryPanelProps) {
-  const sections = parseSections(content);
+  const sections = parseSections(content, CLINICAL_HEADERS);
   const hasSections = Object.keys(sections).length > 1;
 
   if (!hasSections) {
@@ -197,17 +110,9 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
           </div>
         )}
         <div style={{ padding: 20 }}>
-          <pre
-            style={{
-              fontFamily: "Plus Jakarta Sans, sans-serif",
-              fontSize: 14,
-              color: "#1E293B",
-              whiteSpace: "pre-wrap",
-              margin: 0,
-            }}
-          >
-            {content}
-          </pre>
+          <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, overflowWrap: "break-word", wordBreak: "break-word" }}>
+            {renderWithDividers(content)}
+          </div>
         </div>
       </div>
     );

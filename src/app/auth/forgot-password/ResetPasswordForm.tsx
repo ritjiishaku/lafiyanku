@@ -14,11 +14,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-interface ResetPasswordFormProps {
-  onSwitchToLogin?: () => void;
-}
-
-export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps = {}) {
+export function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [password, setPassword] = useState("");

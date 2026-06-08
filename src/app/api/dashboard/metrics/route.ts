@@ -4,6 +4,11 @@ import { auth } from "@/lib/auth";
 import { UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 
+async function countQuery(query: PromiseLike<{ count: number | null }>): Promise<number> {
+  const res = await query;
+  return res.count ?? 0;
+}
+
 export async function GET() {
   try {
     const session = await auth();
@@ -16,17 +21,19 @@ export async function GET() {
     }
 
     const supabase = createServiceClient();
-
     const facilityId = session.user.facilityId;
-    const filter = facilityId ? (q: any) => q.eq("facility_id", facilityId) : (q: any) => q;
-
     const baseQuery = supabase.from("discharge_records");
 
+    async function scopedCount(select: ReturnType<typeof baseQuery.select>) {
+      const q = facilityId ? select.eq("facility_id", facilityId) : select;
+      return countQuery(q);
+    }
+
     const [total, draft, finalised, archived] = await Promise.all([
-      filter(baseQuery.select("*", { count: "estimated", head: true })).then((r: any) => r.count ?? 0),
-      filter(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "draft")).then((r: any) => r.count ?? 0),
-      filter(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "finalised")).then((r: any) => r.count ?? 0),
-      filter(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "archived")).then((r: any) => r.count ?? 0),
+      scopedCount(baseQuery.select("*", { count: "estimated", head: true })),
+      scopedCount(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "draft")),
+      scopedCount(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "finalised")),
+      scopedCount(baseQuery.select("*", { count: "estimated", head: true }).eq("status", "archived")),
     ]);
 
     return NextResponse.json({

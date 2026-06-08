@@ -25,7 +25,7 @@ import { MedicationRow } from "./MedicationRow";
 import { LanguageSelector } from "./LanguageSelector";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOfflineDraft } from "@/hooks/useOfflineDraft";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { Save, AlertCircle, RefreshCw, X } from "lucide-react";
 
 const medicationSchema = z.object({
@@ -111,7 +111,7 @@ export function PatientInputForm({
   const [restoredFromDraft, setRestoredFromDraft] = useState(false);
   const [dismissRestore, setDismissRestore] = useState(false);
 
-  const { draft, isOffline, lastSavedAt, autoSave, clearDraft, saveDraft } =
+  const { draft, isOffline, lastSavedAt, autoSave, saveDraft } =
     useOfflineDraft(DRAFT_KEY);
 
   useEffect(() => {
@@ -124,19 +124,23 @@ export function PatientInputForm({
         setRestoredFromDraft(true);
       }
     }
-  }, [draft, dismissRestore]);
+  }, [draft, dismissRestore, form]);
 
   function handleDismissRestore() {
     setDismissRestore(true);
     setRestoredFromDraft(false);
   }
 
+  const autoSaveRef = useRef(autoSave);
+  autoSaveRef.current = autoSave;
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/incompatible-library
     const sub = form.watch((values) => {
-      autoSave(values);
+      autoSaveRef.current(values);
     });
     return () => sub.unsubscribe();
-  }, [form, autoSave]);
+  }, [form]);
 
   const handleSaveDraft = useCallback(() => {
     saveDraft(form.getValues());

@@ -72,7 +72,7 @@ export async function GET(
     await writeAuditLog({
       recordId: id,
       userId: session.user.id,
-      userRole: role as any,
+      userRole: role as UserRole,
       action: AuditAction.Export,
       facilityId: session.user.facilityId,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,

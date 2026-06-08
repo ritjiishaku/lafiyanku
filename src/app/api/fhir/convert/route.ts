@@ -30,17 +30,16 @@ export async function POST(request: NextRequest) {
     const patientId = (recordId as string) ?? crypto.randomUUID();
     const patientRef = `urn:uuid:${patientId}`;
     const encounterRef = `urn:uuid:${crypto.randomUUID()}`;
-    const practitionerRef = `urn:uuid:${crypto.randomUUID()}`;
 
     const bundle = {
       resourceType: "Bundle",
       type: "document",
       timestamp: new Date().toISOString(),
       entry: [
-        { fullUrl: patientRef, resource: fhirPatient(input, patientId) },
-        { fullUrl: encounterRef, resource: fhirEncounter(input, patientRef) },
-        { fullUrl: `urn:uuid:${crypto.randomUUID()}`, resource: fhirCondition(input, patientRef, encounterRef) },
-        ...(fhirMedicationRequests((input.medications ?? []) as any[], patientRef, encounterRef).map((r) => ({
+        { fullUrl: patientRef, resource: fhirPatient(input) },
+        { fullUrl: encounterRef, resource: fhirEncounter(input) },
+        { fullUrl: `urn:uuid:${crypto.randomUUID()}`, resource: fhirCondition(input) },
+        ...(fhirMedicationRequests((input.medications ?? []) as Array<Record<string, unknown>>).map((r) => ({
           fullUrl: `urn:uuid:${crypto.randomUUID()}`,
           resource: r,
         }))),
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
         }))),
         {
           fullUrl: `urn:uuid:${crypto.randomUUID()}`,
-          resource: fhirDischargeSummary(input, clinicalSummary ?? "", patientRef, encounterRef, practitionerRef, recordId ?? crypto.randomUUID()),
+          resource: fhirDischargeSummary(clinicalSummary ?? "", patientRef),
         },
       ],
     };

@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: "CareFlow — Clinical Discharge Documentation",
   description:
     "AI-powered clinical discharge documentation assistant for Nigerian hospitals.",

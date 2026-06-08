@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,30 @@ export default function AdminPage() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ fullName: "", email: "", password: "", role: "doctor" });
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    async function load() {
+      try {
+        const [clinRes, facRes] = await Promise.all([
+          fetch("/api/admin/clinicians"),
+          fetch("/api/facilities"),
+        ]);
+        const clinJson = await clinRes.json();
+        if (clinJson.success) setClinicians(clinJson.data ?? []);
+        const facJson = await facRes.json();
+        if (facJson.success) {
+          const myFacility = facJson.data.find((f: { facility_id: string }) => f.facility_id === facilityId);
+          if (myFacility) setFacilityCode(myFacility.facility_code || myFacility.facility_name.toLowerCase().replace(/\s+/g, "-"));
+        }
+      } catch {
+        setError("Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [facilityId]);
+
+  async function refresh() {
     setLoading(true);
     try {
       const [clinRes, facRes] = await Promise.all([
@@ -64,9 +87,7 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [facilityId]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
+  }
 
   async function handleAddClinician() {
     if (!form.fullName || !form.email || !form.password) {
@@ -91,7 +112,7 @@ export default function AdminPage() {
         toast.success(`${form.fullName} added as ${form.role}`);
         setDialogOpen(false);
         setForm({ fullName: "", email: "", password: "", role: "doctor" });
-        fetchData();
+        await refresh();
       } else {
         toast.error(json.error ?? "Failed to add clinician");
       }
@@ -123,7 +144,7 @@ export default function AdminPage() {
         setDialogOpen(false);
         setEditingClinician(null);
         setForm({ fullName: "", email: "", password: "", role: "doctor" });
-        fetchData();
+        await refresh();
       } else {
         toast.error(json.error ?? "Failed to update clinician");
       }
@@ -142,7 +163,7 @@ export default function AdminPage() {
       const json = await res.json();
       if (json.success) {
         toast.success("Clinician removed");
-        fetchData();
+        await refresh();
       } else {
         toast.error(json.error ?? "Failed to remove clinician");
       }

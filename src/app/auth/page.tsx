@@ -20,7 +20,7 @@ export default function AuthPage() {
         <ForgotPasswordForm onSwitchToLogin={() => setView("login")} />
       )}
       {view === "reset-password" && (
-        <ResetPasswordForm onSwitchToLogin={() => setView("login")} />
+        <ResetPasswordForm />
       )}
     </AuthShell>
   );

@@ -28,11 +28,6 @@ export default function AuditLogPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (role && role !== "admin") {
-      setError("Only Admin users can view audit logs.");
-      setLoading(false);
-      return;
-    }
     if (!role) return;
 
     async function fetchLogs() {
@@ -58,6 +53,16 @@ export default function AuditLogPage() {
 
     fetchLogs();
   }, [params.recordId, page, role]);
+
+  if (role && role !== "admin") {
+    return (
+      <AppShell>
+        <div className="flex min-h-[60vh] items-center justify-center text-cool-grey">
+          Only Admin users can view audit logs.
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

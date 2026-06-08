@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface AuthShellProps {
   children: React.ReactNode;
   variant?: "default" | "facility";
@@ -19,9 +21,9 @@ export function AuthShell({ children, variant = "default" }: AuthShellProps) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(11,110,110,0.10),transparent_60%)] pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.5'%3E%3Ccircle cx='2' cy='2' r='1'/%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-        <a href="/" className="self-start py-3 text-lg font-bold text-white hover:text-clinical-teal transition-colors relative z-10">
+        <Link href="/" className="self-start py-3 text-lg font-bold text-white hover:text-clinical-teal transition-colors relative z-10">
           CareFlow
-        </a>
+        </Link>
 
         <div className="flex-1 flex flex-col justify-center -mt-6 relative z-10">
           {variant === "facility" ? (
@@ -61,9 +63,9 @@ export function AuthShell({ children, variant = "default" }: AuthShellProps) {
 
       <div className="flex flex-1 items-center justify-center px-5 py-8 overflow-y-auto">
         <div className="w-full max-w-md">
-          <a href="/" className="block text-center py-3 text-lg font-bold text-deep-navy hover:text-clinical-teal transition-colors mb-6 lg:hidden">
+          <Link href="/" className="block text-center py-3 text-lg font-bold text-deep-navy hover:text-clinical-teal transition-colors mb-6 lg:hidden">
             CareFlow
-          </a>
+          </Link>
           {children}
         </div>
       </div>

@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     await writeAuditLog({
       recordId,
       userId: session.user.id,
-      userRole: role as any,
+      userRole: role as UserRole,
       action: AuditAction.Edit,
       facilityId: session.user.facilityId,
       ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
