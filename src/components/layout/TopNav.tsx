@@ -12,13 +12,15 @@ export function TopNav({ onToggleSidebar }: TopNavProps) {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-pure-white px-4 sm:px-6">
-      <button
-        onClick={onToggleSidebar}
-        className="touch-target-min inline-flex items-center justify-center rounded-lg p-2 text-slate hover:text-clinical-teal transition-colors md:hidden"
-        aria-label="Toggle navigation menu"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      {onToggleSidebar && (
+        <button
+          onClick={onToggleSidebar}
+          className="touch-target-min inline-flex items-center justify-center rounded-lg p-2 text-slate hover:text-clinical-teal transition-colors md:hidden"
+          aria-label="Toggle navigation menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      )}
 
       <div className="flex items-center gap-2 ml-auto">
         {isLoading ? (
