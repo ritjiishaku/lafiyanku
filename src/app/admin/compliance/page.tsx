@@ -92,70 +92,71 @@ export default function CompliancePage() {
 
   return (
     <AppShell>
-      <div className="mx-auto flex h-full min-h-0 max-w-6xl flex-col overflow-hidden p-4 sm:p-6">
-        <div className="mb-6 flex-shrink-0 space-y-1">
-          <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">NDPR Compliance</h1>
-          <p className="text-sm text-cool-grey">
-            Monitor audit logs, data access, and regulatory compliance.
-          </p>
+      <div className="mx-auto max-w-6xl p-4 sm:p-6">
+        <div className="sticky top-0 z-10 -mx-4 bg-cool-off-white/95 backdrop-blur-sm px-4 pb-3 pt-4 sm:-mx-6 sm:px-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">NDPR Compliance</h1>
+            <p className="text-sm text-cool-grey">
+              Monitor audit logs, data access, and regulatory compliance.
+            </p>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Card className="border-slate/10">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
+                  <Activity className="h-5 w-5 text-clinical-teal" />
+                </div>
+                <div>
+                  <p className="text-xs text-cool-grey">Total Log Entries</p>
+                  <p className="text-xl font-bold text-slate">{data.totalLogs}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-slate/10">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="rounded-lg bg-purple-500/10 p-2.5 shrink-0">
+                  <Users className="h-5 w-5 text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-cool-grey">Active Users</p>
+                  <p className="text-xl font-bold text-slate">{data.uniqueUsers}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-slate/10">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="rounded-lg bg-blue-500/10 p-2.5 shrink-0">
+                  <FileText className="h-5 w-5 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-cool-grey">Total Actions</p>
+                  <p className="text-xl font-bold text-slate">{totalActions}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-slate/10">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
+                  <Shield className="h-5 w-5 text-clinical-teal" />
+                </div>
+                <div>
+                  <p className="text-xs text-cool-grey">Compliance Status</p>
+                  <p className="text-lg font-bold text-clinical-teal">Active</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        <div className="mb-6 flex-shrink-0 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
-                <Activity className="h-5 w-5 text-clinical-teal" />
-              </div>
-              <div>
-                <p className="text-xs text-cool-grey">Total Log Entries</p>
-                <p className="text-xl font-bold text-slate">{data.totalLogs}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg bg-purple-500/10 p-2.5 shrink-0">
-                <Users className="h-5 w-5 text-purple-500" />
-              </div>
-              <div>
-                <p className="text-xs text-cool-grey">Active Users</p>
-                <p className="text-xl font-bold text-slate">{data.uniqueUsers}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg bg-blue-500/10 p-2.5 shrink-0">
-                <FileText className="h-5 w-5 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-xs text-cool-grey">Total Actions</p>
-                <p className="text-xl font-bold text-slate">{totalActions}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
-                <Shield className="h-5 w-5 text-clinical-teal" />
-              </div>
-              <div>
-                <p className="text-xs text-cool-grey">Compliance Status</p>
-                <p className="text-lg font-bold text-clinical-teal">Active</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="flex min-h-0 flex-1 flex-col border-slate/10">
-          <CardHeader className="flex-shrink-0">
+        <Card className="mt-6 border-slate/10">
+          <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm text-deep-navy">
               <Activity className="h-4 w-4 text-clinical-teal" />
               Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col min-h-0 flex-1 overflow-hidden p-0">
-            <div className="flex-1 min-h-0 overflow-auto">
+          <CardContent className="p-0">
+            <div className="overflow-auto">
               <div className="space-y-3 p-4 sm:hidden">
                 {data.recentActivity.length === 0 ? (
                   <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
@@ -222,7 +223,7 @@ export default function CompliancePage() {
                     </tbody>
                   </table>
                 </div>
-              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
