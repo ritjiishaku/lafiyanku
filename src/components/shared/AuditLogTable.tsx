@@ -61,18 +61,18 @@ export function AuditLogTable({
   return (
     <div className={cn("flex min-h-0 flex-col space-y-4", className)}>
       <div className="flex min-h-0 flex-1 overflow-hidden rounded-lg border border-slate/10">
-        <div className="h-full overflow-y-auto">
-          <div className="inline-block min-w-full align-middle overflow-x-auto">
+        <div className="h-full overflow-auto">
+          <div className="inline-block min-w-full align-middle">
             <table className="w-full text-left text-sm">
               <thead className="sticky top-0 z-10 bg-cool-off-white">
                 <tr className="border-b border-slate/10">
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">User</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Action</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Changes</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Notes</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Timestamp</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">User</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Role</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Action</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">IP Address</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Changes</th>
+                  <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Notes</th>
                 </tr>
               </thead>
           <tbody>
@@ -83,13 +83,13 @@ export function AuditLogTable({
                   idx % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"
                 }`}
               >
-                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate">
+                <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-slate sm:px-4 sm:py-3">
                   {formatTimestamp(entry.timestamp)}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate">
+                <td className="whitespace-nowrap px-3 py-2 text-slate sm:px-4 sm:py-3">
                   <span className="font-mono text-xs">{entry.userId.slice(0, 8)}...</span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3">
+                <td className="whitespace-nowrap px-3 py-2 sm:px-4 sm:py-3">
                   <span
                     className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${
                       entry.userRole === "doctor"
@@ -102,18 +102,18 @@ export function AuditLogTable({
                     {entry.userRole}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate">
+                <td className="whitespace-nowrap px-3 py-2 text-slate sm:px-4 sm:py-3">
                   {formatAction(entry.action)}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-cool-grey">
+                <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-cool-grey sm:px-4 sm:py-3">
                   {entry.ipAddress ?? "—"}
                 </td>
-                <td className="max-w-[200px] truncate px-4 py-3 text-xs text-cool-grey">
+                <td className="max-w-[200px] truncate px-3 py-2 text-xs text-cool-grey sm:px-4 sm:py-3">
                   {entry.changesDiff
                     ? JSON.stringify(entry.changesDiff).slice(0, 80)
                     : "—"}
                 </td>
-                <td className="max-w-[200px] truncate px-4 py-3 text-xs text-cool-grey">
+                <td className="max-w-[200px] truncate px-3 py-2 text-xs text-cool-grey sm:px-4 sm:py-3">
                   {entry.notes ?? "—"}
                 </td>
               </tr>

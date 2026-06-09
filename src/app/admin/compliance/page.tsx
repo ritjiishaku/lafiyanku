@@ -234,38 +234,38 @@ export default function CompliancePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 overflow-hidden p-0">
-            <div className="h-full overflow-y-auto">
+            <div className="h-full overflow-auto">
               <div className="inline-block min-w-full align-middle">
                 <table className="w-full text-left text-sm">
                   <thead className="sticky top-0 z-10 bg-cool-off-white">
                     <tr className="border-b border-slate/10">
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">User</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Action</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">User</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Action</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">IP Address</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Timestamp</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.recentActivity.length === 0 ? (
-                      <tr><td colSpan={4} className="px-4 py-8 text-center text-cool-grey">No recent activity.</td></tr>
+                      <tr><td colSpan={4} className="px-3 py-8 text-center text-cool-grey sm:px-4">No recent activity.</td></tr>
                     ) : (
                       data.recentActivity.map((r, i) => {
                         const colors = ACTION_COLORS[r.action] ?? "text-slate bg-slate/10";
                         return (
                           <tr key={r.logId} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>
-                            <td className="px-4 py-3">
-                              <p className="font-medium text-slate">{r.userName}</p>
-                              <p className="text-xs text-cool-grey font-mono">{r.userRole}</p>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${colors}`}>
-                                {r.action}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-xs text-cool-grey font-mono">{r.ipAddress ?? "—"}</td>
-                            <td className="px-4 py-3 text-xs text-cool-grey font-mono">
-                              {new Date(r.timestamp).toLocaleString("en-NG", { timeZone: "Africa/Lagos" })}
-                            </td>
+                          <td className="px-3 py-2 sm:px-4 sm:py-3">
+                            <p className="font-medium text-slate">{r.userName}</p>
+                            <p className="text-xs text-cool-grey font-mono">{r.userRole}</p>
+                          </td>
+                          <td className="px-3 py-2 sm:px-4 sm:py-3">
+                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${colors}`}>
+                              {r.action}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-xs text-cool-grey font-mono sm:px-4 sm:py-3">{r.ipAddress ?? "—"}</td>
+                          <td className="px-3 py-2 text-xs text-cool-grey font-mono sm:px-4 sm:py-3">
+                            {new Date(r.timestamp).toLocaleString("en-NG", { timeZone: "Africa/Lagos" })}
+                          </td>
                           </tr>
                         );
                       })

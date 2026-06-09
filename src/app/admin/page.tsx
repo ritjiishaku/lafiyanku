@@ -315,35 +315,35 @@ export default function AdminPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 overflow-hidden p-0">
-            <div className="h-full overflow-y-auto">
+            <div className="h-full overflow-auto">
               <div className="inline-block min-w-full align-middle">
                 <table className="w-full text-left text-sm">
                   <thead className="sticky top-0 z-10 bg-cool-off-white">
                     <tr className="border-b border-slate/10">
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Name</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Email</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Joined</th>
-                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy text-right">Actions</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Name</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Email</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Role</th>
+                      <th scope="col" className="px-3 py-2 font-semibold text-deep-navy sm:px-4 sm:py-3">Joined</th>
+                      <th scope="col" className="px-3 py-2 text-right font-semibold text-deep-navy sm:px-4 sm:py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {clinicians.length === 0 ? (
-                      <tr><td colSpan={5} className="px-4 py-8 text-center text-cool-grey">No clinicians found.</td></tr>
+                      <tr><td colSpan={5} className="px-3 py-8 text-center text-cool-grey sm:px-4">No clinicians found.</td></tr>
                     ) : (
                       clinicians.map((c, i) => {
                         const badge = ROLE_BADGES[c.role] ?? { label: c.role, color: "bg-slate/10 text-slate" };
                         return (
                           <tr key={c.user_id} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>
-                            <td className="px-4 py-3 font-medium text-slate">{c.full_name || "—"}</td>
-                            <td className="px-4 py-3 text-cool-grey">{c.email}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-2 font-medium text-slate sm:px-4 sm:py-3">{c.full_name || "—"}</td>
+                            <td className="px-3 py-2 text-cool-grey sm:px-4 sm:py-3">{c.email}</td>
+                            <td className="px-3 py-2 sm:px-4 sm:py-3">
                               <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.color}`}>{badge.label}</span>
                             </td>
-                            <td className="px-4 py-3 text-xs text-cool-grey font-mono">
+                            <td className="px-3 py-2 text-xs text-cool-grey font-mono sm:px-4 sm:py-3">
                               {new Date(c.created_at).toLocaleDateString("en-NG")}
                             </td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="px-3 py-2 text-right sm:px-4 sm:py-3">
                               <div className="inline-flex items-center gap-1">
                                 <button onClick={() => openEditDialog(c)} className="p-2.5 rounded-md text-cool-grey hover:text-clinical-teal hover:bg-clinical-teal/5 transition-colors" title="Edit clinician" aria-label={`Edit ${c.full_name || c.email}`}>
                                   <Edit2 className="h-4 w-4" />
