@@ -233,8 +233,8 @@ export default function CompliancePage() {
               Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex min-h-0 flex-1 overflow-hidden p-0">
-            <div className="h-full overflow-auto">
+          <CardContent className="flex flex-col min-h-0 flex-1 overflow-hidden p-0">
+            <div className="flex-1 min-h-0 overflow-auto">
               <div className="space-y-3 p-4 sm:hidden">
                 {data.recentActivity.length === 0 ? (
                   <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
