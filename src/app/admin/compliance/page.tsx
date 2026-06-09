@@ -10,6 +10,7 @@ import {
   FileText,
   Users,
   Activity,
+  Search,
 } from "lucide-react";
 
 interface RecentActivity {
@@ -45,6 +46,8 @@ export default function CompliancePage() {
   const [data, setData] = useState<ComplianceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [actionFilter, setActionFilter] = useState("all");
 
   useEffect(() => {
     async function load() {
@@ -89,6 +92,13 @@ export default function CompliancePage() {
   }
 
   const totalActions = Object.values(data.actionCounts).reduce((s, c) => s + c, 0);
+
+  const filteredActivity = data.recentActivity.filter((r) => {
+    const query = search.toLowerCase();
+    const matchesSearch = !query || r.userName.toLowerCase().includes(query);
+    const matchesAction = actionFilter === "all" || r.action === actionFilter;
+    return matchesSearch && matchesAction;
+  });
 
   return (
     <AppShell>
@@ -146,6 +156,34 @@ export default function CompliancePage() {
               </CardContent>
             </Card>
           </div>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cool-grey" />
+              <input
+                type="text"
+                aria-label="Search by user name"
+                placeholder="Search by user name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-lg border border-slate/30 bg-white px-3.5 pl-10 text-sm text-slate placeholder:text-cool-grey focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal h-11"
+              />
+            </div>
+            <select
+              value={actionFilter}
+              onChange={(e) => setActionFilter(e.target.value)}
+              aria-label="Filter by action"
+              className="h-11 rounded-lg border border-slate/30 bg-white px-3.5 text-sm text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal"
+            >
+              <option value="all">All actions</option>
+              <option value="generate">Generate</option>
+              <option value="edit">Edit</option>
+              <option value="view">View</option>
+              <option value="finalise">Finalise</option>
+              <option value="archive">Archive</option>
+              <option value="print">Print</option>
+              <option value="export">Export</option>
+            </select>
+          </div>
         </div>
 
         <Card className="mt-6 border-slate/10">
@@ -158,12 +196,12 @@ export default function CompliancePage() {
           <CardContent className="p-0">
             <div className="overflow-auto">
               <div className="space-y-3 p-4 sm:hidden">
-                {data.recentActivity.length === 0 ? (
+                {filteredActivity.length === 0 ? (
                   <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
                     No recent activity.
                   </div>
                 ) : (
-                  data.recentActivity.map((r) => {
+                  filteredActivity.map((r) => {
                     const colors = ACTION_COLORS[r.action] ?? "text-slate bg-slate/10";
                     return (
                       <div key={r.logId} className="rounded-lg border border-slate/10 bg-white p-4">
@@ -196,10 +234,10 @@ export default function CompliancePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.recentActivity.length === 0 ? (
+                      {filteredActivity.length === 0 ? (
                         <tr><td colSpan={4} className="px-3 py-8 text-center text-cool-grey sm:px-4">No recent activity.</td></tr>
                       ) : (
-                        data.recentActivity.map((r, i) => {
+                        filteredActivity.map((r, i) => {
                           const colors = ACTION_COLORS[r.action] ?? "text-slate bg-slate/10";
                           return (
                             <tr key={r.logId} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>

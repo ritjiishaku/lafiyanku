@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Edit2, Trash2, UserPlus, User, Copy, Check, RefreshCw } from "lucide-react";
+import { Edit2, Trash2, UserPlus, User, Copy, Check, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 
 interface Clinician {
@@ -52,6 +52,8 @@ export default function AdminPage() {
     fullName: string;
   } | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   useEffect(() => {
     async function load() {
@@ -230,6 +232,13 @@ export default function AdminPage() {
     setDialogOpen(true);
   }
 
+  const filtered = clinicians.filter((c) => {
+    const query = search.toLowerCase();
+    const matchesSearch = !query || c.full_name.toLowerCase().includes(query) || c.email.toLowerCase().includes(query);
+    const matchesRole = roleFilter === "all" || c.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   if (role !== "admin") {
     return (
       <AppShell>
@@ -307,22 +316,46 @@ export default function AdminPage() {
           </Dialog>
         </div>
 
+        <div className="mb-4 flex flex-shrink-0 flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cool-grey" />
+            <input
+              type="text"
+              aria-label="Search clinicians"
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-slate/30 bg-white px-3.5 pl-10 text-sm text-slate placeholder:text-cool-grey focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal h-11"
+            />
+          </div>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            aria-label="Filter by role"
+            className="h-11 rounded-lg border border-slate/30 bg-white px-3.5 text-sm text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal"
+          >
+            <option value="all">All roles</option>
+            <option value="doctor">Doctor</option>
+            <option value="nurse">Nurse</option>
+          </select>
+        </div>
+
         <Card className="flex min-h-0 flex-1 flex-col border-slate/10">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2 text-base text-deep-navy">
               <User className="h-5 w-5 text-clinical-teal" />
-              Clinicians ({clinicians.length})
+              Clinicians ({filtered.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col min-h-0 flex-1 overflow-hidden p-0">
             <div className="flex-1 min-h-0 overflow-auto">
               <div className="space-y-3 p-4 sm:hidden">
-                {clinicians.length === 0 ? (
+                {filtered.length === 0 ? (
                   <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
                     No clinicians found.
                   </div>
                 ) : (
-                  clinicians.map((c) => {
+                  filtered.map((c) => {
                     const badge = ROLE_BADGES[c.role] ?? { label: c.role, color: "bg-slate/10 text-slate" };
                     return (
                       <div key={c.user_id} className="rounded-lg border border-slate/10 bg-white p-4">
@@ -363,10 +396,10 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {clinicians.length === 0 ? (
+                    {filtered.length === 0 ? (
                       <tr><td colSpan={5} className="px-3 py-8 text-center text-cool-grey sm:px-4">No clinicians found.</td></tr>
                     ) : (
-                      clinicians.map((c, i) => {
+                      filtered.map((c, i) => {
                         const badge = ROLE_BADGES[c.role] ?? { label: c.role, color: "bg-slate/10 text-slate" };
                         return (
                           <tr key={c.user_id} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>

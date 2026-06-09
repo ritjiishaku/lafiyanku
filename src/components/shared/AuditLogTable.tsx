@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface AuditEntry {
   logId: string;
@@ -50,6 +51,10 @@ export function AuditLogTable({
   onPageChange,
   className,
 }: AuditLogTableProps) {
+  const [roleFilter, setRoleFilter] = useState("all");
+
+  const filtered = roleFilter === "all" ? logs : logs.filter((l) => l.userRole === roleFilter);
+
   if (logs.length === 0) {
     return (
       <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-cool-grey">
@@ -60,10 +65,29 @@ export function AuditLogTable({
 
   return (
     <div className={cn("flex min-h-0 flex-col space-y-4", className)}>
+      {logs.length > 0 && (
+        <div className="flex flex-shrink-0 justify-end">
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            aria-label="Filter by role"
+            className="h-10 rounded-lg border border-slate/30 bg-white px-3 text-xs text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal"
+          >
+            <option value="all">All roles</option>
+            <option value="doctor">Doctor</option>
+            <option value="nurse">Nurse</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      )}
       <div className="flex flex-col min-h-0 flex-1 overflow-hidden rounded-lg border border-slate/10">
         <div className="flex-1 min-h-0 overflow-auto">
+          {filtered.length === 0 ? (
+            <div className="p-8 text-center text-sm text-cool-grey">No matching entries.</div>
+          ) : (
+            <>
           <div className="space-y-3 p-4 sm:hidden">
-        {logs.map((entry) => (
+        {filtered.map((entry) => (
           <div key={entry.logId} className="rounded-lg border border-slate/10 bg-white p-4">
             <div className="flex items-start justify-between gap-2">
               <span className="font-mono text-xs text-slate">{formatTimestamp(entry.timestamp)}</span>
@@ -113,7 +137,7 @@ export function AuditLogTable({
                 </tr>
               </thead>
           <tbody>
-            {logs.map((entry, idx) => (
+            {filtered.map((entry, idx) => (
               <tr
                 key={entry.logId}
                 className={`border-b border-slate/10 ${
@@ -158,6 +182,8 @@ export function AuditLogTable({
           </tbody>
         </table>
           </div>
+          </>
+        )}
         </div>
       </div>
 
