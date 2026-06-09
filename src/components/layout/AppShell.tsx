@@ -7,9 +7,10 @@ import { TopNav } from "./TopNav";
 interface AppShellProps {
   children: ReactNode;
   hideSidebar?: boolean;
+  noMainScroll?: boolean;
 }
 
-export function AppShell({ children, hideSidebar }: AppShellProps) {
+export function AppShell({ children, hideSidebar, noMainScroll }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function AppShell({ children, hideSidebar }: AppShellProps) {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopNav onToggleSidebar={hideSidebar ? undefined : () => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className={`flex-1 ${noMainScroll ? "overflow-hidden" : "overflow-y-auto"}`}>{children}</main>
       </div>
     </div>
   );

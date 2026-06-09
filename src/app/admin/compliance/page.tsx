@@ -67,7 +67,7 @@ export default function CompliancePage() {
 
   if (role !== "admin") {
     return (
-      <AppShell>
+      <AppShell noMainScroll>
         <div className="flex min-h-[60vh] items-center justify-center text-cool-grey">
           Access restricted to Admin users.
         </div>
@@ -77,7 +77,7 @@ export default function CompliancePage() {
 
   if (loading) {
     return (
-      <AppShell>
+      <AppShell noMainScroll>
         <div className="flex min-h-[60vh] items-center justify-center"><LoadingSpinner /></div>
       </AppShell>
     );
@@ -85,7 +85,7 @@ export default function CompliancePage() {
 
   if (error || !data) {
     return (
-      <AppShell>
+      <AppShell noMainScroll>
         <div className="mx-auto max-w-4xl p-4"><div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error ?? "No data"}</div></div>
       </AppShell>
     );
@@ -101,100 +101,100 @@ export default function CompliancePage() {
   });
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-6xl p-4 sm:p-6">
-        <div className="sticky top-0 z-10 -mx-4 bg-cool-off-white/95 backdrop-blur-sm px-4 pb-3 pt-4 sm:-mx-6 sm:px-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">NDPR Compliance</h1>
-            <p className="text-sm text-cool-grey">
-              Monitor audit logs, data access, and regulatory compliance.
-            </p>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Card className="border-slate/10">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
-                  <Activity className="h-5 w-5 text-clinical-teal" />
-                </div>
-                <div>
-                  <p className="text-xs text-cool-grey">Total Log Entries</p>
-                  <p className="text-xl font-bold text-slate">{data.totalLogs}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-slate/10">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="rounded-lg bg-purple-500/10 p-2.5 shrink-0">
-                  <Users className="h-5 w-5 text-purple-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-cool-grey">Active Users</p>
-                  <p className="text-xl font-bold text-slate">{data.uniqueUsers}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-slate/10">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="rounded-lg bg-blue-500/10 p-2.5 shrink-0">
-                  <FileText className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-cool-grey">Total Actions</p>
-                  <p className="text-xl font-bold text-slate">{totalActions}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-slate/10">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
-                  <Shield className="h-5 w-5 text-clinical-teal" />
-                </div>
-                <div>
-                  <p className="text-xs text-cool-grey">Compliance Status</p>
-                  <p className="text-lg font-bold text-clinical-teal">Active</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cool-grey" />
-              <input
-                type="text"
-                aria-label="Search by user name"
-                placeholder="Search by user name..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-slate/30 bg-white px-3.5 pl-10 text-sm text-slate placeholder:text-cool-grey focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal h-11"
-              />
-            </div>
-            <select
-              value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value)}
-              aria-label="Filter by action"
-              className="h-11 rounded-lg border border-slate/30 bg-white px-3.5 text-sm text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal"
-            >
-              <option value="all">All actions</option>
-              <option value="generate">Generate</option>
-              <option value="edit">Edit</option>
-              <option value="view">View</option>
-              <option value="finalise">Finalise</option>
-              <option value="archive">Archive</option>
-              <option value="print">Print</option>
-              <option value="export">Export</option>
-            </select>
-          </div>
+    <AppShell noMainScroll>
+      <div className="mx-auto flex h-full min-h-0 max-w-6xl flex-col p-4 sm:p-6">
+        <div className="mb-4 flex-shrink-0 space-y-1">
+          <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">NDPR Compliance</h1>
+          <p className="text-sm text-cool-grey">
+            Monitor audit logs, data access, and regulatory compliance.
+          </p>
         </div>
 
-        <Card className="mt-6 border-slate/10">
-          <CardHeader>
+        <div className="mb-4 flex-shrink-0 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Card className="border-slate/10">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
+                <Activity className="h-5 w-5 text-clinical-teal" />
+              </div>
+              <div>
+                <p className="text-xs text-cool-grey">Total Log Entries</p>
+                <p className="text-xl font-bold text-slate">{data.totalLogs}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-slate/10">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="rounded-lg bg-purple-500/10 p-2.5 shrink-0">
+                <Users className="h-5 w-5 text-purple-500" />
+              </div>
+              <div>
+                <p className="text-xs text-cool-grey">Active Users</p>
+                <p className="text-xl font-bold text-slate">{data.uniqueUsers}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-slate/10">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="rounded-lg bg-blue-500/10 p-2.5 shrink-0">
+                <FileText className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-xs text-cool-grey">Total Actions</p>
+                <p className="text-xl font-bold text-slate">{totalActions}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-slate/10">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="rounded-lg bg-clinical-teal/10 p-2.5 shrink-0">
+                <Shield className="h-5 w-5 text-clinical-teal" />
+              </div>
+              <div>
+                <p className="text-xs text-cool-grey">Compliance Status</p>
+                <p className="text-lg font-bold text-clinical-teal">Active</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mb-4 flex flex-shrink-0 flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cool-grey" />
+            <input
+              type="text"
+              aria-label="Search by user name"
+              placeholder="Search by user name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-slate/30 bg-white px-3.5 pl-10 text-sm text-slate placeholder:text-cool-grey focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal h-11"
+            />
+          </div>
+          <select
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value)}
+            aria-label="Filter by action"
+            className="h-11 rounded-lg border border-slate/30 bg-white px-3.5 text-sm text-slate shadow-sm focus:border-clinical-teal focus:outline-none focus:ring-1 focus:ring-clinical-teal"
+          >
+            <option value="all">All actions</option>
+            <option value="generate">Generate</option>
+            <option value="edit">Edit</option>
+            <option value="view">View</option>
+            <option value="finalise">Finalise</option>
+            <option value="archive">Archive</option>
+            <option value="print">Print</option>
+            <option value="export">Export</option>
+          </select>
+        </div>
+
+        <Card className="flex min-h-0 flex-1 flex-col border-slate/10">
+          <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2 text-sm text-deep-navy">
               <Activity className="h-4 w-4 text-clinical-teal" />
               Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-auto">
+          <CardContent className="flex min-h-0 flex-1 overflow-hidden p-0">
+            <div className="flex-1 min-h-0 overflow-auto">
               <div className="space-y-3 p-4 sm:hidden">
                 {filteredActivity.length === 0 ? (
                   <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
