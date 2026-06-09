@@ -41,8 +41,8 @@ export default function DemoRequestsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
-        <div className="space-y-1">
+      <div className="mx-auto flex h-full min-h-0 max-w-5xl flex-col p-4 sm:p-6">
+        <div className="mb-6 flex-shrink-0 space-y-1">
           <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">Demo Requests</h1>
           <p className="text-sm text-cool-grey">Leads captured from the marketing site</p>
         </div>
@@ -58,8 +58,9 @@ export default function DemoRequestsPage() {
           </div>
         ) : (
           <>
-            <div className="space-y-3 sm:hidden">
-              {requests.map((r) => (
+            <div className="overflow-y-auto sm:hidden flex-1 min-h-0 -mx-4 px-4">
+              <div className="space-y-3 pb-4">
+            {requests.map((r) => (
                 <div key={r.id} className="rounded-lg border border-slate/10 bg-white p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -77,6 +78,7 @@ export default function DemoRequestsPage() {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
             <div className="hidden sm:block overflow-auto rounded-lg border border-slate/10">
               <div className="inline-block min-w-full align-middle">

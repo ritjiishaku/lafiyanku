@@ -307,7 +307,8 @@ export default function AdminPage() {
           </Dialog>
         </div>
 
-        <div className="space-y-3 sm:hidden">
+        <div className="overflow-y-auto sm:hidden flex-1 min-h-0 -mx-4 px-4">
+          <div className="space-y-3 pb-4">
           {clinicians.length === 0 ? (
             <div className="rounded-lg border border-slate/10 bg-white p-8 text-center text-sm text-cool-grey">
               No clinicians found.
@@ -341,6 +342,7 @@ export default function AdminPage() {
               );
             })
           )}
+          </div>
         </div>
 
         <Card className="hidden sm:flex min-h-0 flex-1 flex-col border-slate/10">

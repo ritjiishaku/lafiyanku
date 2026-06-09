@@ -60,7 +60,7 @@ export function AuditLogTable({
 
   return (
     <div className={cn("flex min-h-0 flex-col space-y-4", className)}>
-      <div className="space-y-3 sm:hidden">
+      <div className="space-y-3 sm:hidden overflow-y-auto flex-1 min-h-0 -mx-4 px-4 pb-4">
         {logs.map((entry) => (
           <div key={entry.logId} className="rounded-lg border border-slate/10 bg-white p-4">
             <div className="flex items-start justify-between gap-2">
