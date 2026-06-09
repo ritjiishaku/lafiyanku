@@ -99,6 +99,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { error: authError } = await supabase.auth.admin.deleteUser(id);
     if (authError) throw authError;
 
+    const { error: profileError } = await supabase
+      .from("user_profiles")
+      .delete()
+      .eq("user_id", id);
+    if (profileError) throw profileError;
+
     return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json(
