@@ -3,10 +3,14 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 import { AppShell } from "@/components/layout/AppShell";
 import { useRole } from "@/hooks/useRole";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Hospital, Camera, Copy, Check, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Shield, Hospital, Camera, Copy, Check, ArrowRight, Lock, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 const AVATAR_KEY = "careflow-avatar";
 
@@ -81,6 +85,49 @@ export default function SettingsPage() {
   const { role, userId, userName } = useRole();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+
+  async function handleChangePassword() {
+    if (!pwForm.currentPassword || !pwForm.newPassword || !pwForm.confirmNewPassword) {
+      toast.error("All fields are required.");
+      return;
+    }
+    if (pwForm.newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters.");
+      return;
+    }
+    if (pwForm.newPassword !== pwForm.confirmNewPassword) {
+      toast.error("New passwords do not match.");
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const res = await fetch("/api/settings/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pwForm),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success("Password changed. You will be signed out.");
+        setPwForm({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+        setShowChangePassword(false);
+        setTimeout(() => signOut({ callbackUrl: "/auth" }), 1500);
+      } else {
+        const errMsg = json.error?.message ?? json.error ?? "Failed to change password";
+        toast.error(typeof errMsg === "string" ? errMsg : "Failed to change password");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setChangingPassword(false);
+    }
+  }
 
   return (
     <AppShell>
@@ -127,6 +174,102 @@ export default function SettingsPage() {
             <div>
               <p className="text-xs font-medium text-cool-grey uppercase tracking-wider">Session</p>
               <p className="mt-1 text-sm text-slate">Active</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate/10">
+          <CardContent className="p-6 sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="rounded-lg bg-clinical-teal/10 p-3 shrink-0">
+                  <Lock className="h-5 w-5 text-clinical-teal" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-deep-navy">Change Password</h3>
+                  <p className="mt-1 text-sm text-cool-grey leading-relaxed">
+                    Update your account password. You will be signed out after changing it.
+                  </p>
+                  {showChangePassword && (
+                    <div className="mt-4 space-y-3 max-w-sm">
+                      <div className="relative">
+                        <Input
+                          value={pwForm.currentPassword}
+                          onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                          type={showCurrentPw ? "text" : "password"}
+                          placeholder="Current password"
+                          className="h-11 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPw(!showCurrentPw)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
+                        >
+                          {showCurrentPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Input
+                          value={pwForm.newPassword}
+                          onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                          type={showNewPw ? "text" : "password"}
+                          placeholder="New password (min. 8 characters)"
+                          className="h-11 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPw(!showNewPw)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
+                        >
+                          {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Input
+                          value={pwForm.confirmNewPassword}
+                          onChange={(e) => setPwForm({ ...pwForm, confirmNewPassword: e.target.value })}
+                          type={showConfirmPw ? "text" : "password"}
+                          placeholder="Confirm new password"
+                          className="h-11 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPw(!showConfirmPw)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
+                        >
+                          {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2 pt-1">
+                        <Button
+                          className="bg-clinical-teal hover:bg-clinical-teal/90"
+                          onClick={handleChangePassword}
+                          disabled={changingPassword}
+                        >
+                          {changingPassword ? "Saving..." : "Update Password"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowChangePassword(false);
+                            setPwForm({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {!showChangePassword && (
+                <button
+                  onClick={() => setShowChangePassword(true)}
+                  className="shrink-0 rounded-lg border border-slate/20 px-3 py-1.5 text-xs font-medium text-slate hover:bg-slate/5 transition-colors"
+                >
+                  Change
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>

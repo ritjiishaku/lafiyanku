@@ -12,6 +12,7 @@ declare module "@auth/core/types" {
       role?: string;
       facilityId?: string;
       id?: string;
+      email?: string;
     };
     expires: string;
   }

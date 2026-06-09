@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 
 const colour = JSON.parse(fs.readFileSync('token-colour.json', 'utf8'));

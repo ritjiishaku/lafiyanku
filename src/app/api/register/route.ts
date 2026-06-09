@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomBytes } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
 import { UserRole } from "@/types/schemas";
@@ -35,7 +36,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, password, fullName, role } = parsed.data;
+    const { email, fullName, role } = parsed.data;
+
+    const defaultPassword = randomBytes(12).toString("hex");
 
     const supabase = createClient(url, key, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
-      password,
+      password: defaultPassword,
       email_confirm: true,
       user_metadata: { full_name: fullName },
     });
@@ -79,7 +82,12 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    const loginUrl = new URL("/auth", request.url).toString();
+
+    return NextResponse.json({
+      success: true,
+      data: { userId, email, defaultPassword, loginUrl },
+    }, { status: 201 });
   } catch {
     return NextResponse.json(
       apiError(ErrorCodes.INTERNAL_SERVER_ERROR),

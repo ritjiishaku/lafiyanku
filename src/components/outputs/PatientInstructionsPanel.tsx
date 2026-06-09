@@ -63,6 +63,7 @@ interface PatientInstructionsPanelProps {
   translatedOutput?: string | null;
   translationLanguage?: string | null;
   translationConfidence?: string | null;
+  patientFriendlyOutput?: string;
   isFinalised?: boolean;
 }
 
@@ -70,7 +71,7 @@ export function PatientInstructionsPanel({
   content,
   patientFriendlyOutput,
   isFinalised,
-}: PatientInstructionsPanelProps & { patientFriendlyOutput?: string; isFinalised?: boolean }) {
+}: PatientInstructionsPanelProps) {
   const sections = parseSections(content, PATIENT_HEADERS);
   const hasSections = Object.keys(sections).length > 1;
   const effectiveContent = patientFriendlyOutput ?? content;

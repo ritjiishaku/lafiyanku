@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateDischarge, translateText, getPromptVersion, getModelVersion } from "@/services/ai-provider";
 import { createServiceClient } from "@/services/supabase-server";
-import { UserRole } from "@/types/schemas";
+import { UserRole, AuditAction } from "@/types/schemas";
+import { writeAuditLog } from "@/services/audit-log";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
 
@@ -140,6 +141,18 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    await writeAuditLog({
+      recordId,
+      userId,
+      userRole: userRole as UserRole,
+      action: AuditAction.Generate,
+      facilityId: session.user.facilityId,
+      ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
+      notes: translationLanguage
+        ? `Generated with ${translationLanguage} translation`
+        : undefined,
+    });
 
     return NextResponse.json({
       success: true,

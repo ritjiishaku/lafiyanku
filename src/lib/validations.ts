@@ -19,10 +19,20 @@ export const facilityCodeSchema = z.string().max(50).optional().nullable();
 
 export const registerSchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
   fullName: fullNameSchema,
   role: z.enum(["doctor", "nurse"]),
 });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required."),
+    newPassword: passwordSchema,
+    confirmNewPassword: z.string().min(1, "Please confirm your new password."),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "New passwords do not match.",
+    path: ["confirmNewPassword"],
+  });
 
 export const facilityRegisterSchema = z.object({
   facilityName: facilityNameSchema,

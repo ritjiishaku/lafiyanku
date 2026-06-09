@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Edit2, Trash2, UserPlus, User } from "lucide-react";
+import { Edit2, Trash2, UserPlus, User, Copy, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 interface Clinician {
@@ -44,6 +44,14 @@ export default function AdminPage() {
   const [editingClinician, setEditingClinician] = useState<Clinician | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ fullName: "", email: "", password: "", role: "doctor" });
+  const [credentialsData, setCredentialsData] = useState<{
+    userId: string;
+    email: string;
+    defaultPassword: string;
+    loginUrl: string;
+    fullName: string;
+  } | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -90,8 +98,8 @@ export default function AdminPage() {
   }
 
   async function handleAddClinician() {
-    if (!form.fullName || !form.email || !form.password) {
-      toast.error("Full name, email, and password are required.");
+    if (!form.fullName || !form.email) {
+      toast.error("Full name and email are required.");
       return;
     }
     setSubmitting(true);
@@ -101,20 +109,25 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.email,
-          password: form.password,
           fullName: form.fullName,
           role: form.role,
-          facilityId,
         }),
       });
       const json = await res.json();
       if (json.success) {
-        toast.success(`${form.fullName} added as ${form.role}`);
         setDialogOpen(false);
+        setCredentialsData({
+          userId: json.data.userId ?? "",
+          email: json.data.email,
+          defaultPassword: json.data.defaultPassword,
+          loginUrl: json.data.loginUrl,
+          fullName: form.fullName,
+        });
         setForm({ fullName: "", email: "", password: "", role: "doctor" });
         await refresh();
       } else {
-        toast.error(json.error ?? "Failed to add clinician");
+        const errMsg = json.error?.message ?? json.error ?? "Failed to add clinician";
+        toast.error(typeof errMsg === "string" ? errMsg : "Failed to add clinician");
       }
     } catch {
       toast.error("Network error. Please try again.");
@@ -170,6 +183,39 @@ export default function AdminPage() {
     } catch {
       toast.error("Network error. Please try again.");
     }
+  }
+
+  async function regeneratePassword() {
+    if (!credentialsData) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/clinicians/${credentialsData.userId}/regenerate-password`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (json.success) {
+        setCredentialsData({ ...credentialsData, defaultPassword: json.data.password });
+        toast.success("Password regenerated");
+      } else {
+        toast.error(json.error?.message ?? json.error ?? "Failed to regenerate password");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function copyToClipboard(text: string, field: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  }
+
+  function copyAllCredentials() {
+    if (!credentialsData) return;
+    const text = `Email: ${credentialsData.email}\nPassword: ${credentialsData.defaultPassword}\nLogin URL: ${credentialsData.loginUrl}`;
+    copyToClipboard(text, "all");
   }
 
   function openEditDialog(clinician: Clinician) {
@@ -235,10 +281,12 @@ export default function AdminPage() {
                   <label className="mb-1 block text-xs font-medium text-slate">Email</label>
                   <Input value={form.email} disabled={!!editingClinician} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="e.g. jane.doe@hospital.ng" className="h-11" />
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate">{editingClinician ? "New Password (leave blank to keep current)" : "Temporary Password"}</label>
-                  <Input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder={editingClinician ? "Leave blank to keep current" : "Min. 8 characters"} className="h-11" />
-                </div>
+                {editingClinician && (
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate">New Password (leave blank to keep current)</label>
+                    <Input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Leave blank to keep current" className="h-11" />
+                  </div>
+                )}
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate">Role</label>
                   <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-11 w-full rounded-lg border border-slate/30 bg-white px-3 text-sm text-slate">
@@ -313,6 +361,76 @@ export default function AdminPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Dialog open={!!credentialsData} onOpenChange={(open) => { if (!open) setCredentialsData(null); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Clinician Created</DialogTitle>
+              <DialogDescription>
+                {credentialsData?.fullName} has been added. Share these credentials securely with the clinician.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-2">
+              <div className="rounded-lg border border-slate/10 bg-cool-off-white p-3 font-mono text-xs space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-cool-grey shrink-0">Email:</span>
+                  <span className="text-slate truncate">{credentialsData?.email}</span>
+                  <button
+                    onClick={() => credentialsData && copyToClipboard(credentialsData.email, "email")}
+                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    title="Copy email"
+                  >
+                    {copiedField === "email" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-cool-grey shrink-0">Password:</span>
+                  <span className="text-slate truncate font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
+                  <button
+                    onClick={() => credentialsData && copyToClipboard(credentialsData.defaultPassword, "password")}
+                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    title="Copy password"
+                  >
+                    {copiedField === "password" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-cool-grey shrink-0">Login URL:</span>
+                  <span className="text-slate truncate text-[10px]">{credentialsData?.loginUrl}</span>
+                  <button
+                    onClick={() => credentialsData && copyToClipboard(credentialsData.loginUrl, "url")}
+                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    title="Copy login URL"
+                  >
+                    {copiedField === "url" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={copyAllCredentials}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate/20 bg-white px-3 py-2 text-xs font-medium text-slate hover:bg-slate/5 transition-colors"
+                >
+                  {copiedField === "all" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
+                  Copy All
+                </button>
+                <button
+                  onClick={regeneratePassword}
+                  disabled={submitting}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate/20 bg-white px-3 py-2 text-xs font-medium text-slate hover:bg-slate/5 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${submitting ? "animate-spin" : ""}`} />
+                  Regenerate Password
+                </button>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button className="bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => setCredentialsData(null)}>
+                Done
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
