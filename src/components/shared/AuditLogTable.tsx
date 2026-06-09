@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AuditEntry {
   logId: string;
@@ -19,6 +20,7 @@ interface AuditLogTableProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  className?: string;
 }
 
 function formatAction(action: string): string {
@@ -46,6 +48,7 @@ export function AuditLogTable({
   page,
   totalPages,
   onPageChange,
+  className,
 }: AuditLogTableProps) {
   if (logs.length === 0) {
     return (
@@ -56,20 +59,22 @@ export function AuditLogTable({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto rounded-lg border border-slate/10">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate/10 bg-cool-off-white">
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">User</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Action</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Changes</th>
-              <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Notes</th>
-            </tr>
-          </thead>
+    <div className={cn("flex min-h-0 flex-col space-y-4", className)}>
+      <div className="flex min-h-0 flex-1 overflow-hidden rounded-lg border border-slate/10">
+        <div className="h-full overflow-y-auto">
+          <div className="inline-block min-w-full align-middle overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="sticky top-0 z-10 bg-cool-off-white">
+                <tr className="border-b border-slate/10">
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Timestamp</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">User</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Action</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">IP Address</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Changes</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Notes</th>
+                </tr>
+              </thead>
           <tbody>
             {logs.map((entry, idx) => (
               <tr
@@ -115,6 +120,8 @@ export function AuditLogTable({
             ))}
           </tbody>
         </table>
+          </div>
+        </div>
       </div>
 
       {totalPages > 1 && (

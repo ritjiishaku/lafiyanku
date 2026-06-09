@@ -66,8 +66,8 @@ export default function AuditLogPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
-        <div className="space-y-1">
+      <div className="mx-auto flex h-full min-h-0 max-w-6xl flex-col p-4 sm:p-6">
+        <div className="mb-6 flex-shrink-0 space-y-1">
           <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">
             Audit Log
           </h1>
@@ -90,6 +90,7 @@ export default function AuditLogPage() {
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
+            className="flex-1"
           />
         )}
       </div>

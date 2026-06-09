@@ -250,116 +250,116 @@ export default function AdminPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
+      <div className="mx-auto flex h-full min-h-0 max-w-6xl flex-col p-4 sm:p-6">
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+          <div className="mb-4 flex-shrink-0 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
         )}
 
-        <div className="sticky top-0 z-10 -mx-4 -mt-4 rounded-t-2xl bg-cool-off-white/95 backdrop-blur-sm px-4 pb-2 pt-4 sm:-mx-6 sm:px-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">Facility Management</h1>
-              <p className="text-sm text-cool-grey">Manage facilities, clinicians, and system preferences.</p>
-            </div>
-            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingClinician(null); } }}>
-              <DialogTrigger render={<Button className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={openAddDialog}><UserPlus className="mr-1 h-4 w-4" />Add Clinician</Button>} />
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>{editingClinician ? "Edit Clinician" : "Add Clinician"}</DialogTitle>
-                  <DialogDescription>{editingClinician ? `Editing ${editingClinician.full_name || editingClinician.email}` : "Create a new doctor or nurse account."}</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-2">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate">Full Name</label>
-                    <Input value={form.fullName} onChange={(e) => {
-                      const name = e.target.value;
-                      if (editingClinician) {
-                        setForm({ ...form, fullName: name });
-                      } else {
-                        const slug = name.toLowerCase().replace(/^dr\.?\s*/i, "").replace(/[^a-zA-Z0-9]/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
-                        const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.careflow.app` : "";
-                        setForm({ ...form, fullName: name, email: autoEmail || form.email });
-                      }
-                    }} placeholder="e.g. Dr. Jane Doe" className="h-11" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate">Email</label>
-                    <Input value={form.email} disabled={!!editingClinician} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="e.g. jane.doe@hospital.ng" className="h-11" />
-                  </div>
-                  {editingClinician && (
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate">New Password (leave blank to keep current)</label>
-                      <Input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Leave blank to keep current" className="h-11" />
-                    </div>
-                  )}
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate">Role</label>
-                    <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-11 w-full rounded-lg border border-slate/30 bg-white px-3 text-sm text-slate">
-                      <option value="doctor">Doctor</option>
-                      <option value="nurse">Nurse</option>
-                    </select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => { setDialogOpen(false); setEditingClinician(null); }} disabled={submitting}>Cancel</Button>
-                  <Button className="bg-clinical-teal hover:bg-clinical-teal/90" onClick={editingClinician ? handleEditClinician : handleAddClinician} disabled={submitting}>{submitting ? "Saving..." : editingClinician ? "Save Changes" : "Add Clinician"}</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+        <div className="mb-6 flex flex-shrink-0 flex-wrap items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">Facility Management</h1>
+            <p className="text-sm text-cool-grey">Manage facilities, clinicians, and system preferences.</p>
           </div>
+          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingClinician(null); } }}>
+            <DialogTrigger render={<Button className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={openAddDialog}><UserPlus className="mr-1 h-4 w-4" />Add Clinician</Button>} />
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>{editingClinician ? "Edit Clinician" : "Add Clinician"}</DialogTitle>
+                <DialogDescription>{editingClinician ? `Editing ${editingClinician.full_name || editingClinician.email}` : "Create a new doctor or nurse account."}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate">Full Name</label>
+                  <Input value={form.fullName} onChange={(e) => {
+                    const name = e.target.value;
+                    if (editingClinician) {
+                      setForm({ ...form, fullName: name });
+                    } else {
+                      const slug = name.toLowerCase().replace(/^dr\.?\s*/i, "").replace(/[^a-zA-Z0-9]/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
+                      const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.careflow.app` : "";
+                      setForm({ ...form, fullName: name, email: autoEmail || form.email });
+                    }
+                  }} placeholder="e.g. Dr. Jane Doe" className="h-11" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate">Email</label>
+                  <Input value={form.email} disabled={!!editingClinician} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="e.g. jane.doe@hospital.ng" className="h-11" />
+                </div>
+                {editingClinician && (
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate">New Password (leave blank to keep current)</label>
+                    <Input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Leave blank to keep current" className="h-11" />
+                  </div>
+                )}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate">Role</label>
+                  <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-11 w-full rounded-lg border border-slate/30 bg-white px-3 text-sm text-slate">
+                    <option value="doctor">Doctor</option>
+                    <option value="nurse">Nurse</option>
+                  </select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setDialogOpen(false); setEditingClinician(null); }} disabled={submitting}>Cancel</Button>
+                <Button className="bg-clinical-teal hover:bg-clinical-teal/90" onClick={editingClinician ? handleEditClinician : handleAddClinician} disabled={submitting}>{submitting ? "Saving..." : editingClinician ? "Save Changes" : "Add Clinician"}</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <Card className="border-slate/10">
-          <CardHeader>
+        <Card className="flex min-h-0 flex-1 flex-col border-slate/10">
+          <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2 text-base text-deep-navy">
               <User className="h-5 w-5 text-clinical-teal" />
               Clinicians ({clinicians.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate/10 bg-cool-off-white">
-                    <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Name</th>
-                    <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Email</th>
-                    <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
-                    <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Joined</th>
-                    <th scope="col" className="px-4 py-3 font-semibold text-deep-navy text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clinicians.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-cool-grey">No clinicians found.</td></tr>
-                  ) : (
-                    clinicians.map((c, i) => {
-                      const badge = ROLE_BADGES[c.role] ?? { label: c.role, color: "bg-slate/10 text-slate" };
-                      return (
-                        <tr key={c.user_id} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>
-                          <td className="px-4 py-3 font-medium text-slate">{c.full_name || "—"}</td>
-                          <td className="px-4 py-3 text-cool-grey">{c.email}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.color}`}>{badge.label}</span>
-                          </td>
-                          <td className="px-4 py-3 text-xs text-cool-grey font-mono">
-                            {new Date(c.created_at).toLocaleDateString("en-NG")}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="inline-flex items-center gap-1">
-                              <button onClick={() => openEditDialog(c)} className="p-2.5 rounded-md text-cool-grey hover:text-clinical-teal hover:bg-clinical-teal/5 transition-colors" title="Edit clinician" aria-label={`Edit ${c.full_name || c.email}`}>
-                                <Edit2 className="h-4 w-4" />
-                              </button>
-                              <button onClick={() => handleDeleteClinician(c)} className="p-2.5 rounded-md text-cool-grey hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove clinician" aria-label={`Remove ${c.full_name || c.email}`}>
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+          <CardContent className="flex min-h-0 flex-1 overflow-hidden p-0">
+            <div className="h-full overflow-y-auto">
+              <div className="inline-block min-w-full align-middle">
+                <table className="w-full text-left text-sm">
+                  <thead className="sticky top-0 z-10 bg-cool-off-white">
+                    <tr className="border-b border-slate/10">
+                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Name</th>
+                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Email</th>
+                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Role</th>
+                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy">Joined</th>
+                      <th scope="col" className="px-4 py-3 font-semibold text-deep-navy text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clinicians.length === 0 ? (
+                      <tr><td colSpan={5} className="px-4 py-8 text-center text-cool-grey">No clinicians found.</td></tr>
+                    ) : (
+                      clinicians.map((c, i) => {
+                        const badge = ROLE_BADGES[c.role] ?? { label: c.role, color: "bg-slate/10 text-slate" };
+                        return (
+                          <tr key={c.user_id} className={`border-b border-slate/10 ${i % 2 === 0 ? "bg-white" : "bg-cool-off-white/50"}`}>
+                            <td className="px-4 py-3 font-medium text-slate">{c.full_name || "—"}</td>
+                            <td className="px-4 py-3 text-cool-grey">{c.email}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.color}`}>{badge.label}</span>
+                            </td>
+                            <td className="px-4 py-3 text-xs text-cool-grey font-mono">
+                              {new Date(c.created_at).toLocaleDateString("en-NG")}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="inline-flex items-center gap-1">
+                                <button onClick={() => openEditDialog(c)} className="p-2.5 rounded-md text-cool-grey hover:text-clinical-teal hover:bg-clinical-teal/5 transition-colors" title="Edit clinician" aria-label={`Edit ${c.full_name || c.email}`}>
+                                  <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button onClick={() => handleDeleteClinician(c)} className="p-2.5 rounded-md text-cool-grey hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove clinician" aria-label={`Remove ${c.full_name || c.email}`}>
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </CardContent>
         </Card>
