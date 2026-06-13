@@ -74,7 +74,7 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
   const canCreate = role === "doctor" || role === "nurse";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
+    <div className="mx-auto max-w-6xl space-y-4 p-3 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">Dashboard</h1>
@@ -91,35 +91,35 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
         {/* Metric cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg p-2.5 bg-slate/10 shrink-0">
-                <FileText className="h-5 w-5 text-slate" />
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="rounded-lg p-2 bg-slate/10 shrink-0">
+                <FileText className="h-4 w-4 text-slate" />
               </div>
-              <div><p className="text-xs text-cool-grey">Total</p><p className="text-xl font-bold text-slate">{metrics.total}</p></div>
+              <div><p className="text-xs text-cool-grey">Total</p><p className="text-lg font-bold text-slate">{metrics.total}</p></div>
             </CardContent>
           </Card>
           <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg p-2.5 bg-warm-amber/10 shrink-0">
-                <Clock className="h-5 w-5 text-warm-amber" />
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="rounded-lg p-2 bg-warm-amber/10 shrink-0">
+                <Clock className="h-4 w-4 text-warm-amber" />
               </div>
-              <div><p className="text-xs text-cool-grey">Draft</p><p className="text-xl font-bold text-warm-amber">{metrics.draft}</p></div>
+              <div><p className="text-xs text-cool-grey">Draft</p><p className="text-lg font-bold text-warm-amber">{metrics.draft}</p></div>
             </CardContent>
           </Card>
           <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg p-2.5 bg-clinical-teal/10 shrink-0">
-                <FileCheck className="h-5 w-5 text-clinical-teal" />
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="rounded-lg p-2 bg-clinical-teal/10 shrink-0">
+                <FileCheck className="h-4 w-4 text-clinical-teal" />
               </div>
-              <div><p className="text-xs text-cool-grey">Finalised</p><p className="text-xl font-bold text-clinical-teal">{metrics.finalised}</p></div>
+              <div><p className="text-xs text-cool-grey">Finalised</p><p className="text-lg font-bold text-clinical-teal">{metrics.finalised}</p></div>
             </CardContent>
           </Card>
           <Card className="border-slate/10">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="rounded-lg p-2.5 bg-cool-grey/10 shrink-0">
-                <Archive className="h-5 w-5 text-cool-grey" />
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="rounded-lg p-2 bg-cool-grey/10 shrink-0">
+                <Archive className="h-4 w-4 text-cool-grey" />
               </div>
-              <div><p className="text-xs text-cool-grey">Archived</p><p className="text-xl font-bold text-cool-grey">{metrics.archived}</p></div>
+              <div><p className="text-xs text-cool-grey">Archived</p><p className="text-lg font-bold text-cool-grey">{metrics.archived}</p></div>
             </CardContent>
           </Card>
         </div>
@@ -190,7 +190,7 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
                     onNavigate({ name: "output", id: record.recordId });
                   }
                 }}
-                className="group flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate/10 bg-white p-4 transition-all duration-200 hover:shadow-md hover:border-slate/20 hover:-translate-y-0.5 sm:p-5 cursor-pointer"
+                className="group flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate/10 bg-white p-3 transition-all duration-200 hover:shadow-md hover:border-slate/20 hover:-translate-y-0.5 sm:p-4 cursor-pointer"
                 onClick={() => onNavigate({ name: "output", id: record.recordId })}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
