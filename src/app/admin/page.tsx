@@ -529,7 +529,7 @@ export default function AdminPage() {
         </Card>
 
         <Dialog open={!!credentialsData} onOpenChange={(open) => { if (!open) setCredentialsData(null); }}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Clinician Created</DialogTitle>
               <DialogDescription>
@@ -538,7 +538,7 @@ export default function AdminPage() {
             </DialogHeader>
             <div className="space-y-3 py-2">
               <div className="rounded-lg border border-slate/10 bg-cool-off-white p-3 font-mono text-xs space-y-2.5">
-                <div className="flex items-center gap-2 overflow-hidden">
+                <div className="flex items-center gap-2">
                   <span className="text-cool-grey shrink-0">Email:</span>
                   <span className="text-slate truncate min-w-0">{credentialsData?.email}</span>
                   <button
@@ -549,7 +549,7 @@ export default function AdminPage() {
                     {copiedField === "email" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
-                <div className="flex items-center gap-2 overflow-hidden">
+                <div className="flex items-center gap-2">
                   <span className="text-cool-grey shrink-0">Password:</span>
                   <span className="text-slate truncate min-w-0 font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
                   <button
