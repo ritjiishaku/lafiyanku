@@ -95,14 +95,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("user_profiles")
           .select("role, facility_id, must_change_password")
           .eq("user_id", data.user.id)
-          .single();
+          .maybeSingle();
 
-        if (!profile) {
-          throw new Error("User profile not found. Contact your administrator.");
+        if (profileError || !profile) {
+          console.error("User profile not found for user:", data.user.id, profileError ?? "");
+          return null;
         }
 
         const fullName = data.user.user_metadata?.full_name as string | undefined;
