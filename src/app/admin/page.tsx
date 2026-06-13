@@ -529,7 +529,7 @@ export default function AdminPage() {
         </Card>
 
         <Dialog open={!!credentialsData} onOpenChange={(open) => { if (!open) setCredentialsData(null); }}>
-          <DialogContent className="max-w-xs">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Clinician Created</DialogTitle>
               <DialogDescription>
@@ -540,7 +540,7 @@ export default function AdminPage() {
               <div className="rounded-lg border border-slate/10 bg-cool-off-white p-3 font-mono text-xs space-y-2.5">
                 <div className="flex items-center gap-2">
                   <span className="text-cool-grey shrink-0">Email:</span>
-                  <span className="text-slate truncate min-w-0">{credentialsData?.email}</span>
+                  <span className="text-slate">{credentialsData?.email}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.email, "email")}
                     className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
@@ -551,7 +551,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-cool-grey shrink-0">Password:</span>
-                  <span className="text-slate truncate min-w-0 font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
+                  <span className="text-slate font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.defaultPassword, "password")}
                     className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
@@ -560,9 +560,9 @@ export default function AdminPage() {
                     {copiedField === "password" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-cool-grey shrink-0">Login URL:</span>
-                  <span className="text-slate truncate min-w-0 text-[10px]">{credentialsData?.loginUrl}</span>
+                <div className="flex items-start gap-2">
+                  <span className="text-cool-grey shrink-0 mt-0.5">Login URL:</span>
+                  <span className="text-slate text-[10px] break-all leading-relaxed">{credentialsData?.loginUrl}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.loginUrl, "url")}
                     className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
