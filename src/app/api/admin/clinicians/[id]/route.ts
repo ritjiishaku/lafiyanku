@@ -37,7 +37,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       .eq("user_id", id)
       .single();
 
-    if (!targetProfile || targetProfile.facility_id !== adminProfile?.facility_id) {
+    if (!targetProfile || !adminProfile?.facility_id || targetProfile.facility_id !== adminProfile.facility_id) {
       return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
     }
 
@@ -92,7 +92,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       .eq("user_id", id)
       .single();
 
-    if (!targetProfile || targetProfile.facility_id !== adminProfile?.facility_id || targetProfile.role === "admin") {
+    if (!targetProfile || !adminProfile?.facility_id || targetProfile.facility_id !== adminProfile.facility_id || targetProfile.role === "admin") {
       return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
     }
 

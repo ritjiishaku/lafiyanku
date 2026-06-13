@@ -31,7 +31,7 @@ export async function POST(
       .eq("user_id", id)
       .single();
 
-    if (!targetProfile || targetProfile.facility_id !== adminProfile?.facility_id) {
+    if (!targetProfile || !adminProfile?.facility_id || targetProfile.facility_id !== adminProfile.facility_id) {
       return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
     }
 

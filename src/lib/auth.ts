@@ -101,15 +101,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .eq("user_id", data.user.id)
           .single();
 
+        if (!profile) {
+          throw new Error("User profile not found. Contact your administrator.");
+        }
+
         const fullName = data.user.user_metadata?.full_name as string | undefined;
 
         return {
           id: data.user.id,
           email: data.user.email,
           name: fullName ?? data.user.email,
-          role: profile?.role ?? "nurse",
-          facilityId: profile?.facility_id as string | undefined,
-          mustChangePassword: profile?.must_change_password ?? false,
+          role: profile.role,
+          facilityId: profile.facility_id as string | undefined,
+          mustChangePassword: profile.must_change_password ?? false,
         };
       },
     }),

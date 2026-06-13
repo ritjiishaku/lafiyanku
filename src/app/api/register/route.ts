@@ -76,7 +76,9 @@ export async function POST(request: Request) {
     }, { onConflict: "user_id" });
 
     if (profileError) {
-      await supabase.auth.admin.deleteUser(userId).catch(() => {});
+      await supabase.auth.admin.deleteUser(userId).catch((cleanupErr) => {
+        console.error("CRITICAL: Failed to clean up user after profile upsert failure:", cleanupErr);
+      });
       return NextResponse.json(
         apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPSERT user_profile" }),
         { status: 500 },
