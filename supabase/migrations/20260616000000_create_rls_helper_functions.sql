@@ -1,10 +1,11 @@
 -- ============================================
--- CareFlow — Fix patient_inputs UPDATE RLS policy
--- Migration ID: 20260610000001
--- Adds facility_id check to prevent cross-facility data modification
+-- CareFlow — RLS helper functions
+-- Migration ID: 20260616000000
+-- Creates helper functions used by RLS policies
+-- to check user role and facility_id.
 -- ============================================
 
--- RLS helper functions used by this and future policies
+-- Returns true if the current user has role 'doctor'
 CREATE OR REPLACE FUNCTION is_doctor()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -18,6 +19,7 @@ AS $$
   );
 $$;
 
+-- Returns true if the current user has role 'nurse'
 CREATE OR REPLACE FUNCTION is_nurse()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -31,6 +33,7 @@ AS $$
   );
 $$;
 
+-- Returns the facility_id of the current user
 CREATE OR REPLACE FUNCTION get_user_facility_id()
 RETURNS UUID
 LANGUAGE sql
@@ -40,13 +43,3 @@ AS $$
   SELECT facility_id FROM user_profiles
   WHERE user_id = auth.uid();
 $$;
-
--- Drop the existing policy that lacks facility isolation
-DROP POLICY IF EXISTS patient_inputs_update_clinical ON patient_inputs;
-
--- Recreate with facility_id check
-CREATE POLICY patient_inputs_update_clinical
-    ON patient_inputs
-    FOR UPDATE
-    USING ((is_doctor() OR is_nurse()) AND facility_id = get_user_facility_id())
-    WITH CHECK ((is_doctor() OR is_nurse()) AND facility_id = get_user_facility_id());

@@ -6,8 +6,8 @@
 
 -- Add facility_id to audit_logs for multi-tenant isolation
 -- Nullable: existing rows get NULL, new rows will have facility_id set
-ALTER TABLE audit_logs ADD COLUMN facility_id UUID REFERENCES facilities(facility_id);
-CREATE INDEX idx_audit_logs_facility_id ON audit_logs(facility_id);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS facility_id UUID REFERENCES facilities(facility_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_facility_id ON audit_logs(facility_id);
 
 -- Add unarchive to audit_action_enum (safe enum extension)
 DO $$ BEGIN

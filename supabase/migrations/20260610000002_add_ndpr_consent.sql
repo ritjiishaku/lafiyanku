@@ -5,5 +5,5 @@
 -- ============================================
 
 -- Add consent tracking columns (nullable for existing records)
-ALTER TABLE patient_inputs ADD COLUMN consent_given BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE patient_inputs ADD COLUMN consent_timestamp TIMESTAMPTZ;
+ALTER TABLE patient_inputs ADD COLUMN IF NOT EXISTS consent_given BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE patient_inputs ADD COLUMN IF NOT EXISTS consent_timestamp TIMESTAMPTZ;
