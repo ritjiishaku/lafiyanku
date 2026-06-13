@@ -529,7 +529,7 @@ export default function AdminPage() {
         </Card>
 
         <Dialog open={!!credentialsData} onOpenChange={(open) => { if (!open) setCredentialsData(null); }}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="w-fit min-w-72">
             <DialogHeader>
               <DialogTitle>Clinician Created</DialogTitle>
               <DialogDescription>
@@ -537,35 +537,35 @@ export default function AdminPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-2">
-              <div className="rounded-lg border border-slate/10 bg-cool-off-white p-3 font-mono text-xs space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-cool-grey shrink-0">Email:</span>
-                  <span className="text-slate truncate">{credentialsData?.email}</span>
+              <div className="rounded-lg border border-slate/10 bg-cool-off-white p-3 font-mono text-xs space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-cool-grey">Email:</span>
+                  <span className="text-slate min-w-0">{credentialsData?.email}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.email, "email")}
-                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    className="shrink-0 ml-auto rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
                     title="Copy email"
                   >
                     {copiedField === "email" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-cool-grey shrink-0">Password:</span>
-                  <span className="text-slate truncate font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-cool-grey">Password:</span>
+                  <span className="text-slate min-w-0 font-bold tracking-wide">{credentialsData?.defaultPassword}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.defaultPassword, "password")}
-                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    className="shrink-0 ml-auto rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
                     title="Copy password"
                   >
                     {copiedField === "password" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-cool-grey shrink-0">Login URL:</span>
-                  <span className="text-slate truncate text-[10px]">{credentialsData?.loginUrl}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-cool-grey">Login URL:</span>
+                  <span className="text-slate min-w-0 text-[10px] break-all">{credentialsData?.loginUrl}</span>
                   <button
                     onClick={() => credentialsData && copyToClipboard(credentialsData.loginUrl, "url")}
-                    className="shrink-0 rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
+                    className="shrink-0 ml-auto rounded p-1 text-cool-grey hover:text-clinical-teal transition-colors"
                     title="Copy login URL"
                   >
                     {copiedField === "url" ? <Check className="h-3.5 w-3.5 text-clinical-teal" /> : <Copy className="h-3.5 w-3.5" />}
