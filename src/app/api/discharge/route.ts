@@ -33,9 +33,13 @@ export async function GET(request: NextRequest) {
         )
       `, { count: "estimated" });
 
-    if (session.user.facilityId) {
-      query = query.eq("facility_id", session.user.facilityId);
+    if (!session.user.facilityId) {
+      return NextResponse.json(
+        apiError(ErrorCodes.ROLE_NOT_PERMITTED, { message: "No facility assigned. Contact your admin." }),
+        { status: 403 },
+      );
     }
+    query = query.eq("facility_id", session.user.facilityId);
 
     if (status && ["draft", "finalised", "archived"].includes(status)) {
       query = query.eq("status", status);

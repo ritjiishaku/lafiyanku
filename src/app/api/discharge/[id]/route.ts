@@ -7,7 +7,7 @@ import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -42,6 +42,15 @@ export async function GET(
         { status: 404 },
       );
     }
+
+    await writeAuditLog({
+      recordId: id,
+      userId: session.user.id,
+      userRole: session.user.role as UserRole,
+      action: AuditAction.View,
+      facilityId: session.user.facilityId,
+      ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
+    });
 
     if (session.user.role === UserRole.Admin) {
       const { clinical_summary, ...rest } = data;

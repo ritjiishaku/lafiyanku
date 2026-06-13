@@ -22,6 +22,22 @@ function validatePatientInput(body: Record<string, unknown>): string[] {
       missing.push(field);
     }
   }
+  // Type validation
+  if (body.age !== undefined && body.age !== null && body.age !== "") {
+    if (typeof body.age !== "number" || isNaN(body.age)) {
+      missing.push("age (must be a number)");
+    }
+  }
+  if (body.gender !== undefined && body.gender !== null && body.gender !== "") {
+    if (!["Male", "Female", "Other"].includes(body.gender as string)) {
+      missing.push("gender (must be Male, Female, or Other)");
+    }
+  }
+  if (body.medications !== undefined && body.medications !== null) {
+    if (!Array.isArray(body.medications) || body.medications.length === 0) {
+      missing.push("medications (must be a non-empty array)");
+    }
+  }
   return missing;
 }
 
@@ -56,16 +72,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!patientInput.consentGiven) {
+      return NextResponse.json(
+        apiError(ErrorCodes.MISSING_REQUIRED_FIELD, { field: "consentGiven", message: "Patient consent is required before generating discharge documentation." }),
+        { status: 400 },
+      );
+    }
+
     const generationResult = await generateDischarge(patientInput);
+
+    if (!generationResult.clinicalSummary || !generationResult.patientFriendlyOutput) {
+      return NextResponse.json(
+        apiError(ErrorCodes.GENERATION_FAILED, { details: "AI returned empty output. Please try again." }),
+        { status: 500 },
+      );
+    }
 
     const supabase = createServiceClient();
     const patientId = crypto.randomUUID();
     const recordId = crypto.randomUUID();
 
-    const facilityId = session.user.facilityId ?? (patientInput.facilityId as string | null);
+    const facilityId = session.user.facilityId;
     if (!facilityId) {
       return NextResponse.json(
-        { error: "Facility assignment required. Contact your admin." },
+        apiError(ErrorCodes.MISSING_REQUIRED_FIELD, { field: "facilityId", message: "Facility assignment required. Contact your admin." }),
         { status: 400 },
       );
     }
@@ -133,6 +163,8 @@ export async function POST(request: NextRequest) {
       p_translation_request_id: translationRequestId,
       p_translation_source_text: generationResult.patientFriendlyOutput,
       p_translation_target_language: translationLanguage,
+      p_consent_given: true,
+      p_consent_timestamp: new Date().toISOString(),
     });
 
     if (rpcError) {

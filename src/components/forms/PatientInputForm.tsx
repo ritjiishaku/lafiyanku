@@ -27,6 +27,7 @@ import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOfflineDraft } from "@/hooks/useOfflineDraft";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { Save, AlertCircle, RefreshCw, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const medicationSchema = z.object({
   name: z.string().min(1, "Medication name is required"),
@@ -58,6 +59,9 @@ const patientInputSchema = z
     languageRequested: z.enum(["en", "ha", "yo", "ig"]).optional(),
     dischargedBy: z.string().min(1, "Clinician name is required"),
     clinicianLicenseNo: z.string().optional(),
+    consentGiven: z.boolean().refine((val) => val === true, {
+      message: "Patient consent is required before generating discharge documentation.",
+    }),
   })
   .refine(
     (data) => {
@@ -85,6 +89,7 @@ export function PatientInputForm({
 }: PatientInputFormProps) {
   const form = useForm<PatientInputFormData>({
     resolver: zodResolver(patientInputSchema) as unknown as Resolver<PatientInputFormData>,
+    mode: "onBlur",
     defaultValues: {
       facilityName: "",
       facilityCode: "",
@@ -105,6 +110,7 @@ export function PatientInputForm({
       languageRequested: "en",
       dischargedBy: "",
       clinicianLicenseNo: "",
+      consentGiven: false,
     },
   });
 
@@ -164,6 +170,7 @@ export function PatientInputForm({
           </div>
           <button
             type="button"
+            aria-label="Dismiss draft restore"
             onClick={() => { setDismissRestore(true); setRestoredFromDraft(false); }}
             className="touch-target-min rounded p-1 text-clinical-teal/60 transition-colors hover:text-clinical-teal"
           >
@@ -522,6 +529,30 @@ export function PatientInputForm({
           </div>
 
           <LanguageSelector />
+
+          <FormField
+            control={form.control}
+            name="consentGiven"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-slate/20 bg-white p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-sm font-medium">
+                    I confirm that the patient has provided consent for their data to be processed. <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <p className="text-xs text-cool-grey">
+                    Required by NDPR 2019. Patient data will be stored securely and used only for discharge documentation.
+                  </p>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <div className="flex flex-col gap-3 sm:flex-row-reverse">
             <Button

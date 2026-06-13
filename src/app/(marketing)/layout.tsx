@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
+import { MarketingNav } from "@/components/marketing/MarketingNav";
+import { Footer } from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
-  title: "CareFlow — Clinical Discharge Assistant for Nigerian Hospitals",
+  title: "CareFlow — Discharge Documents Your Patients Can Actually Understand",
   description:
-    "AI-powered clinical discharge documentation with Hausa, Yoruba, and Igbo translation. NDPR compliant. Built for Nigerian hospitals.",
+    "AI-powered discharge documentation in English, Hausa, Yoruba, and Igbo. Built for Nigerian hospitals. NDPR compliant. Start your free 30-day pilot.",
   openGraph: {
-    title: "CareFlow — Clinical Discharge Assistant for Nigerian Hospitals",
+    title: "CareFlow — Discharge Documents Your Patients Can Actually Understand",
     description:
-      "AI-powered clinical discharge documentation with Hausa, Yoruba, and Igbo translation. NDPR compliant. Built for Nigerian hospitals.",
+      "AI-powered discharge documentation in English, Hausa, Yoruba, and Igbo. Built for Nigerian hospitals.",
     siteName: "CareFlow",
     locale: "en_NG",
     type: "website",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "CareFlow — Clinical Discharge Assistant" }],
+    url: process.env.NEXT_PUBLIC_APP_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "CareFlow — Clinical Discharge Assistant for Nigerian Hospitals",
+    title: "CareFlow — Discharge Documents Your Patients Can Actually Understand",
     description:
-      "AI-powered discharge documentation in Hausa, Yoruba, and Igbo. NDPR compliant. Built for Nigerian hospitals.",
+      "AI-powered discharge documentation in English, Hausa, Yoruba, and Igbo. Built for Nigerian hospitals.",
   },
 };
 
@@ -26,5 +28,11 @@ export default function MarketingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen flex flex-col">
+      <MarketingNav />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
+  );
 }

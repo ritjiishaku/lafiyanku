@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ClinicalSummaryPanel } from "@/components/outputs/ClinicalSummaryPanel";
@@ -51,15 +51,17 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
   const [translating, setTranslating] = useState(false);
   const [translateLang, setTranslateLang] = useState<string>("");
   const [activeMode, setActiveMode] = useState<"clinical" | "patient">("patient");
+  const translateAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     document.title = "CareFlow — Discharge Output";
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchRecord() {
       try {
-        const res = await fetch(`/api/discharge/${id}`);
+        const res = await fetch(`/api/discharge/${id}`, { signal: controller.signal });
         const json = await res.json();
         if (json.success) {
           const d = json.data;
@@ -86,13 +88,15 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         } else {
           setError("Record not found");
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
         setError("Failed to load record");
       } finally {
         setLoading(false);
       }
     }
     fetchRecord();
+    return () => controller.abort();
   }, [id]);
 
   async function handleSave() {
@@ -170,16 +174,25 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
     if (!record) return;
     const targetLang = lang ?? translateLang;
     if (!targetLang) return;
+
+    // Abort any in-flight translation
+    translateAbortRef.current?.abort();
+    const controller = new AbortController();
+    translateAbortRef.current = controller;
+
     setTranslating(true);
     try {
-      const res = await fetch("/api/translation/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordId: record.recordId, targetLanguage: targetLang, userId, userRole: role }) });
+      const res = await fetch("/api/translation/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordId: record.recordId, targetLanguage: targetLang, userId, userRole: role }), signal: controller.signal });
       const json = await res.json();
       if (json.success) {
         setRecord((prev) => prev ? { ...prev, translatedOutput: json.data.translatedOutput, translationLanguage: json.data.translationLanguage, translationConfidence: json.data.confidence } : prev);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       toast.error("Translation request failed");
-    } finally { setTranslating(false); }
+    } finally {
+      if (!controller.signal.aborted) setTranslating(false);
+    }
   }
 
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><LoadingSpinner /></div>;
@@ -211,14 +224,14 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
             <Button variant="outline" size="sm" className="touch-target-min" onClick={() => setIsEditing(true)}><Edit className="mr-1 h-4 w-4" />Edit</Button>
           )}
           {record.status === "draft" && role === "doctor" && (
-            <Button size="sm" className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => { setConfirmAction("finalise"); setConfirmOpen(true); }}>
+            <Button size="sm" className="touch-target-min" onClick={() => { setConfirmAction("finalise"); setConfirmOpen(true); }}>
               <CheckCircle className="mr-1 h-4 w-4" />Finalise
             </Button>
           )}
           {isEditing && (
             <>
               <Button variant="outline" size="sm" className="touch-target-min" onClick={handleCancel} disabled={saving}><X className="mr-1 h-4 w-4" />Cancel</Button>
-              <Button size="sm" className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={handleSave} disabled={saving}><Save className="mr-1 h-4 w-4" />{saving ? "Saving..." : "Save"}</Button>
+              <Button size="sm" className="touch-target-min" onClick={handleSave} disabled={saving}><Save className="mr-1 h-4 w-4" />{saving ? "Saving..." : "Save"}</Button>
             </>
           )}
         </div>
@@ -288,10 +301,14 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         </div>
       </div>
 
-      <div className="flex rounded-lg border border-slate/20 bg-cool-off-white p-1">
+      <div className="flex rounded-lg border border-slate/20 bg-cool-off-white p-1" role="tablist" aria-label="Output view mode">
         {canSeeClinical && (
           <button
             type="button"
+            role="tab"
+            aria-selected={activeMode === "clinical"}
+            aria-controls="panel-clinical"
+            id="tab-clinical"
             onClick={() => setActiveMode("clinical")}
             className={`flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:py-2.5 sm:text-sm ${
               activeMode === "clinical"
@@ -313,6 +330,10 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         )}
         <button
           type="button"
+          role="tab"
+          aria-selected={activeMode === "patient"}
+          aria-controls="panel-patient"
+          id="tab-patient"
           onClick={() => setActiveMode("patient")}
           className={`flex-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-4 sm:py-2.5 sm:text-sm ${
             activeMode === "patient"
@@ -334,7 +355,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
       </div>
 
       {activeMode === "clinical" && canSeeClinical && (
-        <div>
+        <div role="tabpanel" id="panel-clinical" aria-labelledby="tab-clinical">
           {isEditing ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
@@ -342,7 +363,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
                   Words: {editClinical.split(/\s+/).filter(Boolean).length} · Characters: {editClinical.length}
                 </span>
               </div>
-              <textarea className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
+              <textarea aria-label="Edit clinical summary" className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
             </div>
           ) : (
             <ClinicalSummaryPanel content={record.clinicalSummary} missingFieldsLog={record.missingFieldsLog} />
@@ -351,7 +372,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
       )}
 
       {activeMode === "patient" && (
-        <div className="space-y-6">
+        <div role="tabpanel" id="panel-patient" aria-labelledby="tab-patient" className="space-y-6">
           {isEditing ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
@@ -359,7 +380,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
                   Words: {editPatient.split(/\s+/).filter(Boolean).length} · Characters: {editPatient.length}
                 </span>
               </div>
-              <textarea className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
+              <textarea aria-label="Edit patient instructions" className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
             </div>
           ) : (
             <PatientInstructionsPanel content={record.patientFriendlyOutput} />
@@ -381,7 +402,7 @@ export function DischargeOutputView({ id, onNavigate }: DischargeOutputViewProps
         title={confirmAction === "finalise" ? "Finalise Discharge Record?" : confirmAction === "archive" ? "Archive Discharge Record?" : "Unarchive Discharge Record?"}
         description={confirmAction === "finalise" ? "This will mark the record as finalised. Only a Doctor can undo this action." : confirmAction === "archive" ? "Archived records can be unarchived later." : "This will return the record to draft status."}
         confirmLabel={confirmAction === "finalise" ? "Finalise" : confirmAction === "archive" ? "Archive" : "Unarchive"}
-        variant={confirmAction === "archive" ? "destructive" : "default"}
+        variant={confirmAction === "archive" ? "destructive" : "primary"}
         onConfirm={confirmAction === "finalise" ? handleFinalise : confirmAction === "archive" ? handleArchive : handleUnarchive}
       />
     </div>

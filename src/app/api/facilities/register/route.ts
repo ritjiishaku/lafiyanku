@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     if (authError) {
       await supabase.from("facilities").delete().eq("facility_id", facility.facility_id);
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "CREATE user", details: authError.message }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "CREATE user" }),
         { status: 500 },
       );
     }

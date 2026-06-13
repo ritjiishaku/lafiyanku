@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/services/supabase-server";
 import { auth } from "@/lib/auth";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
+import { UserRole } from "@/types/schemas";
+
+function isClinician(role?: string): boolean {
+  return role === UserRole.Doctor || role === UserRole.Nurse;
+}
 
 export async function GET() {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || !isClinician(session.user.role)) {
       return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
     }
 
@@ -32,7 +37,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || !isClinician(session.user.role)) {
       return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
     }
 
@@ -65,7 +70,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || !isClinician(session.user.role)) {
       return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
     }
 

@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const parsed = clinicianUpdateSchema.safeParse(body);
     if (!parsed.success) {
       const firstIssue = parsed.error.issues[0];
-      return NextResponse.json({ error: firstIssue.message }, { status: 400 });
+      return NextResponse.json(apiError(ErrorCodes.VALIDATION_ERROR, { field: firstIssue.path.join("."), message: firstIssue.message }), { status: 400 });
     }
 
     const { fullName, role, password } = parsed.data;
@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to update clinician" },
+      apiError(ErrorCodes.INTERNAL_SERVER_ERROR, { details: err instanceof Error ? err.message : "Failed to update clinician" }),
       { status: 500 },
     );
   }
@@ -108,7 +108,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to remove clinician" },
+      apiError(ErrorCodes.INTERNAL_SERVER_ERROR, { details: err instanceof Error ? err.message : "Failed to remove clinician" }),
       { status: 500 },
     );
   }

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
+import { toast } from "sonner";
 
 interface PrintButtonProps {
   patientName: string;
@@ -12,6 +13,15 @@ interface PrintButtonProps {
   translatedOutput?: string | null;
   translationLanguage?: string | null;
   translationConfidence?: string | null;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function stripSeparators(text: string): string {
@@ -41,13 +51,24 @@ export function PrintButton({
       (translationConfidence === "high" || translationConfidence === "low");
 
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    if (!printWindow) {
+      toast.error("Popup blocked. Please allow popups for this site and try again.");
+      return;
+    }
+
+    const safePatientName = escapeHtml(patientName);
+    const safeFacilityName = escapeHtml(facilityName);
+    const safeDischargeDate = escapeHtml(dischargeDate);
+    const safeClinicianName = escapeHtml(clinicianName);
+    const safeOutput = escapeHtml(stripSeparators(patientFriendlyOutput));
+    const safeTranslation = translatedOutput ? escapeHtml(stripSeparators(translatedOutput)) : "";
+    const safeLangLabel = translationLanguage ? escapeHtml(languageLabel[translationLanguage!] ?? translationLanguage) : "";
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Discharge Instructions - ${patientName}</title>
+        <title>Discharge Instructions - ${safePatientName}</title>
         <meta charset="utf-8">
         <style>
           @page { margin: 20mm 15mm; }
@@ -91,27 +112,21 @@ export function PrintButton({
       </head>
       <body>
         <div class="header">
-          <h1>${facilityName}</h1>
-          <p>Patient: ${patientName} | Discharge date: ${dischargeDate} | Clinician: ${clinicianName}</p>
+          <h1>${safeFacilityName}</h1>
+          <p>Patient: ${safePatientName} | Discharge date: ${safeDischargeDate} | Clinician: ${safeClinicianName}</p>
         </div>
 
         <div class="section">
           <h2>Discharge Instructions</h2>
-          ${stripSeparators(patientFriendlyOutput)
-            .split("\n")
-            .map((line) => (line.trim() ? `<p>${line}</p>` : ""))
-            .join("")}
+          ${safeOutput.split("\n").map((line) => (line.trim() ? `<p>${line}</p>` : "")).join("")}
         </div>
 
         ${
           showTranslation
             ? `
         <div class="section" style="margin-top: 20pt; border-top: 2px solid #0D2B4E; padding-top: 14pt;">
-          <h2>${languageLabel[translationLanguage!] ?? translationLanguage} Translation</h2>
-          ${stripSeparators(translatedOutput!)
-            .split("\n")
-            .map((line) => (line.trim() ? `<p>${line}</p>` : ""))
-            .join("")}
+          <h2>${safeLangLabel} Translation</h2>
+          ${safeTranslation.split("\n").map((line) => (line.trim() ? `<p>${line}</p>` : "")).join("")}
           ${
             translationConfidence === "low"
               ? '<p style="margin-top: 8pt; font-style: italic; color: #B45309;">Note: This translation was completed with low confidence. Please verify with a fluent speaker.</p>'
@@ -121,7 +136,7 @@ export function PrintButton({
             : translatedOutput && translationConfidence === "failed"
               ? `
         <div class="section" style="margin-top: 20pt; border-top: 2px solid #0D2B4E; padding-top: 14pt;">
-          <p style="font-style: italic; color: #64748B;">Translation into ${languageLabel[translationLanguage!] ?? translationLanguage} could not be completed with sufficient confidence. English version is shown above.</p>
+          <p style="font-style: italic; color: #64748B;">Translation into ${safeLangLabel} could not be completed with sufficient confidence. English version is shown above.</p>
         </div>`
               : ""
         }

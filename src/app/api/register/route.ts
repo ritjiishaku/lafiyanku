@@ -72,6 +72,7 @@ export async function POST(request: Request) {
       full_name: fullName,
       role,
       facility_id: adminFacilityId ?? null,
+      must_change_password: true,
     }, { onConflict: "user_id" });
 
     if (profileError) {
@@ -82,7 +83,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const loginUrl = new URL("/auth", request.url).toString();
+    const facilityRecord = await supabase
+      .from("facilities")
+      .select("facility_name")
+      .eq("facility_id", adminFacilityId)
+      .single();
+
+    const facilityQueryName = facilityRecord.data?.facility_name;
+    const loginUrl = facilityQueryName
+      ? new URL(`/facility/login?name=${encodeURIComponent(facilityQueryName)}`, request.url).toString()
+      : new URL("/login", request.url).toString();
 
     return NextResponse.json({
       success: true,

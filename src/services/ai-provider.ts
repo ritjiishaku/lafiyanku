@@ -51,7 +51,9 @@ export function validateInput(input: Record<string, unknown>): { missingFieldsLo
   }
 
   const medications = input.medications as Array<Record<string, unknown>> | undefined;
-  if (medications) {
+  if (Array.isArray(medications) && medications.length === 0) {
+    missingFieldsLog.push("Medications array is empty. At least one medication is required. Please verify before finalising.");
+  } else if (medications) {
     for (const med of medications) {
       if (!med.dosage || !med.frequency) {
         flaggedIssues.push(
@@ -94,6 +96,35 @@ export function validateOutput(content: string): string[] {
     }
     if (!mode2[0].toLowerCase().includes("follow-up")) {
       issues.push("Mode 2 is missing Your Follow-Up Appointment section.");
+    }
+  }
+
+  return issues;
+}
+
+export function validateContentFidelity(
+  input: Record<string, unknown>,
+  clinicalSummary: string,
+  patientFriendlyOutput: string,
+): string[] {
+  const issues: string[] = [];
+
+  // Check diagnosis appears in output
+  const inputDiagnosis = (input.diagnosis as string)?.toLowerCase() ?? "";
+  if (inputDiagnosis && inputDiagnosis.length > 5 && !clinicalSummary.toLowerCase().includes(inputDiagnosis.slice(0, 30))) {
+    issues.push("The diagnosis from the input may not be reflected in the clinical summary. Please verify.");
+  }
+
+  // Check medications are present in output
+  const inputMeds = input.medications as Array<Record<string, unknown>> ?? [];
+  for (const med of inputMeds) {
+    const medName = (med.name as string)?.toLowerCase() ?? "";
+    if (medName && medName.length > 3) {
+      const inClinical = clinicalSummary.toLowerCase().includes(medName);
+      const inPatient = patientFriendlyOutput.toLowerCase().includes(medName);
+      if (!inClinical && !inPatient) {
+        issues.push(`Medication "${med.name}" from input may not appear in the generated output. Please verify.`);
+      }
     }
   }
 
@@ -161,11 +192,12 @@ export async function generateDischarge(
 
     const outputIssues = validateOutput(content);
     const result = parseGenerationOutput(content);
+    const fidelityIssues = validateContentFidelity(patientInput, result.clinicalSummary, result.patientFriendlyOutput);
 
     return {
       ...result,
       missingFieldsLog: [...missingFieldsLog, ...result.missingFieldsLog],
-      flaggedIssues: [...flaggedIssues, ...outputIssues, ...result.flaggedIssues],
+      flaggedIssues: [...flaggedIssues, ...outputIssues, ...fidelityIssues, ...result.flaggedIssues],
     };
   } catch (err: unknown) {
     clearTimeout(timeoutId);
@@ -198,7 +230,7 @@ export async function translateText(
         messages: [
           {
             role: "system",
-            content: `You are a medical translator. Translate the following discharge instructions into ${targetLanguage === "ha" ? "Hausa" : targetLanguage === "yo" ? "Yoruba" : "Igbo"}. Preserve the structure. Do not alter medical content. If you are not confident, respond with "LOW_CONFIDENCE".`,
+            content: `You are a medical translator. Translate the following discharge instructions into ${targetLanguage === "ha" ? "Hausa" : targetLanguage === "yo" ? "Yoruba" : "Igbo"}. Preserve the structure. Never produce unsafe, misleading, or dangerous medical translations. Preserve all clinical meaning exactly. If you are not confident, respond with "LOW_CONFIDENCE".`,
           },
           {
             role: "user",

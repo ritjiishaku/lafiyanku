@@ -8,6 +8,7 @@ import {
   fhirDischargeSummary,
 } from "@/services/fhir-adapter";
 import { auth } from "@/lib/auth";
+import { UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 
 export async function POST(request: NextRequest) {
@@ -15,6 +16,9 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
+    }
+    if (session.user.role !== UserRole.Doctor && session.user.role !== UserRole.Nurse) {
+      return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
     }
 
     const body = await request.json();

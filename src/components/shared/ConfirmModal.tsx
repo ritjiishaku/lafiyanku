@@ -15,7 +15,7 @@ interface ConfirmModalProps {
   description: string;
   confirmLabel?: string;
   onConfirm: () => void;
-  variant?: "default" | "destructive";
+  variant?: "primary" | "destructive";
 }
 
 export function ConfirmModal({
@@ -25,7 +25,7 @@ export function ConfirmModal({
   description,
   confirmLabel = "Confirm",
   onConfirm,
-  variant = "default",
+  variant = "primary",
 }: ConfirmModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,7 +39,7 @@ export function ConfirmModal({
             Cancel
           </Button>
           <Button
-            variant={variant === "destructive" ? "destructive" : "default"}
+            variant={variant === "destructive" ? "destructive" : "primary"}
             onClick={onConfirm}
           >
             {confirmLabel}

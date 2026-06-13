@@ -5,6 +5,7 @@ import Link from "next/link";
 interface AuthShellProps {
   children: React.ReactNode;
   variant?: "default" | "facility";
+  facilityName?: string;
 }
 
 const FEATURES = [
@@ -14,7 +15,7 @@ const FEATURES = [
   "Aligned with FMOH patient record standards",
 ];
 
-export function AuthShell({ children, variant = "default" }: AuthShellProps) {
+export function AuthShell({ children, variant = "default", facilityName }: AuthShellProps) {
   return (
     <div className="flex h-dvh bg-cool-off-white">
       <div className="hidden lg:flex lg:w-[42%] xl:w-[45%] flex-col bg-deep-navy text-white p-10 xl:p-14 relative">
@@ -30,10 +31,12 @@ export function AuthShell({ children, variant = "default" }: AuthShellProps) {
             <>
               <p className="text-xs font-semibold text-clinical-teal tracking-widest uppercase mb-3">Get started</p>
               <h2 className="text-3xl xl:text-4xl font-extrabold leading-tight max-w-sm">
-                Register your facility
+                {facilityName ? `${facilityName}` : "Register your facility"}
               </h2>
               <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-sm">
-                Create an admin account to manage your hospital or clinic. Add doctors and nurses after signing in.
+                {facilityName
+                  ? "Sign in to access your CareFlow dashboard."
+                  : "Create an admin account to manage your hospital or clinic. Add doctors and nurses after signing in."}
               </p>
             </>
           ) : (

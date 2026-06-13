@@ -56,6 +56,13 @@ export async function POST(request: Request) {
       );
     }
 
+    // Invalidate all existing sessions for this user by refreshing the JWT
+    // The user will need to log in again with the new password
+    await supabase.auth.admin.signOut(session.user.id);
+
+    // Clear the must_change_password flag
+    await supabase.from("user_profiles").update({ must_change_password: false }).eq("user_id", session.user.id);
+
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(

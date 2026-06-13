@@ -42,7 +42,9 @@ CREATE OR REPLACE FUNCTION create_discharge_record(
   p_flagged_issues JSONB,
   p_translation_request_id UUID,
   p_translation_source_text TEXT,
-  p_translation_target_language TEXT
+  p_translation_target_language TEXT,
+  p_consent_given BOOLEAN,
+  p_consent_timestamp TIMESTAMPTZ
 ) RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -56,14 +58,14 @@ BEGIN
     age, gender, hospital_number, nhis_number, diagnosis,
     treatment_given, procedures_performed, medications,
     follow_up_instructions, additional_notes, language_requested,
-    discharged_by, clinician_license_no
+    discharged_by, clinician_license_no, consent_given, consent_timestamp
   ) VALUES (
     p_patient_id, p_facility_id, p_facility_name, p_facility_code,
     p_ward_name, p_admission_date, p_discharge_date, p_patient_name,
-     p_age, p_gender::gender_enum, p_hospital_number, p_nhis_number, p_diagnosis,
+    p_age, p_gender::gender_enum, p_hospital_number, p_nhis_number, p_diagnosis,
     p_treatment_given, ARRAY(SELECT jsonb_array_elements_text(p_procedures_performed)), p_medications,
     p_follow_up_instructions, p_additional_notes, p_language_requested::language_enum,
-    p_discharged_by, p_clinician_license_no
+    p_discharged_by, p_clinician_license_no, COALESCE(p_consent_given, false), p_consent_timestamp
   );
 
   IF p_translation_confidence IS NOT NULL THEN

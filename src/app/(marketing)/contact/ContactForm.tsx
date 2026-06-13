@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Building, Phone, Mail, ArrowRight, CheckCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { isNigerianPhone, isValidEmail } from "@/lib/validations";
+import { demoRequestSchema } from "@/lib/validations";
 import { toast } from "sonner";
 
 const ROLES = [
@@ -22,34 +22,12 @@ const ROLES = [
 type FieldName = "fullName" | "role" | "facilityName" | "whatsappNumber" | "email";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
-const FIELD_LABELS: Record<FieldName, string> = {
-  fullName: "Full name",
-  role: "Role",
-  facilityName: "Facility name",
-  whatsappNumber: "WhatsApp number",
-  email: "Email",
-};
-
-function validateField(name: FieldName, value: string): string | undefined {
-  if (name === "whatsappNumber") {
-    if (!value.trim()) return "WhatsApp number is required";
-    const digits = value.replace(/\s+/g, "");
-    if (!isNigerianPhone(digits)) return "Enter a valid Nigerian number (e.g. +2348031234567)";
-    return;
-  }
-  if (name === "email") {
-    if (!value.trim()) return "Email is required";
-    if (!isValidEmail(value.trim())) return "Enter a valid email address";
-    return;
-  }
-  if (!value.trim()) return `${FIELD_LABELS[name]} is required`;
-}
-
 export function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [ndprConsent, setNdprConsent] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     fullName: "",
     role: "",
@@ -58,35 +36,37 @@ export function ContactForm() {
     email: "",
   });
 
+  function validateField(name: FieldName) {
+    const result = demoRequestSchema.safeParse(formData);
+    if (result.success) { setFieldErrors({}); return; }
+    const issue = result.error.issues.find((i) => i.path[0] === name);
+    setFieldErrors((prev) => ({ ...prev, [name]: issue?.message }));
+  }
+
   const updateField = useCallback((name: FieldName, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setFieldErrors((prev) => {
-      const err = validateField(name, value);
-      return err ? { ...prev, [name]: err } : { ...prev, [name]: undefined };
-    });
-  }, []);
+    if (touched[name]) validateField(name);
+  }, [touched]);
 
   const handleBlur = useCallback((name: FieldName) => {
-    setFieldErrors((prev) => {
-      const err = validateField(name, formData[name]);
-      return err ? { ...prev, [name]: err } : { ...prev, [name]: undefined };
-    });
-  }, [formData]);
-
-  const validate = useCallback((): FieldErrors => {
-    const errors: FieldErrors = {};
-    for (const name of Object.keys(FIELD_LABELS) as FieldName[]) {
-      const err = validateField(name, formData[name]);
-      if (err) errors[name] = err;
-    }
-    return errors;
-  }, [formData]);
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const errors = validate();
-    setFieldErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    const result = demoRequestSchema.safeParse(formData);
+    if (!result.success) {
+      const errors: FieldErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as FieldName;
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setFieldErrors(errors);
+      setTouched({ fullName: true, role: true, facilityName: true, whatsappNumber: true, email: true });
+      return;
+    }
+    setFieldErrors({});
 
     setLoading(true);
     try {
@@ -126,10 +106,12 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-3">
+    <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-3" noValidate>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="fullName" className="text-sm font-medium text-slate">Full name</Label>
+          <Label htmlFor="fullName" className="text-sm font-medium text-slate">
+            Full name <span className="text-warm-amber">*</span>
+          </Label>
           <div className="relative">
             <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
             <Input
@@ -139,26 +121,33 @@ export function ContactForm() {
               onBlur={() => handleBlur("fullName")}
               placeholder="Dr. Chidi Obi"
               className="pl-10 h-11"
-              aria-invalid={!!fieldErrors.fullName}
+              aria-invalid={!!touched.fullName && !!fieldErrors.fullName}
+              aria-describedby={fieldErrors.fullName ? "fullName-error" : undefined}
             />
           </div>
-          {fieldErrors.fullName && <p className="text-xs text-warm-amber mt-1">{fieldErrors.fullName}</p>}
+          {touched.fullName && fieldErrors.fullName && <p id="fullName-error" className="text-[11px] text-warm-amber">{fieldErrors.fullName}</p>}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="role" className="text-sm font-medium text-slate">Your role</Label>
-          <Select onValueChange={(val) => updateField("role", val as string)}>
-            <SelectTrigger id="role" className="h-11" data-invalid={!!fieldErrors.role}><SelectValue placeholder="Select role" /></SelectTrigger>
+          <Label htmlFor="role" className="text-sm font-medium text-slate">
+            Your role <span className="text-warm-amber">*</span>
+          </Label>
+          <Select onValueChange={(val) => { if (typeof val === "string") { updateField("role", val); setTouched((prev) => ({ ...prev, role: true })); } else { setFieldErrors((prev) => ({ ...prev, role: "Please select your role." })); } }}>
+            <SelectTrigger id="role" className="h-11" data-invalid={!!touched.role && !!fieldErrors.role} aria-describedby={fieldErrors.role ? "role-error" : undefined}>
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
             <SelectContent>
               {ROLES.map((r) => (<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>))}
             </SelectContent>
           </Select>
-          {fieldErrors.role && <p className="text-xs text-warm-amber mt-1">{fieldErrors.role}</p>}
+          {touched.role && fieldErrors.role && <p id="role-error" className="text-[11px] text-warm-amber">{fieldErrors.role}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="facilityName" className="text-sm font-medium text-slate">Facility name</Label>
+          <Label htmlFor="facilityName" className="text-sm font-medium text-slate">
+            Facility name <span className="text-warm-amber">*</span>
+          </Label>
           <div className="relative">
             <Building className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
             <Input
@@ -168,13 +157,16 @@ export function ContactForm() {
               onBlur={() => handleBlur("facilityName")}
               placeholder="Lagos University Teaching Hospital"
               className="pl-10 h-11"
-              aria-invalid={!!fieldErrors.facilityName}
+              aria-invalid={!!touched.facilityName && !!fieldErrors.facilityName}
+              aria-describedby={fieldErrors.facilityName ? "facilityName-error" : undefined}
             />
           </div>
-          {fieldErrors.facilityName && <p className="text-xs text-warm-amber mt-1">{fieldErrors.facilityName}</p>}
+          {touched.facilityName && fieldErrors.facilityName && <p id="facilityName-error" className="text-[11px] text-warm-amber">{fieldErrors.facilityName}</p>}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="whatsappNumber" className="text-sm font-medium text-slate">WhatsApp number</Label>
+          <Label htmlFor="whatsappNumber" className="text-sm font-medium text-slate">
+            WhatsApp number <span className="text-warm-amber">*</span>
+          </Label>
           <div className="relative">
             <Phone className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
             <Input
@@ -185,15 +177,18 @@ export function ContactForm() {
               onBlur={() => handleBlur("whatsappNumber")}
               placeholder="+234 803 123 4567"
               className="pl-10 h-11"
-              aria-invalid={!!fieldErrors.whatsappNumber}
+              aria-invalid={!!touched.whatsappNumber && !!fieldErrors.whatsappNumber}
+              aria-describedby={fieldErrors.whatsappNumber ? "whatsappNumber-error" : undefined}
             />
           </div>
-          {fieldErrors.whatsappNumber && <p className="text-xs text-warm-amber mt-1">{fieldErrors.whatsappNumber}</p>}
+          {touched.whatsappNumber && fieldErrors.whatsappNumber && <p id="whatsappNumber-error" className="text-[11px] text-warm-amber">{fieldErrors.whatsappNumber}</p>}
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="email" className="text-sm font-medium text-slate">Email</Label>
+        <Label htmlFor="email" className="text-sm font-medium text-slate">
+          Email <span className="text-warm-amber">*</span>
+        </Label>
         <div className="relative">
           <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cool-grey/60" />
           <Input
@@ -204,10 +199,11 @@ export function ContactForm() {
             onBlur={() => handleBlur("email")}
             placeholder="chidi.obi@luth.gov.ng"
             className="pl-10 h-11"
-            aria-invalid={!!fieldErrors.email}
+            aria-invalid={!!touched.email && !!fieldErrors.email}
+            aria-describedby={fieldErrors.email ? "email-error" : undefined}
           />
         </div>
-        {fieldErrors.email && <p className="text-xs text-warm-amber mt-1">{fieldErrors.email}</p>}
+        {touched.email && fieldErrors.email && <p id="email-error" className="text-[11px] text-warm-amber">{fieldErrors.email}</p>}
       </div>
 
       <div className="flex items-start gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3">

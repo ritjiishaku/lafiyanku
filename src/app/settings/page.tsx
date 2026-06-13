@@ -9,8 +9,10 @@ import { useRole } from "@/hooks/useRole";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Shield, Hospital, Camera, Copy, Check, ArrowRight, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { changePasswordSchema } from "@/lib/validations";
 
 const AVATAR_KEY = "careflow-avatar";
 
@@ -91,20 +93,37 @@ export default function SettingsPage() {
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+  const [pwErrors, setPwErrors] = useState<Partial<Record<keyof typeof pwForm, string>>>({});
+  const [pwTouched, setPwTouched] = useState<Record<string, boolean>>({});
 
-  async function handleChangePassword() {
-    if (!pwForm.currentPassword || !pwForm.newPassword || !pwForm.confirmNewPassword) {
-      toast.error("All fields are required.");
+  function validatePwField(name: string) {
+    const result = changePasswordSchema.safeParse(pwForm);
+    if (result.success) { setPwErrors({}); return; }
+    const issue = result.error.issues.find((i) => i.path[0] === name);
+    setPwErrors((prev) => ({ ...prev, [name]: issue?.message }));
+  }
+
+  function handlePwBlur(name: string) {
+    setPwTouched((prev) => ({ ...prev, [name]: true }));
+    validatePwField(name);
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    const result = changePasswordSchema.safeParse(pwForm);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof typeof pwForm, string>> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field as keyof typeof pwForm]) {
+          fieldErrors[field as keyof typeof pwForm] = issue.message;
+        }
+      }
+      setPwErrors(fieldErrors);
+      setPwTouched({ currentPassword: true, newPassword: true, confirmNewPassword: true });
       return;
     }
-    if (pwForm.newPassword.length < 8) {
-      toast.error("New password must be at least 8 characters.");
-      return;
-    }
-    if (pwForm.newPassword !== pwForm.confirmNewPassword) {
-      toast.error("New passwords do not match.");
-      return;
-    }
+    setPwErrors({});
     setChangingPassword(true);
     try {
       const res = await fetch("/api/settings/change-password", {
@@ -117,7 +136,10 @@ export default function SettingsPage() {
         toast.success("Password changed. You will be signed out.");
         setPwForm({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
         setShowChangePassword(false);
-        setTimeout(() => signOut({ callbackUrl: "/auth" }), 1500);
+        setTimeout(async () => {
+          await signOut({ redirect: false });
+          window.location.href = "/login";
+        }, 1500);
       } else {
         const errMsg = json.error?.message ?? json.error ?? "Failed to change password";
         toast.error(typeof errMsg === "string" ? errMsg : "Failed to change password");
@@ -191,74 +213,83 @@ export default function SettingsPage() {
                     Update your account password. You will be signed out after changing it.
                   </p>
                   {showChangePassword && (
-                    <div className="mt-4 space-y-3 max-w-sm">
-                      <div className="relative">
-                        <Input
-                          value={pwForm.currentPassword}
-                          onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                          type={showCurrentPw ? "text" : "password"}
-                          placeholder="Current password"
-                          className="h-11 pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowCurrentPw(!showCurrentPw)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
-                        >
-                          {showCurrentPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
+                    <form onSubmit={handleChangePassword} className="mt-4 space-y-3 max-w-sm" noValidate>
+                      <div className="space-y-1">
+                        <Label htmlFor="currentPassword" className="text-xs font-medium text-slate">Current password</Label>
+                        <div className="relative">
+                          <Input
+                            id="currentPassword"
+                            value={pwForm.currentPassword}
+                            onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                            onBlur={() => handlePwBlur("currentPassword")}
+                            type={showCurrentPw ? "text" : "password"}
+                            className="h-11 pr-10"
+                            aria-invalid={!!pwTouched.currentPassword && !!pwErrors.currentPassword}
+                            aria-describedby={pwErrors.currentPassword ? "currentPassword-error" : undefined}
+                          />
+                          <button type="button" onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate" tabIndex={-1}>
+                            {showCurrentPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                        {pwTouched.currentPassword && pwErrors.currentPassword && <p id="currentPassword-error" className="text-[11px] text-warm-amber">{pwErrors.currentPassword}</p>}
                       </div>
-                      <div className="relative">
-                        <Input
-                          value={pwForm.newPassword}
-                          onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                          type={showNewPw ? "text" : "password"}
-                          placeholder="New password (min. 8 characters)"
-                          className="h-11 pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowNewPw(!showNewPw)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
-                        >
-                          {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
+                      <div className="space-y-1">
+                        <Label htmlFor="newPassword" className="text-xs font-medium text-slate">New password</Label>
+                        <div className="relative">
+                          <Input
+                            id="newPassword"
+                            value={pwForm.newPassword}
+                            onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                            onBlur={() => handlePwBlur("newPassword")}
+                            type={showNewPw ? "text" : "password"}
+                            placeholder="Min. 8 characters"
+                            className="h-11 pr-10"
+                            aria-invalid={!!pwTouched.newPassword && !!pwErrors.newPassword}
+                            aria-describedby={pwErrors.newPassword ? "newPassword-error" : undefined}
+                          />
+                          <button type="button" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate" tabIndex={-1}>
+                            {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                        {pwTouched.newPassword && pwErrors.newPassword && <p id="newPassword-error" className="text-[11px] text-warm-amber">{pwErrors.newPassword}</p>}
                       </div>
-                      <div className="relative">
-                        <Input
-                          value={pwForm.confirmNewPassword}
-                          onChange={(e) => setPwForm({ ...pwForm, confirmNewPassword: e.target.value })}
-                          type={showConfirmPw ? "text" : "password"}
-                          placeholder="Confirm new password"
-                          className="h-11 pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPw(!showConfirmPw)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate"
-                        >
-                          {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
+                      <div className="space-y-1">
+                        <Label htmlFor="confirmNewPassword" className="text-xs font-medium text-slate">Confirm new password</Label>
+                        <div className="relative">
+                          <Input
+                            id="confirmNewPassword"
+                            value={pwForm.confirmNewPassword}
+                            onChange={(e) => setPwForm({ ...pwForm, confirmNewPassword: e.target.value })}
+                            onBlur={() => handlePwBlur("confirmNewPassword")}
+                            type={showConfirmPw ? "text" : "password"}
+                            className="h-11 pr-10"
+                            aria-invalid={!!pwTouched.confirmNewPassword && !!pwErrors.confirmNewPassword}
+                            aria-describedby={pwErrors.confirmNewPassword ? "confirmNewPassword-error" : undefined}
+                          />
+                          <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-cool-grey hover:text-slate" tabIndex={-1}>
+                            {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                        {pwTouched.confirmNewPassword && pwErrors.confirmNewPassword && <p id="confirmNewPassword-error" className="text-[11px] text-warm-amber">{pwErrors.confirmNewPassword}</p>}
                       </div>
                       <div className="flex items-center gap-2 pt-1">
-                        <Button
-                          className="bg-clinical-teal hover:bg-clinical-teal/90"
-                          onClick={handleChangePassword}
-                          disabled={changingPassword}
-                        >
+                        <Button type="submit" disabled={changingPassword}>
                           {changingPassword ? "Saving..." : "Update Password"}
                         </Button>
                         <Button
+                          type="button"
                           variant="outline"
                           onClick={() => {
                             setShowChangePassword(false);
                             setPwForm({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
+                            setPwErrors({});
+                            setPwTouched({});
                           }}
                         >
                           Cancel
                         </Button>
                       </div>
-                    </div>
+                    </form>
                   )}
                 </div>
               </div>

@@ -81,7 +81,7 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
           <p className="text-sm text-cool-grey">Manage discharge records</p>
         </div>
         {canCreate && (
-          <Button className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => onNavigate({ name: "new" })}>
+          <Button className="touch-target-min" onClick={() => onNavigate({ name: "new" })}>
             <Plus className="mr-1 h-4 w-4" />
             New Discharge
           </Button>
@@ -182,6 +182,14 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
             {records.map((record, i) => (
               <div
                 key={record.recordId}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onNavigate({ name: "output", id: record.recordId });
+                  }
+                }}
                 className="group flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate/10 bg-white p-4 transition-all duration-200 hover:shadow-md hover:border-slate/20 hover:-translate-y-0.5 sm:p-5 cursor-pointer"
                 onClick={() => onNavigate({ name: "output", id: record.recordId })}
                 style={{ animationDelay: `${i * 50}ms` }}

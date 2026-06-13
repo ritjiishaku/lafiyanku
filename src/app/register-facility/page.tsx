@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { facilityRegisterSchema } from "@/lib/validations";
 import {
   Building, User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft,
   Eye, EyeOff, Check,
@@ -90,26 +91,24 @@ export default function RegisterFacilityPage() {
 
   function clearError() { setError(null); setFieldErrors({}); }
 
-  function validateStep2(): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function validateStep(stepData: Record<string, unknown>, schema: any) {
+    const result = schema.safeParse(stepData);
+    if (result.success) { setFieldErrors({}); return true; }
     const errs: Record<string, string> = {};
-    if (!adminName.trim()) errs.adminName = "Admin full name is required.";
-    if (!adminEmail.trim()) errs.adminEmail = "Admin email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) errs.adminEmail = "Enter a valid email address.";
-    if (!adminPassword) errs.adminPassword = "Password is required.";
-    else if (adminPassword.length < 8) errs.adminPassword = "At least 8 characters.";
-    if (!adminConfirmPassword) errs.adminConfirmPassword = "Confirm your password.";
-    else if (adminPassword !== adminConfirmPassword) errs.adminConfirmPassword = "Passwords do not match.";
+    for (const issue of result.error.issues) {
+      const field = issue.path[0] as string;
+      if (!errs[field]) errs[field] = issue.message;
+    }
     setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
+    return false;
   }
 
   const handleNext = useCallback(() => {
     clearError();
-    const errs: Record<string, string> = {};
-    if (!facilityName.trim()) errs.facilityName = "Facility name is required.";
-    setFieldErrors(errs);
-    if (Object.keys(errs).length === 0) setStep(2);
-  }, [facilityName]);
+    validateStep({ facilityName, facilityCode }, facilityRegisterSchema.pick({ facilityName: true, facilityCode: true }));
+    if (!fieldErrors.facilityName) setStep(2);
+  }, [facilityName, facilityCode]);
 
   const handleBack = useCallback(() => {
     setStep(1);
@@ -120,7 +119,7 @@ export default function RegisterFacilityPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     clearError();
-    if (!validateStep2()) return;
+    if (!validateStep({ facilityName, facilityCode, adminName, adminEmail, adminPassword, adminConfirmPassword }, facilityRegisterSchema)) return;
 
     setIsLoading(true);
     try {
@@ -147,7 +146,7 @@ export default function RegisterFacilityPage() {
 
       setSuccess(true);
       setIsLoading(false);
-      setTimeout(() => router.push("/auth"), 3000);
+      setTimeout(() => router.push(`/facility/login?name=${encodeURIComponent(facilityName)}`), 3000);
     } catch {
       setError("Network error. Please try again.");
       setIsLoading(false);
@@ -199,6 +198,8 @@ export default function RegisterFacilityPage() {
                   autoComplete="organization"
                   enterKeyHint="next"
                   className="pl-10 h-11"
+                  aria-invalid={!!fieldErrors.facilityName}
+                  aria-describedby={fieldErrors.facilityName ? "facilityName-error" : undefined}
                 />
               </div>
             </Field>
@@ -220,7 +221,7 @@ export default function RegisterFacilityPage() {
               <Button
                 type="button"
                 onClick={handleNext}
-                className="w-full h-11 rounded-lg bg-clinical-teal text-white text-sm font-bold hover:bg-clinical-teal/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150"
+                className="w-full h-11 rounded-lg text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150"
               >
                 <span className="inline-flex items-center gap-2">
                   Next step
@@ -256,6 +257,8 @@ export default function RegisterFacilityPage() {
                   autoComplete="name"
                   enterKeyHint="next"
                   className="pl-10 h-11"
+                  aria-invalid={!!fieldErrors.adminName}
+                  aria-describedby={fieldErrors.adminName ? "adminName-error" : undefined}
                 />
               </div>
             </Field>
@@ -277,6 +280,8 @@ export default function RegisterFacilityPage() {
                   autoComplete="email"
                   enterKeyHint="next"
                   className="pl-10 h-11"
+                  aria-invalid={!!fieldErrors.adminEmail}
+                  aria-describedby={fieldErrors.adminEmail ? "adminEmail-error" : undefined}
                 />
               </div>
             </Field>
@@ -297,6 +302,8 @@ export default function RegisterFacilityPage() {
                   autoComplete="new-password"
                   enterKeyHint="next"
                   className="pl-10 pr-10 h-11"
+                  aria-invalid={!!fieldErrors.adminPassword}
+                  aria-describedby={fieldErrors.adminPassword ? "adminPassword-error" : undefined}
                 />
                 <button
                   type="button"
@@ -326,6 +333,8 @@ export default function RegisterFacilityPage() {
                   autoComplete="new-password"
                   enterKeyHint="done"
                   className="pl-10 pr-10 h-11"
+                  aria-invalid={!!fieldErrors.adminConfirmPassword}
+                  aria-describedby={fieldErrors.adminConfirmPassword ? "adminConfirmPassword-error" : undefined}
                 />
                 <button
                   type="button"
@@ -361,7 +370,7 @@ export default function RegisterFacilityPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="h-11 rounded-lg bg-clinical-teal text-white text-sm font-bold hover:bg-clinical-teal/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0 flex-[2]"
+                className="h-11 rounded-lg text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-clinical-teal/20 transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0 flex-[2]"
               >
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">
@@ -384,7 +393,7 @@ export default function RegisterFacilityPage() {
       <div className="mt-5 space-y-2 text-center text-sm text-cool-grey">
         <p>
           Already registered?{" "}
-          <Link href="/auth" className="font-medium text-clinical-teal hover:text-clinical-teal/80 transition-colors">
+          <Link href="/login" className="font-medium text-clinical-teal hover:text-clinical-teal/80 transition-colors">
             Sign in
           </Link>
         </p>

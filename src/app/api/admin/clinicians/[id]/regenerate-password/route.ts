@@ -48,6 +48,9 @@ export async function POST(
       );
     }
 
+    // Force password change on next login
+    await supabase.from("user_profiles").update({ must_change_password: true }).eq("user_id", id);
+
     return NextResponse.json({ success: true, data: { password: newPassword } });
   } catch {
     return NextResponse.json(

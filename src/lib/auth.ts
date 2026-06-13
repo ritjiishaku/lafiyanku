@@ -1,3 +1,4 @@
+import "server-only";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
@@ -6,11 +7,13 @@ declare module "@auth/core/types" {
   interface User {
     role?: string;
     facilityId?: string;
+    mustChangePassword?: boolean;
   }
   interface Session {
     user: {
       role?: string;
       facilityId?: string;
+      mustChangePassword?: boolean;
       id?: string;
       email?: string;
     };
@@ -94,7 +97,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const { data: profile } = await supabase
           .from("user_profiles")
-          .select("role, facility_id")
+          .select("role, facility_id, must_change_password")
           .eq("user_id", data.user.id)
           .single();
 
@@ -106,6 +109,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: fullName ?? data.user.email,
           role: profile?.role ?? "nurse",
           facilityId: profile?.facility_id as string | undefined,
+          mustChangePassword: profile?.must_change_password ?? false,
         };
       },
     }),
@@ -113,16 +117,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const u = user as { role?: string; facilityId?: string };
+        const u = user as { role?: string; facilityId?: string; mustChangePassword?: boolean };
         token.role = u.role;
         token.id = user.id;
         token.name = user.name;
         token.facilityId = u.facilityId;
+        token.mustChangePassword = u.mustChangePassword;
       }
       return token;
     },
     async session({ session, token }) {
-      const t = token as { role?: string; id?: string; facilityId?: string; name?: string };
+      const t = token as { role?: string; id?: string; facilityId?: string; name?: string; mustChangePassword?: boolean };
       return {
         ...session,
         user: {
@@ -131,6 +136,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: t.id,
           name: t.name,
           facilityId: t.facilityId,
+          mustChangePassword: t.mustChangePassword,
         },
       } as typeof session;
     },
@@ -140,6 +146,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   trustHost: true,
   pages: {
-    signIn: "/auth",
+    signIn: "/login",
   },
 });

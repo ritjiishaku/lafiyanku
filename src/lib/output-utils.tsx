@@ -157,6 +157,8 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // Clipboard API unavailable or denied — silently fail
     });
   }, [text]);
 

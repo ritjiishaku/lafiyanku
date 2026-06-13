@@ -77,6 +77,7 @@ interface ExportData {
   patientFriendlyOutput: string;
   translatedOutput?: string | null;
   translationLanguage?: string | null;
+  translationConfidence?: string | null;
 }
 
 const languageLabel: Record<string, string> = {
@@ -134,9 +135,11 @@ export function DischargePdf({ data }: DischargePdfProps) {
               .map((line, i) => (
                 <Text key={i} style={styles.paragraph}>{line}</Text>
               ))}
-            <Text style={styles.lowConfidenceNote}>
-              Note: This translation was completed with low confidence. Please verify with a fluent speaker.
-            </Text>
+            {data.translationConfidence === "low" && (
+              <Text style={styles.lowConfidenceNote}>
+                Note: This translation was completed with low confidence. Please verify with a fluent speaker.
+              </Text>
+            )}
           </View>
         ) : data.translatedOutput && (
           <View style={styles.translationSection}>

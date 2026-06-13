@@ -52,6 +52,36 @@ export const clinicianUpdateSchema = z.object({
   password: passwordSchema.optional(),
 });
 
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, "Password is required."),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Please confirm your new password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+export const demoRequestSchema = z.object({
+  fullName: z.string().min(1, "Full name is required.").max(200),
+  role: z.string().min(1, "Please select your role."),
+  facilityName: z.string().min(1, "Facility name is required.").max(300),
+  whatsappNumber: z.string().min(1, "WhatsApp number is required."),
+  email: emailSchema,
+}).refine((data) => isNigerianPhone(data.whatsappNumber.replace(/\s+/g, "")), {
+  message: "Enter a valid Nigerian number (e.g. +2348031234567).",
+  path: ["whatsappNumber"],
+});
+
 export function isNigerianPhone(value: string): boolean {
   return /^(\+234|0)\d{10}$/.test(value);
 }

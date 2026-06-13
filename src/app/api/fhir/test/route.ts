@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { UserRole } from "@/types/schemas";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { mapFHIRToPatientInput, FHIRPatient, FHIREncounter, FHIRCondition, FHIRMedicationRequest } from "@/services/fhir-adapter";
 
@@ -9,14 +10,14 @@ export async function POST(req: Request) {
     if (!session?.user?.id) {
       return NextResponse.json(apiError(ErrorCodes.UNAUTHORIZED), { status: 401 });
     }
-    if (session.user.role !== "doctor") {
+    if (session.user.role !== UserRole.Doctor) {
       return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED, { role: session.user.role, requiredRole: "doctor" }), { status: 403 });
     }
 
     const bundle = await req.json();
 
     if (!bundle || bundle.resourceType !== "Bundle" || !Array.isArray(bundle.entry)) {
-      return NextResponse.json({ error: "Invalid FHIR Bundle payload" }, { status: 400 });
+      return NextResponse.json(apiError(ErrorCodes.VALIDATION_ERROR, { field: "bundle", message: "Invalid FHIR Bundle payload" }), { status: 400 });
     }
 
     let patient: FHIRPatient | null = null;
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 
     if (!patient || !encounter) {
       return NextResponse.json(
-        { error: "FHIR Bundle must contain at least a Patient and an Encounter resource" },
+        apiError(ErrorCodes.MISSING_REQUIRED_FIELD, { field: "Patient/Encounter", message: "FHIR Bundle must contain at least a Patient and an Encounter resource" }),
         { status: 400 }
       );
     }
@@ -52,8 +53,7 @@ export async function POST(req: Request) {
       success: true,
       patientInput: mappedInput,
     });
-  } catch (err: unknown) {
-    console.error("FHIR mapping error:", err);
-    return NextResponse.json({ error: "Mapping failed" }, { status: 500 });
+  } catch {
+    return NextResponse.json(apiError(ErrorCodes.INTERNAL_SERVER_ERROR, { details: "FHIR mapping failed" }), { status: 500 });
   }
 }

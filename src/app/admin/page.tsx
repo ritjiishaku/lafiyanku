@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRole } from "@/hooks/useRole";
 import {
@@ -18,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Edit2, Trash2, UserPlus, User, Copy, Check, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
+import { registerSchema, clinicianUpdateSchema } from "@/lib/validations";
 
 interface Clinician {
   user_id: string;
@@ -54,6 +57,8 @@ export default function AdminPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [adminFieldErrors, setAdminFieldErrors] = useState<Record<string, string>>({});
+  const [adminTouched, setAdminTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function load() {
@@ -78,6 +83,26 @@ export default function AdminPage() {
     load();
   }, [facilityId]);
 
+  function validateAdminField(name: string) {
+    const schema = editingClinician ? clinicianUpdateSchema : registerSchema;
+    const result = schema.safeParse(editingClinician ? { fullName: form.fullName, role: form.role } : { email: form.email, fullName: form.fullName, role: form.role });
+    if (result.success) { setAdminFieldErrors({}); return; }
+    const issue = result.error.issues.find((i) => i.path[0] === name);
+    setAdminFieldErrors((prev) => ({ ...prev, [name]: issue?.message ?? "" }));
+  }
+
+  const handleAdminBlur = useCallback((name: string) => {
+    setAdminTouched((prev) => ({ ...prev, [name]: true }));
+    validateAdminField(name);
+  }, [editingClinician, form.fullName, form.email, form.role]);
+
+  function resetAdminDialog() {
+    setEditingClinician(null);
+    setForm({ fullName: "", email: "", password: "", role: "doctor" });
+    setAdminFieldErrors({});
+    setAdminTouched({});
+  }
+
   async function refresh() {
     setLoading(true);
     try {
@@ -99,11 +124,32 @@ export default function AdminPage() {
     }
   }
 
+  function openAddDialog() {
+    resetAdminDialog();
+    setDialogOpen(true);
+  }
+
+  function openEditDialog(c: Clinician) {
+    setEditingClinician(c);
+    setForm({ fullName: c.full_name, email: c.email, password: "", role: c.role });
+    setAdminFieldErrors({});
+    setAdminTouched({});
+    setDialogOpen(true);
+  }
+
   async function handleAddClinician() {
-    if (!form.fullName || !form.email) {
-      toast.error("Full name and email are required.");
+    setAdminTouched({ fullName: true, email: true, role: true });
+    const result = registerSchema.safeParse({ email: form.email, fullName: form.fullName, role: form.role });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setAdminFieldErrors(errors);
       return;
     }
+    setAdminFieldErrors({});
     setSubmitting(true);
     try {
       const res = await fetch("/api/register", {
@@ -125,7 +171,7 @@ export default function AdminPage() {
           loginUrl: json.data.loginUrl,
           fullName: form.fullName,
         });
-        setForm({ fullName: "", email: "", password: "", role: "doctor" });
+        resetAdminDialog();
         await refresh();
       } else {
         const errMsg = json.error?.message ?? json.error ?? "Failed to add clinician";
@@ -139,10 +185,18 @@ export default function AdminPage() {
   }
 
   async function handleEditClinician() {
-    if (!form.fullName) {
-      toast.error("Full name is required.");
+    setAdminTouched({ fullName: true, role: true });
+    const result = clinicianUpdateSchema.safeParse({ fullName: form.fullName, role: form.role });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setAdminFieldErrors(errors);
       return;
     }
+    setAdminFieldErrors({});
     if (!editingClinician) return;
     setSubmitting(true);
     try {
@@ -157,8 +211,7 @@ export default function AdminPage() {
       if (json.success) {
         toast.success("Clinician updated");
         setDialogOpen(false);
-        setEditingClinician(null);
-        setForm({ fullName: "", email: "", password: "", role: "doctor" });
+        resetAdminDialog();
         await refresh();
       } else {
         toast.error(json.error ?? "Failed to update clinician");
@@ -220,18 +273,6 @@ export default function AdminPage() {
     copyToClipboard(text, "all");
   }
 
-  function openEditDialog(clinician: Clinician) {
-    setEditingClinician(clinician);
-    setForm({ fullName: clinician.full_name, email: clinician.email, password: "", role: clinician.role });
-    setDialogOpen(true);
-  }
-
-  function openAddDialog() {
-    setEditingClinician(null);
-    setForm({ fullName: "", email: "", password: "", role: "doctor" });
-    setDialogOpen(true);
-  }
-
   const filtered = clinicians.filter((c) => {
     const query = search.toLowerCase();
     const matchesSearch = !query || c.full_name.toLowerCase().includes(query) || c.email.toLowerCase().includes(query);
@@ -269,48 +310,103 @@ export default function AdminPage() {
             <h1 className="text-2xl font-bold text-deep-navy sm:text-3xl">Facility Management</h1>
             <p className="text-sm text-cool-grey">Manage facilities, clinicians, and system preferences.</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingClinician(null); } }}>
-            <DialogTrigger render={<Button className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={openAddDialog}><UserPlus className="mr-1 h-4 w-4" />Add Clinician</Button>} />
+          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { resetAdminDialog(); } }}>
+            <DialogTrigger render={<Button className="touch-target-min" onClick={openAddDialog}><UserPlus className="mr-1 h-4 w-4" />Add Clinician</Button>} />
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>{editingClinician ? "Edit Clinician" : "Add Clinician"}</DialogTitle>
                 <DialogDescription>{editingClinician ? `Editing ${editingClinician.full_name || editingClinician.email}` : "Create a new doctor or nurse account."}</DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 py-2">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate">Full Name</label>
-                  <Input value={form.fullName} onChange={(e) => {
-                    const name = e.target.value;
-                    if (editingClinician) {
-                      setForm({ ...form, fullName: name });
-                    } else {
-                      const slug = name.toLowerCase().replace(/^dr\.?\s*/i, "").replace(/[^a-zA-Z0-9]/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
-                      const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.careflow.app` : "";
-                      setForm({ ...form, fullName: name, email: autoEmail || form.email });
-                    }
-                  }} placeholder="e.g. Dr. Jane Doe" className="h-11" />
+              <form onSubmit={(e) => { e.preventDefault(); editingClinician ? handleEditClinician() : handleAddClinician(); }} noValidate className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="admin-fullName" className="text-sm font-medium text-slate">
+                    Full name <span className="text-warm-amber">*</span>
+                  </Label>
+                  <Input
+                    id="admin-fullName"
+                    value={form.fullName}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      if (editingClinician) {
+                        setForm({ ...form, fullName: name });
+                      } else {
+                        const slug = name.toLowerCase().replace(/^dr\.?\s*/i, "").replace(/[^a-zA-Z0-9]/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
+                        const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.careflow.app` : "";
+                        setForm({ ...form, fullName: name, email: autoEmail || form.email });
+                      }
+                    }}
+                    onBlur={() => handleAdminBlur("fullName")}
+                    placeholder="e.g. Dr. Jane Doe"
+                    className="h-11"
+                    aria-invalid={!!adminTouched.fullName && !!adminFieldErrors.fullName}
+                    aria-describedby={adminFieldErrors.fullName ? "admin-fullName-error" : undefined}
+                  />
+                  {adminTouched.fullName && adminFieldErrors.fullName && <p id="admin-fullName-error" className="text-[11px] text-warm-amber">{adminFieldErrors.fullName}</p>}
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate">Email</label>
-                  <Input value={form.email} disabled={!!editingClinician} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="e.g. jane.doe@hospital.ng" className="h-11" />
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="admin-email" className="text-sm font-medium text-slate">
+                    Email <span className="text-warm-amber">*</span>
+                  </Label>
+                  <Input
+                    id="admin-email"
+                    value={form.email}
+                    disabled={!!editingClinician}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onBlur={() => handleAdminBlur("email")}
+                    type="email"
+                    inputMode="email"
+                    placeholder="e.g. jane.doe@hospital.ng"
+                    className="h-11"
+                    aria-invalid={!!adminTouched.email && !!adminFieldErrors.email}
+                    aria-describedby={adminFieldErrors.email ? "admin-email-error" : undefined}
+                  />
+                  {adminTouched.email && adminFieldErrors.email && <p id="admin-email-error" className="text-[11px] text-warm-amber">{adminFieldErrors.email}</p>}
                 </div>
+
                 {editingClinician && (
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-slate">New Password (leave blank to keep current)</label>
-                    <Input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Leave blank to keep current" className="h-11" />
+                  <div className="space-y-1.5">
+                    <Label htmlFor="admin-password" className="text-sm font-medium text-slate">New Password</Label>
+                    <Input
+                      id="admin-password"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      type="password"
+                      placeholder="Leave blank to keep current"
+                      className="h-11"
+                      aria-describedby="admin-password-hint"
+                    />
+                    <p id="admin-password-hint" className="text-[11px] text-cool-grey">Leave blank to keep current password.</p>
                   </div>
                 )}
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate">Role</label>
-                  <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-11 w-full rounded-lg border border-slate/30 bg-white px-3 text-sm text-slate">
-                    <option value="doctor">Doctor</option>
-                    <option value="nurse">Nurse</option>
-                  </select>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="admin-role" className="text-sm font-medium text-slate">
+                    Role <span className="text-warm-amber">*</span>
+                  </Label>
+                  <Select
+                    value={form.role}
+                    onValueChange={(val) => { if (val) { setForm({ ...form, role: val }); setAdminTouched((prev) => ({ ...prev, role: true })); validateAdminField("role"); } }}
+                  >
+                    <SelectTrigger
+                      id="admin-role"
+                      className="h-11"
+                      aria-invalid={!!adminTouched.role && !!adminFieldErrors.role}
+                      aria-describedby={adminFieldErrors.role ? "admin-role-error" : undefined}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="doctor">Doctor</SelectItem>
+                      <SelectItem value="nurse">Nurse</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {adminTouched.role && adminFieldErrors.role && <p id="admin-role-error" className="text-[11px] text-warm-amber">{adminFieldErrors.role}</p>}
                 </div>
-              </div>
+              </form>
               <DialogFooter>
-                <Button variant="outline" onClick={() => { setDialogOpen(false); setEditingClinician(null); }} disabled={submitting}>Cancel</Button>
-                <Button className="bg-clinical-teal hover:bg-clinical-teal/90" onClick={editingClinician ? handleEditClinician : handleAddClinician} disabled={submitting}>{submitting ? "Saving..." : editingClinician ? "Save Changes" : "Add Clinician"}</Button>
+                <Button variant="outline" onClick={() => { setDialogOpen(false); resetAdminDialog(); }} disabled={submitting}>Cancel</Button>
+                <Button onClick={editingClinician ? handleEditClinician : handleAddClinician} disabled={submitting}>{submitting ? "Saving..." : editingClinician ? "Save Changes" : "Add Clinician"}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -495,7 +591,7 @@ export default function AdminPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button className="bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => setCredentialsData(null)}>
+              <Button onClick={() => setCredentialsData(null)}>
                 Done
               </Button>
             </DialogFooter>

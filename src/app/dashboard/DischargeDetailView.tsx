@@ -121,7 +121,7 @@ export function DischargeDetailView({ id, onNavigate }: DischargeDetailViewProps
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button className="touch-target-min bg-clinical-teal hover:bg-clinical-teal/90" onClick={() => onNavigate({ name: "output", id: record.recordId })}>
+        <Button className="touch-target-min" onClick={() => onNavigate({ name: "output", id: record.recordId })}>
           <Eye className="mr-1 h-4 w-4" />
           View Full Output
         </Button>
