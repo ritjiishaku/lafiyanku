@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="postBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D2B4E"/>
+      <stop offset="100%" stop-color="#0B6E6E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#postBg)"/>
+  <!-- Decorative -->
+  <circle cx="900" cy="200" r="220" fill="rgba(11,110,110,0.12)"/>
+  <circle cx="150" cy="850" r="180" fill="rgba(11,110,110,0.08)"/>
+  <!-- Logo cross -->
+  <g transform="translate(540, 260)" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round">
+    <rect x="-40" y="-14" width="80" height="28" rx="6"/>
+    <rect x="-14" y="-40" width="28" height="80" rx="6"/>
+  </g>
+  <!-- Brand name -->
+  <text x="540" y="400" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="60" fill="#FFFFFF" letter-spacing="3">CareFlow</text>
+  <!-- Tagline -->
+  <text x="540" y="450" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="22" fill="rgba(255,255,255,0.8)">AI-Powered Clinical Discharge Documentation</text>
+  <!-- Feature cards -->
+  <g transform="translate(120, 560)">
+    <rect x="0" y="0" width="380" height="150" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="30" y="40" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">Mode 1 + Mode 2</text>
+    <text x="30" y="70" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Clinical summary + Patient-</text>
+    <text x="30" y="92" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">friendly instructions from</text>
+    <text x="30" y="114" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">one structured form.</text>
+  </g>
+  <g transform="translate(580, 560)">
+    <rect x="0" y="0" width="380" height="150" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="30" y="40" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">Local Languages</text>
+    <text x="30" y="70" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Translate to Hausa, Yoruba,</text>
+    <text x="30" y="92" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">or Igbo — one tap.</text>
+    <text x="30" y="114" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Patients understand.</text>
+  </g>
+  <g transform="translate(120, 740)">
+    <rect x="0" y="0" width="380" height="150" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="30" y="40" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">NDPR Compliant</text>
+    <text x="30" y="70" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Nigeria Data Protection</text>
+    <text x="30" y="92" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Regulation 2019 compliant.</text>
+    <text x="30" y="114" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">Audit-logged. Secure.</text>
+  </g>
+  <g transform="translate(580, 740)">
+    <rect x="0" y="0" width="380" height="150" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="30" y="40" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">Doctor-Controlled</text>
+    <text x="30" y="70" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">AI drafts — clinicians review</text>
+    <text x="30" y="92" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">and finalise. Human judgement</text>
+    <text x="30" y="114" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="16" fill="rgba(255,255,255,0.65)">always comes first.</text>
+  </g>
+  <!-- CTA -->
+  <rect x="340" y="960" width="400" height="56" rx="28" fill="#FFFFFF"/>
+  <text x="540" y="995" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#0D2B4E">Start Free Pilot →</text>
+  <!-- URL -->
+  <text x="540" y="1040" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="rgba(255,255,255,0.4)">careflow-kappa.vercel.app</text>
+</svg>
