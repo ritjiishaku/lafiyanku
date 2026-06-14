@@ -10,6 +10,7 @@ export function useRole() {
         id?: string;
         name?: string;
         facilityId?: string;
+        mustChangePassword?: boolean;
       }
     | undefined;
 
@@ -18,6 +19,7 @@ export function useRole() {
     userId: user?.id ?? null,
     userName: user?.name ?? null,
     facilityId: user?.facilityId ?? null,
+    mustChangePassword: user?.mustChangePassword ?? false,
     isLoading: status === "loading",
   };
 }

@@ -33,7 +33,8 @@ export async function GET() {
     if (error) throw error;
 
     return NextResponse.json({ success: true, data: data ?? [] });
-  } catch {
+  } catch (err) {
+    console.error("Load clinicians error:", err);
     return NextResponse.json(apiError(ErrorCodes.SUPABASE_ERROR), { status: 500 });
   }
 }

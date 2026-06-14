@@ -31,9 +31,16 @@ export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
 
   useEffect(() => {
     if (session?.user) {
-      const user = session.user as { role?: string };
-      const dest = user.role === "admin" ? "/admin" : "/dashboard";
-      router.push(dest);
+      const user = session.user as { role?: string; mustChangePassword?: boolean };
+      if (user.mustChangePassword) {
+        const dest = user.role === "admin" ? "/onboarding/admin" : "/onboarding/clinician";
+        router.push(dest);
+      } else if (user.role === "admin" && typeof window !== "undefined" && !localStorage.getItem("lafiyanku-admin-onboarded")) {
+        router.push("/onboarding/admin");
+      } else {
+        const dest = user.role === "admin" ? "/admin" : "/dashboard";
+        router.push(dest);
+      }
     }
   }, [session, router]);
 

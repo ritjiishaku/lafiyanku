@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { useRole } from "@/hooks/useRole";
-import { Plus, Search, FileText, Eye, ChevronLeft, ChevronRight, FileCheck, Clock, Archive, Edit3 } from "lucide-react";
+import { Plus, Search, FileText, Eye, ChevronLeft, ChevronRight, FileCheck, Clock, Archive, Edit3, FilePlus } from "lucide-react";
 
 interface DischargeSummary {
   recordId: string;
@@ -194,16 +194,45 @@ export function DashboardList({ onNavigate }: DashboardListProps) {
           ))}
         </div>
       ) : records.length === 0 ? (
-        <div className="rounded-lg border border-slate/10 bg-white p-12 text-center">
-          <FileText className="mx-auto h-12 w-12 text-cool-grey/50" />
-          <p className="mt-4 text-lg font-medium text-deep-navy">No discharge records found</p>
-          <p className="mt-1 text-sm text-cool-grey">
-            {search || statusFilter !== "all"
-              ? "Try adjusting your search or filter."
-              : canCreate
-                ? "Create your first discharge record to get started."
-                : "No records available."}
-          </p>
+        <div className="rounded-lg border border-slate/10 bg-white p-8 sm:p-12 text-center">
+          {search || statusFilter !== "all" ? (
+            <>
+              <FileText className="mx-auto h-12 w-12 text-cool-grey/50" />
+              <p className="mt-4 text-lg font-medium text-deep-navy">No discharge records found</p>
+              <p className="mt-1 text-sm text-cool-grey">Try adjusting your search or filter.</p>
+            </>
+          ) : (
+            <>
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-clinical-teal/10 mb-5">
+                <FilePlus className="h-8 w-8 text-clinical-teal" />
+              </div>
+              <h2 className="text-xl font-bold text-deep-navy">Create your first discharge record</h2>
+              <p className="mt-1.5 text-sm text-cool-grey max-w-sm mx-auto leading-relaxed">
+                Fill in the patient form and the AI generates both a clinical summary and patient-friendly instructions in seconds.
+              </p>
+              <div className="mt-6 grid gap-3 max-w-md mx-auto sm:grid-cols-3">
+                <div className="rounded-xl border border-slate/10 bg-cool-off-white p-3">
+                  <FilePlus className="h-5 w-5 text-clinical-teal mx-auto mb-1.5" />
+                  <p className="text-xs font-medium text-deep-navy">Quick form</p>
+                  <p className="text-[10px] text-cool-grey mt-0.5">Structured input, not free-text</p>
+                </div>
+                <div className="rounded-xl border border-slate/10 bg-cool-off-white p-3">
+                  <FileText className="h-5 w-5 text-clinical-teal mx-auto mb-1.5" />
+                  <p className="text-xs font-medium text-deep-navy">Dual output</p>
+                  <p className="text-[10px] text-cool-grey mt-0.5">Clinical + patient-friendly</p>
+                </div>
+                <div className="rounded-xl border border-slate/10 bg-cool-off-white p-3">
+                  <FileCheck className="h-5 w-5 text-clinical-teal mx-auto mb-1.5" />
+                  <p className="text-xs font-medium text-deep-navy">Local languages</p>
+                  <p className="text-[10px] text-cool-grey mt-0.5">Hausa, Yoruba, Igbo</p>
+                </div>
+              </div>
+              <Button className="mt-6 touch-target-min" onClick={() => onNavigate({ name: "new" })}>
+                <Plus className="mr-1 h-4 w-4" />
+                New Discharge
+              </Button>
+            </>
+          )}
         </div>
       ) : (
         <>

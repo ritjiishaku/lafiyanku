@@ -54,12 +54,13 @@ export async function POST(request: Request) {
     if (authError) {
       if (authError.message.includes("already registered") || authError.message.includes("already exists")) {
         return NextResponse.json(
-          apiError(ErrorCodes.SUPABASE_ERROR, { details: "An account with this email already exists." }),
+          apiError(ErrorCodes.SUPABASE_ERROR, { detail: "An account with this email already exists." }),
           { status: 409 },
         );
       }
+      console.error("Clinician auth creation error:", authError);
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "CREATE user" }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "CREATE user", detail: authError.message }),
         { status: 500 },
       );
     }
@@ -76,11 +77,12 @@ export async function POST(request: Request) {
     }, { onConflict: "user_id" });
 
     if (profileError) {
+      console.error("Clinician profile upsert error:", profileError);
       await supabase.auth.admin.deleteUser(userId).catch((cleanupErr) => {
         console.error("CRITICAL: Failed to clean up user after profile upsert failure:", cleanupErr);
       });
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPSERT user_profile" }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPSERT user_profile", detail: profileError.message }),
         { status: 500 },
       );
     }
@@ -100,7 +102,8 @@ export async function POST(request: Request) {
       success: true,
       data: { userId, email, defaultPassword, loginUrl },
     }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("Register clinician unexpected error:", err);
     return NextResponse.json(
       apiError(ErrorCodes.INTERNAL_SERVER_ERROR),
       { status: 500 },

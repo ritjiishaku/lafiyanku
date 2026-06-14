@@ -39,8 +39,9 @@ export async function POST(request: Request) {
       .single();
 
     if (facilityError) {
+      console.error("Facility insert error:", facilityError);
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "INSERT facility" }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "INSERT facility", detail: facilityError.message }),
         { status: 500 },
       );
     }
@@ -53,10 +54,15 @@ export async function POST(request: Request) {
     });
 
     if (authError) {
+      console.error("Auth user creation error:", authError);
       await supabase.from("facilities").delete().eq("facility_id", facility.facility_id);
+      const isDuplicate = authError.message.includes("already registered") || authError.message.includes("already exists");
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "CREATE user" }),
-        { status: 500 },
+        apiError(ErrorCodes.SUPABASE_ERROR, {
+          operation: "CREATE user",
+          detail: isDuplicate ? "An account with this email already exists." : authError.message,
+        }),
+        { status: isDuplicate ? 409 : 500 },
       );
     }
 
@@ -71,12 +77,13 @@ export async function POST(request: Request) {
     }, { onConflict: "user_id" });
 
     if (profileError) {
+      console.error("Profile upsert error:", profileError);
       await supabase.auth.admin.deleteUser(userId).catch((cleanupErr) => {
         console.error("CRITICAL: Failed to clean up user after profile upsert failure:", cleanupErr);
       });
       await supabase.from("facilities").delete().eq("facility_id", facility.facility_id);
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPSERT user_profile" }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { operation: "UPSERT user_profile", detail: profileError.message }),
         { status: 500 },
       );
     }

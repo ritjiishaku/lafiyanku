@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { facilityRegisterSchema } from "@/lib/validations";
+import { facilityRegisterSchema, facilityRegisterStep1Schema } from "@/lib/validations";
 import {
   Building, User, Mail, Lock, CheckCircle, ArrowRight, ArrowLeft,
   Eye, EyeOff, Check,
@@ -106,7 +106,7 @@ export default function RegisterFacilityPage() {
 
   const handleNext = useCallback(() => {
     clearError();
-    validateStep({ facilityName, facilityCode }, facilityRegisterSchema.pick({ facilityName: true, facilityCode: true }));
+    validateStep({ facilityName, facilityCode }, facilityRegisterStep1Schema);
     if (!fieldErrors.facilityName) setStep(2);
   }, [facilityName, facilityCode]);
 
@@ -139,7 +139,10 @@ export default function RegisterFacilityPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Registration failed. Please try again.");
+        const detail = data.error?.details?.detail as string | undefined;
+        const baseMsg = data.error?.message ?? "Registration failed. Please try again.";
+        const displayMsg = detail || (typeof baseMsg === "string" ? baseMsg : "Registration failed. Please try again.");
+        setError(displayMsg);
         setIsLoading(false);
         return;
       }

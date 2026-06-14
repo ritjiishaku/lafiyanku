@@ -34,6 +34,11 @@ export const changePasswordSchema = z
     path: ["confirmNewPassword"],
   });
 
+export const facilityRegisterStep1Schema = z.object({
+  facilityName: facilityNameSchema,
+  facilityCode: facilityCodeSchema,
+});
+
 export const facilityRegisterSchema = z.object({
   facilityName: facilityNameSchema,
   facilityCode: facilityCodeSchema,

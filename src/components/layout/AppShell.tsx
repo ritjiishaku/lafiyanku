@@ -1,8 +1,10 @@
 "use client";
 
 import { Suspense, useState, useEffect, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
+import { useRole } from "@/hooks/useRole";
 
 interface AppShellProps {
   children: ReactNode;
@@ -10,8 +12,13 @@ interface AppShellProps {
   noMainScroll?: boolean;
 }
 
+const BYPASS_ROUTES = ["/change-password", "/onboarding"];
+
 export function AppShell({ children, hideSidebar, noMainScroll }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { mustChangePassword, isLoading } = useRole();
 
   useEffect(() => {
     function handleEscape(e: KeyboardEvent) {
@@ -20,6 +27,23 @@ export function AppShell({ children, hideSidebar, noMainScroll }: AppShellProps)
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
+
+  useEffect(() => {
+    if (isLoading || !mustChangePassword) return;
+    const isBypassRoute = BYPASS_ROUTES.some((r) => pathname.startsWith(r));
+    if (!isBypassRoute) {
+      router.replace("/change-password");
+    }
+  }, [mustChangePassword, isLoading, pathname, router]);
+
+  const isBypassRoute = BYPASS_ROUTES.some((r) => pathname.startsWith(r));
+  if (mustChangePassword && !isBypassRoute) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-cool-off-white p-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-clinical-teal border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-cool-off-white">
