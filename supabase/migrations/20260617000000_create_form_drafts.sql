@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Create form_drafts table for FR-07
+-- Lafiyanku — Create form_drafts table for FR-07
 -- Migration ID: 20260617000000
 -- Enables server-side save-as-draft persistence
 -- ============================================

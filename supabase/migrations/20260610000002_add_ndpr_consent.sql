@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Add NDPR consent columns
+-- Lafiyanku — Add NDPR consent columns
 -- Migration ID: 20260610000002
 -- Adds: consent_given, consent_timestamp to patient_inputs
 -- ============================================

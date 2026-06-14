@@ -81,7 +81,7 @@ interface PatientInputFormProps {
   isGenerating?: boolean;
 }
 
-const DRAFT_KEY = "careflow-discharge-draft";
+const DRAFT_KEY = "lafiyanku-discharge-draft";
 
 export function PatientInputForm({
   onSubmit,

@@ -11,7 +11,7 @@ export function ContactSection() {
   return (
     <section id="contact" className="flex flex-col items-center justify-center bg-gradient-to-br from-clinical-teal/5 via-cool-off-white to-cool-off-white px-3 sm:px-4 py-8 sm:py-12 min-h-dvh scroll-mt-20">
       <Link href="/" className="mb-4 text-xl font-bold tracking-tight text-deep-navy sm:text-2xl hover:text-clinical-teal transition-colors shrink-0">
-        CareFlow
+        Lafiyanku
       </Link>
       <div className="w-full max-w-xl">
         <div className="bg-white rounded-lg shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">

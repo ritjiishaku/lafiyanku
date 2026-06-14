@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Fix patient_inputs UPDATE RLS policy
+-- Lafiyanku — Fix patient_inputs UPDATE RLS policy
 -- Migration ID: 20260610000001
 -- Adds facility_id check to prevent cross-facility data modification
 -- ============================================

@@ -1,8 +1,8 @@
-# CareFlow
+# Lafiyanku
 
 **AI-powered clinical discharge documentation for Nigerian hospitals.**
 
-CareFlow converts structured clinical input into two outputs simultaneously — a professional clinical discharge summary (Mode 1) and plain-language patient-friendly instructions (Mode 2) — with optional translation into Hausa, Yoruba, or Igbo.
+Lafiyanku converts structured clinical input into two outputs simultaneously — a professional clinical discharge summary (Mode 1) and plain-language patient-friendly instructions (Mode 2) — with optional translation into Hausa, Yoruba, or Igbo.
 
 > ⚕️ Every generated record is draft-first, clinician-reviewed, and audit-logged. The AI assists documentation — it never replaces clinical judgement.
 
@@ -14,7 +14,7 @@ Clinicians in Nigeria discharge patients under time pressure and produce incompl
 
 ## Solution
 
-CareFlow solves this by providing a structured form that clinicians fill in, then:
+Lafiyanku solves this by providing a structured form that clinicians fill in, then:
 
 1. **Mode 1 — Clinical Discharge Summary**: A professional, structured document for hospital records
 2. **Mode 2 — Patient-Friendly Instructions**: Plain-language explanation the patient or caregiver can act on
@@ -140,8 +140,8 @@ Role-based access is enforced **server-side** on every API route via NextAuth se
 
 ```bash
 # Clone the repository
-git clone https://github.com/ritjiishaku/careflow.git
-cd careflow
+git clone https://github.com/ritjiishaku/lafiyanku.git
+cd lafiyanku
 
 # Install dependencies
 npm install
@@ -192,9 +192,9 @@ After running `supabase db reset`, the following accounts are available:
 
 | Email | Password | Role |
 |-------|----------|------|
-| `dr.emeka@careflow.dev` | `CareFlow@2026` | Doctor |
-| `fatima.bello@careflow.dev` | `CareFlow@2026` | Nurse |
-| `chidi.okonkwo@careflow.dev` | `CareFlow@2026` | Admin |
+| `dr.emeka@lafiyanku.dev` | `Lafiyanku@2026` | Doctor |
+| `fatima.bello@lafiyanku.dev` | `Lafiyanku@2026` | Nurse |
+| `chidi.okonkwo@lafiyanku.dev` | `Lafiyanku@2026` | Admin |
 
 ---
 
@@ -402,7 +402,7 @@ Set all environment variables in Vercel dashboard across 3 environments (product
 
 ### Domain
 
-- Custom domain: e.g. `careflow.ng` or `app.careflow.health`
+- Custom domain: e.g. `lafiyanku.ng` or `app.lafiyanku.health`
 - Auto SSL via Let's Encrypt (Vercel default)
 
 ---
@@ -438,4 +438,4 @@ Internal use. Not for clinical distribution without verification.
 
 ---
 
-*CareFlow — Built for Nigerian hospitals, clinics, and telemedicine providers.*
+*Lafiyanku — Built for Nigerian hospitals, clinics, and telemedicine providers.*

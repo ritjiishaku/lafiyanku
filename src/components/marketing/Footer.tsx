@@ -21,7 +21,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16">
           <div>
             <Link href="/" className="text-xl font-bold tracking-tight">
-              CareFlow
+              Lafiyanku
             </Link>
             <p className="mt-3 text-sm text-white/50 leading-relaxed max-w-xs">
               AI-powered discharge documentation for Nigerian hospitals.
@@ -59,7 +59,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/40">
-            &copy; {new Date().getFullYear()} CareFlow. Built in Nigeria for Nigerian hospitals.
+            &copy; {new Date().getFullYear()} Lafiyanku. Built in Nigeria for Nigerian hospitals.
           </p>
           <div className="flex items-center gap-4">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-clinical-teal transition-colors" aria-label="Twitter">

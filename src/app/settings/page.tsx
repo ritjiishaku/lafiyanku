@@ -14,7 +14,7 @@ import { Shield, Hospital, Camera, Copy, Check, ArrowRight, Lock, Eye, EyeOff } 
 import { toast } from "sonner";
 import { changePasswordSchema } from "@/lib/validations";
 
-const AVATAR_KEY = "careflow-avatar";
+const AVATAR_KEY = "lafiyanku-avatar";
 
 function notifyAvatarChange() {
   if (typeof window !== "undefined") window.dispatchEvent(new Event("avatar-updated"));

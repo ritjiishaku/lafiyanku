@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Add must_change_password flag
+-- Lafiyanku — Add must_change_password flag
 -- Migration ID: 20260610000003
 -- Adds: must_change_password to user_profiles
 -- ============================================

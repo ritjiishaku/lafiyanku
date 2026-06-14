@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Fix profiles table name and schema
+-- Lafiyanku — Fix profiles table name and schema
 -- Renames `profiles` → `user_profiles`
 -- Changes primary key column `id` → `user_id`
 -- Migration ID: 20260603_fix_profiles_table

@@ -20,12 +20,12 @@ function DashboardContent() {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      list: "CareFlow — Dashboard",
-      new: "CareFlow — New Discharge",
-      output: "CareFlow — Discharge Output",
-      detail: "CareFlow — Record Detail",
+      list: "Lafiyanku — Dashboard",
+      new: "Lafiyanku — New Discharge",
+      output: "Lafiyanku — Discharge Output",
+      detail: "Lafiyanku — Record Detail",
     };
-    document.title = titles[view] ?? "CareFlow";
+    document.title = titles[view] ?? "Lafiyanku";
   }, [view]);
 
   const navigate = useCallback((v: { name: string; id?: string }) => {

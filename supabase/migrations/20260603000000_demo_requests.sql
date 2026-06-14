@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Demo Requests Table
+-- Lafiyanku — Demo Requests Table
 -- Captures marketing demo requests from the public site
 -- Migration ID: 20260603_demo_requests
 -- ============================================

@@ -49,7 +49,7 @@ function resolve(ref) {
 const skipTypographyVars = new Set(['text-case', 'text-decoration', 'paragraph-indent', 'paragraph-spacing']);
 
 let css = `/* ========================================
-   CareFlow — Design Tokens
+   Lafiyanku — Design Tokens
    Auto-generated from token-colour.json
    and token-typography.json
    ======================================== */

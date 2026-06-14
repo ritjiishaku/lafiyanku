@@ -1,23 +1,10 @@
 /* ========================================
-   CareFlow — Design Tokens
+   Lafiyanku — Design Tokens
    Auto-generated from token-colour.json
    and token-typography.json
    ======================================== */
 
-/* ---- CareFlow Branded Token Aliases ---- */
-/* These bridge M3 semantic tokens with the CareFlow brand naming system.
-   Components can reference either --color-primary (M3) or --clinical-teal (brand).
-   Tailwind config (bootstrap.md) uses named colour classes mapped to these. */
-
-:root {
-  --clinical-teal: #0B6E6E;
-  --deep-navy: #0D2B4E;
-  --warm-amber: #B45309;
-  --slate: #1E293B;
-  --cool-grey: #64748B;
-  --pure-white: #FFFFFF;
-  --cool-off-white: #F0F4F8;
-}
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
 /* ---- Colour System — Light Roles ---- */
 

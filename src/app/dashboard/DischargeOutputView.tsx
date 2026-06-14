@@ -53,7 +53,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
   const translateAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "CareFlow — Discharge Output";
+    document.title = "Lafiyanku — Discharge Output";
   }, []);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
             dischargeDate: pi?.discharge_date ?? "",
             dischargedBy: pi?.discharged_by ?? "",
           });
-          if (name) document.title = `CareFlow — ${name}`;
+          if (name) document.title = `Lafiyanku — ${name}`;
           setEditClinical(d.clinical_summary);
           setEditPatient(d.patient_friendly_output);
         } else {

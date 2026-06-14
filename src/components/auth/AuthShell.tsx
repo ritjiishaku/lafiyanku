@@ -23,7 +23,7 @@ export function AuthShell({ children, variant = "default", facilityName }: AuthS
         <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.5'%3E%3Ccircle cx='2' cy='2' r='1'/%3E%3C/g%3E%3C/svg%3E\")" }} />
 
         <Link href="/" className="self-start py-3 text-lg font-bold text-white hover:text-clinical-teal transition-colors relative z-10">
-          CareFlow
+          Lafiyanku
         </Link>
 
         <div className="flex-1 flex flex-col justify-center -mt-6 relative z-10">
@@ -35,13 +35,13 @@ export function AuthShell({ children, variant = "default", facilityName }: AuthS
               </h2>
               <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-sm">
                 {facilityName
-                  ? "Sign in to access your CareFlow dashboard."
+                  ? "Sign in to access your Lafiyanku dashboard."
                   : "Create an admin account to manage your hospital or clinic. Add doctors and nurses after signing in."}
               </p>
             </>
           ) : (
             <>
-              <p className="text-xs font-semibold text-clinical-teal tracking-widest uppercase mb-3">CareFlow</p>
+              <p className="text-xs font-semibold text-clinical-teal tracking-widest uppercase mb-3">Lafiyanku</p>
               <h2 className="text-3xl xl:text-4xl font-extrabold leading-tight max-w-sm">
                 Discharge documentation for Nigerian hospitals
               </h2>
@@ -67,7 +67,7 @@ export function AuthShell({ children, variant = "default", facilityName }: AuthS
       <div className="flex flex-1 items-center justify-center px-5 py-8 overflow-y-auto">
         <div className="w-full max-w-md">
           <Link href="/" className="block text-center py-3 text-lg font-bold text-deep-navy hover:text-clinical-teal transition-colors mb-6 lg:hidden">
-            CareFlow
+            Lafiyanku
           </Link>
           {children}
         </div>

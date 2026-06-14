@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Complete Database Schema
+-- Lafiyanku — Complete Database Schema
 -- Stack: Supabase (PostgreSQL 15+)
 -- Migration ID: 20260602_initial_schema
 -- ============================================

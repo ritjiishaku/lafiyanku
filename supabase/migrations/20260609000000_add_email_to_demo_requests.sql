@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Add email column to demo_requests
+-- Lafiyanku — Add email column to demo_requests
 -- Migration ID: 20260609_add_email_to_demo_requests
 -- ============================================
 

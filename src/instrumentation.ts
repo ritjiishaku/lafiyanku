@@ -5,7 +5,7 @@ export function register() {
     try {
       validateEnv();
     } catch (err) {
-      console.error("[CareFlow] Environment validation failed:", err);
+      console.error("[Lafiyanku] Environment validation failed:", err);
       process.exit(1);
     }
   }

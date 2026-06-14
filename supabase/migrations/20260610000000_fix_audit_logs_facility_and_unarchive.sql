@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Fix audit_logs schema gaps
+-- Lafiyanku — Fix audit_logs schema gaps
 -- Migration ID: 20260610000000
 -- Adds: facility_id column, unarchive enum value
 -- ============================================

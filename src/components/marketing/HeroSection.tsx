@@ -62,7 +62,7 @@ export function HeroSection() {
                     <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
                     <div className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono tracking-tight">careflow-output.log</span>
+                  <span className="text-[10px] text-slate-500 font-mono tracking-tight">lafiyanku-output.log</span>
                   <div className="ml-auto flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-clinical-teal/60 animate-pulse" />
                     <span className="text-[10px] text-clinical-teal/60 font-mono">AI READY</span>

@@ -138,7 +138,7 @@ export function DemoRequestForm() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(11,110,110,0.15),transparent_50%)]" />
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">See CareFlow in Your Hospital</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">See Lafiyanku in Your Hospital</h2>
           <p className="mt-3 text-lg text-slate-300">Request a personalized walkthrough or start your 30-day free facility pilot.</p>
         </div>
 
@@ -232,7 +232,7 @@ export function DemoRequestForm() {
             <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
               <Checkbox id="ndpr-consent" checked={ndprConsent} onChange={(e) => setNdprConsent(e.target.checked)} />
               <Label htmlFor="ndpr-consent" className="w-full text-sm text-slate-600 leading-relaxed cursor-pointer select-none">
-                I consent to CareFlow contacting me via WhatsApp to discuss this demo request and to process my details in accordance with the{" "}
+                I consent to Lafiyanku contacting me via WhatsApp to discuss this demo request and to process my details in accordance with the{" "}
                 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-clinical-teal underline hover:text-clinical-teal/80">Privacy Policy</a>{" "}
                 and{" "}
                 <a href="/ndpr" target="_blank" rel="noopener noreferrer" className="font-semibold text-clinical-teal underline hover:text-clinical-teal/80">NDPR 2019 compliance statement</a>.

@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Development Seed Data
+-- Lafiyanku — Development Seed Data
 -- IMPORTANT: Dev seed only. Never run in production.
 -- Run with: supabase db reset
 -- ============================================
@@ -26,18 +26,18 @@ INSERT INTO facilities (facility_id, facility_code, facility_name) VALUES
 
 -- ============================================
 -- AUTH USERS (Supabase Auth)
--- Default password for all seed users: CareFlow@2026
+-- Default password for all seed users: Lafiyanku@2026
 -- In local dev, passwords use Supabase's `crypt` for bcrypt.
--- Generate with: `supabase db reset && select crypt('CareFlow@2026', gen_salt('bf'));`
+-- Generate with: `supabase db reset && select crypt('Lafiyanku@2026', gen_salt('bf'));`
 -- ============================================
 
 -- Doctor: Ritji Ishaku
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'dr.ritji@careflow.dev',
+    'dr.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
-    crypt('CareFlow@2026', gen_salt('bf')),
+    crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
@@ -46,9 +46,9 @@ VALUES (
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    'nurse.ritji@careflow.dev',
+    'nurse.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
-    crypt('CareFlow@2026', gen_salt('bf')),
+    crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
@@ -57,9 +57,9 @@ VALUES (
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
-    'admin.ritji@careflow.dev',
+    'admin.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
-    crypt('CareFlow@2026', gen_salt('bf')),
+    crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
@@ -70,11 +70,11 @@ VALUES (
 
 INSERT INTO user_profiles (user_id, email, full_name, role, facility_id) VALUES
     -- Doctor
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.ritji@careflow.dev', 'Ritji Ishaku', 'doctor', '11111111-1111-1111-1111-111111111111'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.ritji@lafiyanku.dev', 'Ritji Ishaku', 'doctor', '11111111-1111-1111-1111-111111111111'),
     -- Nurse
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'nurse.ritji@careflow.dev', 'Ritji Ishaku', 'nurse', '11111111-1111-1111-1111-111111111111'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'nurse.ritji@lafiyanku.dev', 'Ritji Ishaku', 'nurse', '11111111-1111-1111-1111-111111111111'),
     -- Admin
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'admin.ritji@careflow.dev', 'Ritji Ishaku', 'admin', '11111111-1111-1111-1111-111111111111');
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'admin.ritji@lafiyanku.dev', 'Ritji Ishaku', 'admin', '11111111-1111-1111-1111-111111111111');
 
 -- ============================================
 -- PATIENT INPUTS (Nigerian clinical example)

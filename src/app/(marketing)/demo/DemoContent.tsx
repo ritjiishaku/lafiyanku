@@ -48,7 +48,7 @@ const SAMPLE_DATA = {
 
 export function DemoContent() {
   useEffect(() => {
-    document.title = "AI Playground — CareFlow";
+    document.title = "AI Playground — Lafiyanku";
   }, []);
 
   const [loading, setLoading] = useState(false);
@@ -90,7 +90,7 @@ export function DemoContent() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <h1 className="text-3xl font-extrabold tracking-tight text-deep-navy sm:text-4xl">
-          CareFlow Playground
+          Lafiyanku Playground
         </h1>
         <p className="text-lg text-slate-600">
           Experience our dual-engine generation pipeline first-hand using sandbox patient data.

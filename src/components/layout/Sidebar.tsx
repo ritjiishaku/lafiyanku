@@ -38,7 +38,7 @@ const ROLE_LABELS: Record<string, { label: string; color: string }> = {
   admin: { label: "Admin", color: "bg-purple-500/20 text-purple-400" },
 };
 
-const AVATAR_KEY = "careflow-avatar";
+const AVATAR_KEY = "lafiyanku-avatar";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -105,7 +105,7 @@ export function Sidebar({ onClose }: SidebarProps) {
   return (
     <aside className="flex h-screen w-64 flex-col bg-deep-navy text-pure-white sticky top-0">
       <button onClick={() => { router.push("/"); onClose?.(); }} className="flex w-full items-center gap-2 border-b border-white/[0.06] px-6 py-4 shrink-0 hover:bg-white/5 transition-colors text-left">
-        <span className="text-xl font-bold tracking-tight text-white">CareFlow</span>
+        <span className="text-xl font-bold tracking-tight text-white">Lafiyanku</span>
       </button>
 
       <nav className="flex flex-col gap-1 p-4 flex-1 overflow-y-auto">
@@ -178,7 +178,7 @@ export function Sidebar({ onClose }: SidebarProps) {
       <ConfirmModal
         open={logoutConfirmOpen}
         onOpenChange={setLogoutConfirmOpen}
-        title="Sign out of CareFlow?"
+        title="Sign out of Lafiyanku?"
         description="You will be signed out of your account and redirected to the login page."
         confirmLabel="Sign Out"
         variant="destructive"

@@ -209,7 +209,7 @@ export function ContactForm() {
       <div className="flex items-start gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3">
         <Checkbox id="ndpr-consent" checked={ndprConsent} onChange={(e) => setNdprConsent(e.target.checked)} className="mt-0.5" />
         <label htmlFor="ndpr-consent" className="w-full text-sm text-slate-600 leading-relaxed cursor-pointer select-none">
-          I consent to CareFlow contacting me via WhatsApp to process my details in accordance with the{" "}
+          I consent to Lafiyanku contacting me via WhatsApp to process my details in accordance with the{" "}
           <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-clinical-teal underline hover:text-clinical-teal/80">Privacy Policy</a>{" "}
           and{" "}
           <a href="/ndpr" target="_blank" rel="noopener noreferrer" className="font-semibold text-clinical-teal underline hover:text-clinical-teal/80">NDPR 2019 compliance statement</a>.

@@ -341,7 +341,7 @@ export default function AdminPage() {
                         setForm({ ...form, fullName: name });
                       } else {
                         const slug = name.toLowerCase().replace(/^dr\.?\s*/i, "").replace(/[^a-zA-Z0-9]/g, ".").replace(/\.+/g, ".").replace(/^\.|\.$/g, "");
-                        const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.careflow.app` : "";
+                        const autoEmail = slug && facilityCode ? `${slug}@${facilityCode}.lafiyanku.app` : "";
                         setForm({ ...form, fullName: name, email: autoEmail || form.email });
                       }
                     }}

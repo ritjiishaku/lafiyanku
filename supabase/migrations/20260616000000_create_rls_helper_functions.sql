@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — RLS helper functions
+-- Lafiyanku — RLS helper functions
 -- Migration ID: 20260616000000
 -- Creates helper functions used by RLS policies
 -- to check user role and facility_id.

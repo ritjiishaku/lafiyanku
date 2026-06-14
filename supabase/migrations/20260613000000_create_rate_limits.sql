@@ -1,5 +1,5 @@
 -- ============================================
--- CareFlow — Rate Limiting Table
+-- Lafiyanku — Rate Limiting Table
 -- Migration ID: 20260613000000_create_rate_limits
 -- Supports auth.ts login rate limiting (5 attempts / 10 min window)
 -- ============================================

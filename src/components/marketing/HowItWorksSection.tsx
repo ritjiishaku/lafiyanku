@@ -11,7 +11,7 @@ const STEPS = [
     number: 2,
     icon: Sparkles,
     title: "Generate",
-    description: "CareFlow drafts the clinical summary and patient instructions.",
+    description: "Lafiyanku drafts the clinical summary and patient instructions.",
   },
   {
     number: 3,

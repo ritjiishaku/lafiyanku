@@ -21,7 +21,7 @@ export function TrustSection() {
           AI You Can Trust
         </h2>
         <p className="text-lg text-cool-grey mb-10">
-          CareFlow assists clinicians. It never replaces clinical judgement.
+          Lafiyanku assists clinicians. It never replaces clinical judgement.
         </p>
 
         <div className="space-y-4 mb-10">

@@ -14,7 +14,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  title: "CareFlow — Clinical Discharge Documentation",
+  title: "Lafiyanku — Clinical Discharge Documentation",
   description:
     "AI-powered clinical discharge documentation assistant for Nigerian hospitals.",
 };
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "CareFlow",
+  name: "Lafiyanku",
   applicationCategory: "HealthApplication",
   operatingSystem: "Web",
   description:
@@ -36,7 +36,7 @@ const jsonLd = {
   },
   creator: {
     "@type": "Organization",
-    name: "CareFlow",
+    name: "Lafiyanku",
     url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   },
 };
