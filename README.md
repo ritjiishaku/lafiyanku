@@ -192,9 +192,9 @@ After running `supabase db reset`, the following accounts are available:
 
 | Email | Password | Role |
 |-------|----------|------|
-| `dr.emeka@lafiyanku.vercel.app` | `Lafiyanku@2026` | Doctor |
-| `fatima.bello@lafiyanku.vercel.app` | `Lafiyanku@2026` | Nurse |
-| `chidi.okonkwo@lafiyanku.vercel.app` | `Lafiyanku@2026` | Admin |
+| `dr.emeka@lafiyanku.dev` | `Lafiyanku@2026` | Doctor |
+| `fatima.bello@lafiyanku.dev` | `Lafiyanku@2026` | Nurse |
+| `chidi.okonkwo@lafiyanku.dev` | `Lafiyanku@2026` | Admin |
 
 ---
 

@@ -35,7 +35,7 @@ INSERT INTO facilities (facility_id, facility_code, facility_name) VALUES
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'dr.ritji@lafiyanku.vercel.app',
+    'dr.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
     crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
@@ -46,7 +46,7 @@ VALUES (
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    'nurse.ritji@lafiyanku.vercel.app',
+    'nurse.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
     crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
@@ -57,7 +57,7 @@ VALUES (
 INSERT INTO auth.users (id, email, raw_user_meta_data, encrypted_password, created_at, updated_at)
 VALUES (
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
-    'admin.ritji@lafiyanku.vercel.app',
+    'admin.ritji@lafiyanku.dev',
     '{"full_name": "Ritji Ishaku"}',
     crypt('Lafiyanku@2026', gen_salt('bf')),
     NOW(),
@@ -70,11 +70,11 @@ VALUES (
 
 INSERT INTO user_profiles (user_id, email, full_name, role, facility_id) VALUES
     -- Doctor
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.ritji@lafiyanku.vercel.app', 'Ritji Ishaku', 'doctor', '11111111-1111-1111-1111-111111111111'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dr.ritji@lafiyanku.dev', 'Ritji Ishaku', 'doctor', '11111111-1111-1111-1111-111111111111'),
     -- Nurse
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'nurse.ritji@lafiyanku.vercel.app', 'Ritji Ishaku', 'nurse', '11111111-1111-1111-1111-111111111111'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'nurse.ritji@lafiyanku.dev', 'Ritji Ishaku', 'nurse', '11111111-1111-1111-1111-111111111111'),
     -- Admin
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'admin.ritji@lafiyanku.vercel.app', 'Ritji Ishaku', 'admin', '11111111-1111-1111-1111-111111111111');
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'admin.ritji@lafiyanku.dev', 'Ritji Ishaku', 'admin', '11111111-1111-1111-1111-111111111111');
 
 -- ============================================
 -- PATIENT INPUTS (Nigerian clinical example)
