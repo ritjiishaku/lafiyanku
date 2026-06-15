@@ -136,12 +136,13 @@ export function Sidebar({ onClose }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t border-white/[0.06] shrink-0" ref={menuRef}>
+      <div className="relative border-t border-white/[0.06] shrink-0" ref={menuRef}>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           aria-expanded={menuOpen}
           aria-haspopup="true"
-          className="flex w-full items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors"
+          aria-controls="user-menu"
+          className="flex w-full items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors touch-target-min"
         >
           <AvatarDisplay src={avatarSrc} name={userName} />
           <div className="min-w-0 flex-1 text-left">
@@ -156,17 +157,23 @@ export function Sidebar({ onClose }: SidebarProps) {
         </button>
 
         {menuOpen && (
-          <div className="px-3 pb-3 space-y-1 animate-in fade-in slide-in-from-bottom-1 duration-150">
+          <div
+            id="user-menu"
+            role="menu"
+            className="absolute bottom-full left-3 right-3 mb-2 space-y-1 rounded-lg bg-deep-navy p-2 shadow-xl ring-1 ring-white/10 animate-in fade-in slide-in-from-bottom-2 duration-150"
+          >
             <button
+              role="menuitem"
               onClick={() => { setMenuOpen(false); onClose?.(); router.push("/settings"); }}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-3 touch-target-min text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-md px-3 py-3 touch-target-min text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors"
             >
               <Settings className="h-4 w-4" />
               Settings
             </button>
             <button
+              role="menuitem"
               onClick={() => setLogoutConfirmOpen(true)}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-3 touch-target-min text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-md px-3 py-3 touch-target-min text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
             >
               <LogOut className="h-4 w-4" />
               Logout
