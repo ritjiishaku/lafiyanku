@@ -62,12 +62,14 @@ export function ConfirmModal({
           </div>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button variant={confirmButtonVariant[variant]} onClick={onConfirm}>
-            {confirmLabel}
-          </Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 w-full">
+            <Button variant="ghost" className="touch-target-min w-full sm:w-auto" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button variant={confirmButtonVariant[variant]} className="touch-target-min w-full sm:w-auto" onClick={onConfirm}>
+              {confirmLabel}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
