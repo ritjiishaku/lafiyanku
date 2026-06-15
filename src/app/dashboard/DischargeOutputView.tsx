@@ -13,7 +13,7 @@ import { PrintButton } from "@/components/shared/PrintButton";
 import { WhatsAppShareButton } from "@/components/shared/WhatsAppShareButton";
 import { useRole } from "@/hooks/useRole";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { Edit, Save, X, CheckCircle, Archive } from "lucide-react";
+import { Edit, Save, X, CheckCircle, Archive, Languages, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 interface DischargeRecordData {
@@ -194,6 +194,16 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
     }
   }
 
+  function handleClearTranslation() {
+    setRecord((prev) => prev ? {
+      ...prev,
+      translatedOutput: null,
+      translationLanguage: null,
+      translationConfidence: null,
+    } : prev);
+    setTranslateLang("");
+  }
+
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-live="polite"><LoadingSpinner /></div>;
   if (error || !record) return (
     <div className="flex min-h-[60vh] items-center justify-center" role="alert" aria-live="assertive">
@@ -255,45 +265,6 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
           <FlaggedIssuesBanner issues={record.flaggedIssues} />
         </div>
       )}
-
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate/20 bg-white p-3 sm:p-4">
-        <span className="text-xs font-medium text-slate sm:text-sm">Translate to:</span>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {(["ha", "yo", "ig"] as const).map((lang) => {
-            const label = lang === "ha" ? "Hausa" : lang === "yo" ? "Yoruba" : "Igbo";
-            const isActive = record.translationLanguage === lang;
-            const isPending = translateLang === lang && !record.translationLanguage;
-            return (
-              <button
-                key={lang}
-                type="button"
-                onClick={() => {
-                  setTranslateLang(lang);
-                  handleTranslate(lang);
-                }}
-                disabled={translating}
-                className={`touch-target-min inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors sm:px-4 sm:py-2 sm:text-sm ${
-                  translating && isPending
-                    ? "animate-pulse bg-clinical-teal/20 text-clinical-teal"
-                    : isActive
-                    ? record.translationConfidence === "low" || record.translationConfidence === "failed"
-                      ? "bg-warm-amber/10 text-warm-amber"
-                      : "bg-clinical-teal/10 text-clinical-teal"
-                    : "bg-slate/10 text-slate hover:bg-slate/20"
-                }`}
-              >
-                {label}
-                {isActive && record.translationConfidence === "low" && (
-                  <span className="text-[9px] opacity-70 sm:text-[10px]">(low)</span>
-                )}
-                {isActive && record.translationConfidence === "failed" && (
-                  <span className="text-[9px] opacity-70 sm:text-[10px]">(failed)</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       <div className="flex rounded-lg border border-slate/20 bg-cool-off-white p-1" role="tablist" aria-label="Output view mode">
         {canSeeClinical && (
@@ -366,7 +337,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
       )}
 
       {activeMode === "patient" && (
-        <div role="tabpanel" id="panel-patient" aria-labelledby="tab-patient" className="space-y-6">
+        <div role="tabpanel" id="panel-patient" aria-labelledby="tab-patient" className="space-y-4">
           {isEditing ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between rounded-lg border-2 border-warm-amber bg-warm-amber/5 p-2">
@@ -377,15 +348,89 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
               <textarea aria-label="Edit patient instructions" className="min-h-[250px] sm:min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
             </div>
           ) : (
-            <PatientInstructionsPanel content={record.patientFriendlyOutput} />
-          )}
-          {record.translatedOutput && (
-            <TranslationPanel
-              content={record.translatedOutput}
-              language={record.translationLanguage ?? null}
-              confidence={record.translationConfidence ?? null}
-              onRetranslate={record.translationLanguage ? () => handleTranslate(record.translationLanguage!) : undefined}
-            />
+            <>
+              <PatientInstructionsPanel content={record.patientFriendlyOutput} />
+
+              <div className="rounded-lg border border-slate/20 bg-white p-4 sm:p-5" aria-busy={translating}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Languages className="h-4 w-4 text-clinical-teal" />
+                    <div>
+                      <p className="text-sm font-semibold text-deep-navy">Translate Patient Instructions</p>
+                      <p className="text-xs text-cool-grey">Convert these instructions into a local language for the patient</p>
+                    </div>
+                  </div>
+                  {record.translatedOutput && (
+                    <button
+                      type="button"
+                      onClick={handleClearTranslation}
+                      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-cool-grey hover:bg-slate/10 hover:text-slate transition-colors"
+                    >
+                      <X className="h-3 w-3" />Clear
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {(["ha", "yo", "ig"] as const).map((lang) => {
+                    const label = lang === "ha" ? "Hausa" : lang === "yo" ? "Yoruba" : "Igbo";
+                    const isActive = record.translationLanguage === lang;
+                    const isTranslatingThis = translating && translateLang === lang;
+                    return (
+                      <button
+                        key={lang}
+                        type="button"
+                        onClick={() => { setTranslateLang(lang); handleTranslate(lang); }}
+                        disabled={translating}
+                        className={`touch-target-min inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors sm:px-4 sm:text-sm ${
+                          isTranslatingThis
+                            ? "bg-clinical-teal/20 text-clinical-teal"
+                            : isActive
+                              ? record.translationConfidence === "low" || record.translationConfidence === "failed"
+                                ? "bg-warm-amber/10 text-warm-amber"
+                                : "bg-clinical-teal/10 text-clinical-teal"
+                              : "bg-slate/10 text-slate hover:bg-slate/20"
+                        }`}
+                        aria-label={isTranslatingThis ? `Translating to ${label}` : `Translate to ${label}`}
+                        aria-busy={isTranslatingThis}
+                      >
+                        {isTranslatingThis && <Loader2 className="h-3 w-3 animate-spin" />}
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {record.translatedOutput && record.translationLanguage && (
+                  <div className={`mt-3 flex items-center gap-2 rounded-md px-3 py-2 text-xs ${
+                    record.translationConfidence === "low"
+                      ? "bg-warm-amber/5 text-warm-amber"
+                      : record.translationConfidence === "failed"
+                        ? "bg-red-50 text-red-600"
+                        : "bg-clinical-teal/5 text-clinical-teal"
+                  }`}>
+                    {(record.translationConfidence === "low" || record.translationConfidence === "failed") && (
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                    )}
+                    <span>
+                      {record.translationLanguage === "ha" ? "Hausa" : record.translationLanguage === "yo" ? "Yoruba" : "Igbo"}
+                      {record.translationConfidence === "high" && " — high confidence"}
+                      {record.translationConfidence === "low" && " — low confidence. Please verify with a fluent speaker."}
+                      {record.translationConfidence === "failed" && " — translation failed. English version is shown above."}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {record.translatedOutput && (
+                <TranslationPanel
+                  content={record.translatedOutput}
+                  language={record.translationLanguage ?? null}
+                  confidence={record.translationConfidence ?? null}
+                  onRetranslate={record.translationLanguage ? () => handleTranslate(record.translationLanguage!) : undefined}
+                />
+              )}
+            </>
           )}
         </div>
       )}
