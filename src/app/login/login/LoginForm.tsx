@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,8 +18,6 @@ type FieldErrors = Partial<Record<"email" | "password", string>>;
 
 export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
-  const { data: session } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,21 +25,6 @@ export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    if (session?.user) {
-      const user = session.user as { role?: string; mustChangePassword?: boolean };
-      if (user.mustChangePassword) {
-        const dest = user.role === "admin" ? "/onboarding/admin" : "/onboarding/clinician";
-        router.push(dest);
-      } else if (user.role === "admin" && typeof window !== "undefined" && !localStorage.getItem("lafiyanku-admin-onboarded")) {
-        router.push("/onboarding/admin");
-      } else {
-        const dest = user.role === "admin" ? "/admin" : "/dashboard";
-        router.push(dest);
-      }
-    }
-  }, [session, router]);
 
   function validateField(name: string, value: string): string | undefined {
     const result = loginSchema.shape[name as keyof typeof loginSchema.shape].safeParse(value);
