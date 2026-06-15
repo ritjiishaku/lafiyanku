@@ -122,7 +122,7 @@ export function Sidebar({ onClose }: SidebarProps) {
             <button
               key={link.href}
               onClick={() => { router.push(link.href); onClose?.(); }}
-              className={`w-full text-left group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+              className={`w-full text-left group relative flex items-center gap-3 rounded-lg px-3 py-3 touch-target-min text-sm font-medium transition-all duration-150 ${
                 isActive
                   ? "bg-clinical-teal/15 text-white"
                   : "text-white/50 hover:bg-white/10 hover:text-white"
@@ -159,14 +159,14 @@ export function Sidebar({ onClose }: SidebarProps) {
           <div className="px-3 pb-3 space-y-1 animate-in fade-in slide-in-from-bottom-1 duration-150">
             <button
               onClick={() => { setMenuOpen(false); onClose?.(); router.push("/settings"); }}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-3 touch-target-min text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors"
             >
               <Settings className="h-4 w-4" />
               Settings
             </button>
             <button
               onClick={() => setLogoutConfirmOpen(true)}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-3 touch-target-min text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
             >
               <LogOut className="h-4 w-4" />
               Logout

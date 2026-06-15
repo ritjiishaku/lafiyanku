@@ -71,7 +71,7 @@ export function MarketingNav() {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="md:hidden flex items-center justify-center h-10 w-10 rounded-md text-slate-600 hover:text-clinical-teal hover:bg-slate-100 transition-colors"
+          className="md:hidden touch-target-min flex items-center justify-center rounded-md text-slate-600 hover:text-clinical-teal hover:bg-slate-100 transition-colors"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -94,12 +94,12 @@ export function MarketingNav() {
 
           <div className="flex flex-col gap-3 px-4 pb-5 pt-2 border-t border-slate-100">
             <Link href="/login" onClick={closeMenu}>
-              <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:text-clinical-teal hover:border-clinical-teal">
+              <Button variant="outline" className="touch-target-min w-full border-slate-300 text-slate-700 hover:text-clinical-teal hover:border-clinical-teal">
                 Sign In
               </Button>
             </Link>
             <Link href="/register-facility" onClick={closeMenu}>
-              <Button className="w-full bg-clinical-teal hover:bg-clinical-teal/90 text-white font-semibold">
+              <Button className="touch-target-min w-full bg-clinical-teal hover:bg-clinical-teal/90 text-white font-semibold">
                 Start Free Pilot
               </Button>
             </Link>
