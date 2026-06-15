@@ -88,7 +88,7 @@ export function PrintButton({
             margin-bottom: 16pt;
           }
           .header h1 { font-size: 18pt; color: #0D2B4E; margin-bottom: 2pt; }
-          .header p { font-size: 10pt; color: #64748B; }
+          .header p { font-size: 10pt; color: #4B5E73; }
           .section { margin-bottom: 14pt; }
           .section h2 {
             font-size: 14pt;
@@ -103,7 +103,7 @@ export function PrintButton({
             padding-top: 8pt;
             border-top: 1px solid #E2E8F0;
             font-size: 9pt;
-            color: #64748B;
+            color: #4B5E73;
           }
           @media print {
             body { padding: 0; }
@@ -136,7 +136,7 @@ export function PrintButton({
             : translatedOutput && translationConfidence === "failed"
               ? `
         <div class="section" style="margin-top: 20pt; border-top: 2px solid #0D2B4E; padding-top: 14pt;">
-          <p style="font-style: italic; color: #64748B;">Translation into ${safeLangLabel} could not be completed with sufficient confidence. English version is shown above.</p>
+          <p style="font-style: italic; color: #4B5E73;">Translation into ${safeLangLabel} could not be completed with sufficient confidence. English version is shown above.</p>
         </div>`
               : ""
         }

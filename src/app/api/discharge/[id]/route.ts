@@ -95,6 +95,23 @@ export async function PUT(
 
     const body = await request.json();
 
+    const MAX_LENGTH = 50000;
+    const clinicalSummary = typeof body.clinicalSummary === "string" ? body.clinicalSummary : undefined;
+    const patientFriendlyOutput = typeof body.patientFriendlyOutput === "string" ? body.patientFriendlyOutput : undefined;
+
+    if (clinicalSummary !== undefined && clinicalSummary.length > MAX_LENGTH) {
+      return NextResponse.json(
+        apiError(ErrorCodes.VALIDATION_ERROR, { field: "clinicalSummary", message: `Exceeds maximum length of ${MAX_LENGTH} characters.` }),
+        { status: 400 },
+      );
+    }
+    if (patientFriendlyOutput !== undefined && patientFriendlyOutput.length > MAX_LENGTH) {
+      return NextResponse.json(
+        apiError(ErrorCodes.VALIDATION_ERROR, { field: "patientFriendlyOutput", message: `Exceeds maximum length of ${MAX_LENGTH} characters.` }),
+        { status: 400 },
+      );
+    }
+
     const supabase = createServiceClient();
 
     const { data: existing, error: findError } = await supabase

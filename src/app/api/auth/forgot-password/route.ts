@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
+import { checkRateLimit } from "@/services/rate-limit";
+
+const PASSWORD_RESET_RATE_LIMIT = { maxAttempts: 3, windowMs: 60 * 60 * 1000 }; // 3 per hour
 
 export async function POST(request: Request) {
   try {
@@ -8,6 +11,16 @@ export async function POST(request: Request) {
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(apiError(ErrorCodes.VALIDATION_ERROR, { field: "email", message: "Email is required." }), { status: 400 });
+    }
+
+    const rateLimit = await checkRateLimit(
+      email.toLowerCase().trim(),
+      "password_reset",
+      PASSWORD_RESET_RATE_LIMIT.maxAttempts,
+      PASSWORD_RESET_RATE_LIMIT.windowMs,
+    );
+    if (rateLimit.limited) {
+      return NextResponse.json(apiError(ErrorCodes.RATE_LIMITED), { status: 429 });
     }
 
     const supabase = createClient(

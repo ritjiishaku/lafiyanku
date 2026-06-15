@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -13,6 +13,22 @@ const NAV_LINKS = [
 
 export function MarketingNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => {
+    setMobileOpen(false);
+    triggerRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") closeMenu();
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [mobileOpen, closeMenu]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md">
@@ -50,6 +66,7 @@ export function MarketingNav() {
 
         <button
           type="button"
+          ref={triggerRef}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
@@ -61,13 +78,13 @@ export function MarketingNav() {
       </div>
 
       {mobileOpen && (
-        <div id="mobile-nav" className="md:hidden absolute top-full left-0 right-0 border-t border-slate-100 bg-white shadow-lg z-50">
+        <div id="mobile-nav" ref={menuRef} className="md:hidden absolute top-full left-0 right-0 border-t border-slate-100 bg-white shadow-lg z-50">
           <nav aria-label="Mobile navigation" className="flex flex-col px-4 py-3 space-y-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={closeMenu}
                 className="flex items-center py-3 px-3 text-base font-medium text-slate-700 rounded-lg hover:bg-slate-50 hover:text-clinical-teal transition-colors"
               >
                 {link.label}
@@ -76,12 +93,12 @@ export function MarketingNav() {
           </nav>
 
           <div className="flex flex-col gap-3 px-4 pb-5 pt-2 border-t border-slate-100">
-            <Link href="/login" onClick={() => setMobileOpen(false)}>
+            <Link href="/login" onClick={closeMenu}>
               <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:text-clinical-teal hover:border-clinical-teal">
                 Sign In
               </Button>
             </Link>
-            <Link href="/register-facility" onClick={() => setMobileOpen(false)}>
+            <Link href="/register-facility" onClick={closeMenu}>
               <Button className="w-full bg-clinical-teal hover:bg-clinical-teal/90 text-white font-semibold">
                 Start Free Pilot
               </Button>

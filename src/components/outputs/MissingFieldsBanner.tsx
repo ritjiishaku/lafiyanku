@@ -9,7 +9,7 @@ export function MissingFieldsBanner({ fields }: MissingFieldsBannerProps) {
   if (fields.length === 0) return null;
 
   return (
-    <Alert variant="default" className="border-warm-amber bg-warm-amber/5">
+    <Alert variant="default" className="border-warm-amber bg-warm-amber/5" role="alert" aria-live="polite">
       <AlertTriangle className="h-4 w-4 text-warm-amber" />
       <AlertTitle className="text-warm-amber">Missing Information</AlertTitle>
       <AlertDescription>

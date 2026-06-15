@@ -15,8 +15,8 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cool-off-white p-6 text-center space-y-6">
-      <div className="rounded-full bg-red-100 p-6 text-red-600">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cool-off-white p-6 text-center space-y-6" role="alert" aria-live="assertive">
+      <div className="rounded-full bg-red-100 p-6 text-red-600" role="img" aria-label="Error">
         ⚠
       </div>
       <h1 className="text-3xl font-extrabold text-deep-navy">Something went wrong</h1>

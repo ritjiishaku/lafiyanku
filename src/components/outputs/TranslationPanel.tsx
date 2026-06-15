@@ -79,12 +79,12 @@ function renderDocumentContent(text: string) {
                   </div>
                 )}
                 {(med.timing || med.duration) && (
-                  <div style={{ color: "#64748B", fontSize: 12, marginBottom: 2 }}>
+                  <div style={{ color: "#4B5E73", fontSize: 12, marginBottom: 2 }}>
                     {[med.timing, med.duration].filter(Boolean).join(" · ")}
                   </div>
                 )}
                 {med.notes && (
-                  <div style={{ color: "#64748B", fontStyle: "italic", fontSize: 12 }}>
+                  <div style={{ color: "#4B5E73", fontStyle: "italic", fontSize: 12 }}>
                     {med.notes}
                   </div>
                 )}

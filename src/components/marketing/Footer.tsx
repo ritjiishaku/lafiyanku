@@ -62,7 +62,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Lafiyanku. Built in Nigeria for Nigerian hospitals.
           </p>
           <div className="flex items-center gap-4">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-clinical-teal transition-colors" aria-label="Twitter">
+            <a href="https://x.com/lafiyanku" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-clinical-teal transition-colors" aria-label="X (Twitter)">
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
             <a href="https://www.linkedin.com/company/lafiyanku" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-clinical-teal transition-colors" aria-label="LinkedIn">

@@ -23,10 +23,10 @@ const STEPS = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="bg-pure-white py-20 lg:py-24">
+    <section id="how-it-works" aria-labelledby="hiw-heading" className="bg-pure-white py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-deep-navy">
+          <h2 id="hiw-heading" className="text-3xl sm:text-4xl font-extrabold tracking-tight text-deep-navy">
             How It Works
           </h2>
           <p className="mt-3 text-lg text-cool-grey">Three steps. Under 30 seconds.</p>

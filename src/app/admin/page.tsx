@@ -217,7 +217,7 @@ export default function AdminPage() {
         resetAdminDialog();
         await refresh();
       } else {
-        toast.error(json.error ?? "Failed to update clinician");
+        toast.error(json.error?.message ?? json.error ?? "Failed to update clinician");
       }
     } catch {
       toast.error("Network error. Please try again.");
@@ -233,20 +233,20 @@ export default function AdminPage() {
 
   async function executeDelete() {
     if (!deleteTarget) return;
+    const targetId = deleteTarget.user_id;
+    setDeleteConfirmOpen(false);
+    setDeleteTarget(null);
     try {
-      const res = await fetch(`/api/admin/clinicians/${deleteTarget.user_id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/clinicians/${targetId}`, { method: "DELETE" });
       const json = await res.json();
       if (json.success) {
         toast.success("Clinician removed");
         await refresh();
       } else {
-        toast.error(json.error ?? "Failed to remove clinician");
+        toast.error(json.error?.message ?? json.error ?? "Failed to remove clinician");
       }
     } catch {
       toast.error("Network error. Please try again.");
-    } finally {
-      setDeleteConfirmOpen(false);
-      setDeleteTarget(null);
     }
   }
 

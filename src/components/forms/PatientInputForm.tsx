@@ -192,7 +192,7 @@ export function PatientInputForm({
     <>
       <OfflineBanner />
       {restoredFromDraft && !dismissRestore && (
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-clinical-teal/20 bg-clinical-teal/5 px-4 py-3">
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-clinical-teal/20 bg-clinical-teal/5 px-4 py-3" role="status" aria-live="polite">
           <div className="flex items-center gap-2 text-sm text-clinical-teal">
             <RefreshCw className="h-4 w-4" />
             <span>
@@ -215,7 +215,7 @@ export function PatientInputForm({
         </div>
       )}
       {!restoredFromDraft && draft?.data && !dismissRestore && (
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-500/20 bg-amber-50 px-4 py-3">
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-500/20 bg-amber-50 px-4 py-3" role="status" aria-live="polite">
           <div className="flex items-center gap-2 text-sm text-amber-700">
             <AlertCircle className="h-4 w-4" />
             <span>
@@ -249,7 +249,7 @@ export function PatientInputForm({
         </div>
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl">
           {lastSavedAt && (
             <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-xs text-green-700">
               <AlertCircle className="h-3 w-3" />
@@ -266,7 +266,7 @@ export function PatientInputForm({
                   Facility Name <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input className="h-11" {...field} placeholder="e.g. Lagos University Teaching Hospital" />
+                  <Input className="h-11" {...field} placeholder="e.g. Lagos University Teaching Hospital" aria-required="true" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -316,7 +316,7 @@ export function PatientInputForm({
                     Admission Date <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" type="date" {...field} />
+                    <Input className="h-11" type="date" {...field} aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -331,7 +331,7 @@ export function PatientInputForm({
                     Discharge Date <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" type="date" {...field} />
+                    <Input className="h-11" type="date" {...field} aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -349,7 +349,7 @@ export function PatientInputForm({
                     Patient Name <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" {...field} placeholder="Full name" />
+                    <Input className="h-11" {...field} placeholder="Full name" aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -364,7 +364,7 @@ export function PatientInputForm({
                     Age <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" type="number" min={0} max={130} inputMode="numeric" {...field} value={field.value ?? ""} />
+                    <Input className="h-11" type="number" min={0} max={130} inputMode="numeric" {...field} value={field.value ?? ""} aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -380,7 +380,7 @@ export function PatientInputForm({
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="h-11">
+                      <SelectTrigger className="h-11" aria-required="true">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                     </FormControl>
@@ -406,7 +406,7 @@ export function PatientInputForm({
                     Hospital Number <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" {...field} placeholder="e.g. LUTH/2024/00412" />
+                    <Input className="h-11" {...field} placeholder="e.g. LUTH/2024/00412" aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -442,6 +442,7 @@ export function PatientInputForm({
                     {...field}
                     placeholder="Primary diagnosis and secondary conditions"
                     rows={3}
+                    aria-required="true"
                   />
                 </FormControl>
                 <FormMessage />
@@ -462,6 +463,7 @@ export function PatientInputForm({
                     {...field}
                     placeholder="Summary of treatment during admission"
                     rows={3}
+                    aria-required="true"
                   />
                 </FormControl>
                 <FormMessage />
@@ -541,7 +543,7 @@ export function PatientInputForm({
                     Discharged By <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input className="h-11" {...field} placeholder="Clinician full name" />
+                    <Input className="h-11" {...field} placeholder="Clinician full name" aria-required="true" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -625,7 +627,7 @@ export function PatientInputForm({
             </Button>
           </div>
           {(serverSavedAt || serverSaveFailed) && (
-            <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs ${serverSaveFailed ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
+            <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs ${serverSaveFailed ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`} role="status" aria-live="polite">
               {serverSaveFailed ? (
                 <><CloudOff className="h-3 w-3" /> Could not save to server. Draft saved locally.</>
               ) : (

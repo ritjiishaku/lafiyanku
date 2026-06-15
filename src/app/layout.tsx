@@ -55,6 +55,12 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col font-sans" suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="fixed left-0 top-0 z-[100] -translate-y-full bg-deep-navy px-4 py-2 text-sm font-medium text-white transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-clinical-teal focus:ring-offset-2"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

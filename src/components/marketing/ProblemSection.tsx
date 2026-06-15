@@ -38,10 +38,10 @@ const SOLUTIONS = [
 
 export function ProblemSection() {
   return (
-    <section id="problem" className="bg-cool-off-white py-20 lg:py-24">
+    <section id="problem" aria-labelledby="problem-heading" className="bg-cool-off-white py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-deep-navy">
+          <h2 id="problem-heading" className="text-3xl sm:text-4xl font-extrabold tracking-tight text-deep-navy">
             Why Lafiyanku Exists
           </h2>
         </div>

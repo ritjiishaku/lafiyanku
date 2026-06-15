@@ -22,7 +22,7 @@ const statusConfig: Record<string, { label: string; icon: string; bg: string; te
     label: "Archived",
     icon: "\uD83D\uDCC1",
     bg: "#F0F4F8",
-    text: "#64748B",
+    text: "#4B5E73",
     border: "#CBD5E1",
   },
 };

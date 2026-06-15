@@ -130,7 +130,7 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
           {heading !== undefined ? (
             heading
           ) : (
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748B" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#4B5E73" }}>
               {name}
             </div>
           )}
@@ -191,18 +191,11 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
         {sections["Facility"] && (
           renderSection("Facility",
             <div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "auto 1fr",
-                  gap: "4px 24px",
-                  alignItems: "baseline",
-                }}
-              >
+              <div className="space-y-1 sm:grid sm:grid-cols-[auto_1fr] sm:gap-x-6 sm:gap-y-1">
                 {Object.entries(facilityKv).map(([k, v]) => (
-                  <div key={k} style={{ display: "contents" }}>
-                    <span style={{ fontSize: 13, color: "#64748B", whiteSpace: "nowrap" }}>{k}</span>
-                    <span style={{ fontSize: 14, color: "#1E293B" }}>{v}</span>
+                  <div key={k} className="contents">
+                    <span className="text-[13px] text-cool-grey">{k}</span>
+                    <span className="text-sm text-foreground">{v}</span>
                   </div>
                 ))}
               </div>
@@ -213,18 +206,11 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
         {sections["Patient information"] && (
           renderSection("Patient information",
             <div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "auto 1fr",
-                  gap: "4px 24px",
-                  alignItems: "baseline",
-                }}
-              >
+              <div className="space-y-1 sm:grid sm:grid-cols-[auto_1fr] sm:gap-x-6 sm:gap-y-1">
                 {Object.entries(patientKv).map(([k, v]) => (
-                  <div key={k} style={{ display: "contents" }}>
-                    <span style={{ fontSize: 13, color: "#64748B", whiteSpace: "nowrap" }}>{k}</span>
-                    <span style={{ fontSize: 14, color: "#1E293B" }}>{v}</span>
+                  <div key={k} className="contents">
+                    <span className="text-[13px] text-cool-grey">{k}</span>
+                    <span className="text-sm text-foreground">{v}</span>
                   </div>
                 ))}
               </div>
@@ -268,43 +254,50 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
 
         {medications.length > 0 && (
           renderSection("Medications",
-            <div
-              style={{
-                border: "1px solid #E2E8F0",
-                borderRadius: 8,
-                overflow: "hidden",
-              }}
-            >
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                <thead>
-                  <tr style={{ background: "#0D2B4E", color: "#FFFFFF" }}>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Medication</th>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Dosage</th>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Frequency</th>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Timing</th>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Duration</th>
-                    <th style={{ padding: "8px 12px", textAlign: "left", fontSize: 12, fontWeight: 600 }}>Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {medications.map((med, idx) => (
-                    <tr
-                      key={idx}
-                      style={{
-                        background: idx % 2 === 0 ? "#FFFFFF" : "#F7FAFD",
-                        borderBottom: "1px solid #E2E8F0",
-                      }}
-                    >
-                      <td style={{ padding: "8px 12px", fontWeight: 600, color: "#1E293B" }}>{med.Medication}</td>
-                      <td style={{ padding: "8px 12px", color: "#64748B" }}>{med.Dosage}</td>
-                      <td style={{ padding: "8px 12px", color: "#64748B" }}>{med.Frequency}</td>
-                      <td style={{ padding: "8px 12px", color: "#64748B" }}>{med.Timing}</td>
-                      <td style={{ padding: "8px 12px", color: "#64748B" }}>{med.Duration}</td>
-                      <td style={{ padding: "8px 12px", color: "#64748B" }}>{med.Notes}</td>
+            <div>
+              {/* Mobile: stacked cards */}
+              <div className="sm:hidden space-y-3">
+                {medications.map((med, idx) => (
+                  <div key={idx} className="rounded-lg border border-slate-200 bg-cool-off-white p-3">
+                    <div className="text-sm font-semibold text-foreground mb-2">{med.Medication}</div>
+                    <div className="space-y-1 text-xs">
+                      {med.Dosage && <div><span className="font-medium text-cool-grey">Dosage:</span> <span className="text-foreground">{med.Dosage}</span></div>}
+                      {med.Frequency && <div><span className="font-medium text-cool-grey">Frequency:</span> <span className="text-foreground">{med.Frequency}</span></div>}
+                      {med.Timing && <div><span className="font-medium text-cool-grey">Timing:</span> <span className="text-foreground">{med.Timing}</span></div>}
+                      {med.Duration && <div><span className="font-medium text-cool-grey">Duration:</span> <span className="text-foreground">{med.Duration}</span></div>}
+                      {med.Notes && <div><span className="font-medium text-cool-grey">Notes:</span> <span className="text-foreground">{med.Notes}</span></div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: table */}
+              <div className="hidden sm:block rounded-lg border border-slate-200 overflow-hidden">
+                <table className="w-full text-[13px]">
+                  <thead>
+                    <tr className="bg-deep-navy text-white">
+                      <th className="text-left px-3 py-2 font-semibold">Medication</th>
+                      <th className="text-left px-3 py-2 font-semibold">Dosage</th>
+                      <th className="text-left px-3 py-2 font-semibold">Frequency</th>
+                      <th className="text-left px-3 py-2 font-semibold">Timing</th>
+                      <th className="text-left px-3 py-2 font-semibold">Duration</th>
+                      <th className="text-left px-3 py-2 font-semibold">Notes</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {medications.map((med, idx) => (
+                      <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-cool-off-white"}>
+                        <td className="px-3 py-2 font-semibold text-foreground">{med.Medication}</td>
+                        <td className="px-3 py-2 text-cool-grey">{med.Dosage}</td>
+                        <td className="px-3 py-2 text-cool-grey">{med.Frequency}</td>
+                        <td className="px-3 py-2 text-cool-grey">{med.Timing}</td>
+                        <td className="px-3 py-2 text-cool-grey">{med.Duration}</td>
+                        <td className="px-3 py-2 text-cool-grey">{med.Notes}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )
         )}
@@ -372,7 +365,7 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
                 const kv = parseKeyValue(sections["Discharged by"]);
                 if (kv["MDCN Licence No."]) {
                   return (
-                    <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "#4B5E73", marginTop: 2 }}>
                       MDCN: {kv["MDCN Licence No."]}
                     </div>
                   );
@@ -380,7 +373,7 @@ export function ClinicalSummaryPanel({ content, missingFieldsLog }: ClinicalSumm
                 const licenceMatch = sections["Discharged by"].match(/MDCN[:\s]+(.+)/i);
                 if (licenceMatch) {
                   return (
-                    <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "#4B5E73", marginTop: 2 }}>
                       MDCN: {licenceMatch[1].trim()}
                     </div>
                   );

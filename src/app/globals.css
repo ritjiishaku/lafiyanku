@@ -15,7 +15,7 @@
   --color-deep-navy: #0D2B4E;
   --color-warm-amber: #B45309;
   --color-slate: #1E293B;
-  --color-cool-grey: #64748B;
+  --color-cool-grey: #4B5E73;
   --color-pure-white: #FFFFFF;
   --color-cool-off-white: #F0F4F8;
 
@@ -69,7 +69,7 @@
   --secondary: #0D2B4E;
   --secondary-foreground: #FFFFFF;
   --muted: #F0F4F8;
-  --muted-foreground: #64748B;
+  --muted-foreground: #4B5E73;
   --accent: #0D2B4E;
   --accent-foreground: #FFFFFF;
   --destructive: #DC2626;
@@ -79,7 +79,7 @@
   --chart-1: #0B6E6E;
   --chart-2: #0D2B4E;
   --chart-3: #B45309;
-  --chart-4: #64748B;
+  --chart-4: #4B5E73;
   --chart-5: #1E293B;
   --radius: 0.625rem;
   --sidebar: #FFFFFF;
@@ -122,6 +122,15 @@
 .touch-target-min {
   min-height: 44px;
   min-width: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @keyframes glow-pulse {

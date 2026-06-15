@@ -5,8 +5,11 @@ import { UserRole, AuditAction } from "@/types/schemas";
 import { writeAuditLog } from "@/services/audit-log";
 import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/services/rate-limit";
 
 const VALID_LANGUAGES = ["en", "ha", "yo", "ig"];
+
+const GENERATE_RATE_LIMIT = { maxAttempts: 10, windowMs: 60 * 60 * 1000 }; // 10 per hour
 
 const REQUIRED = [
   "facilityName", "admissionDate", "dischargeDate",
@@ -52,6 +55,16 @@ export async function POST(request: NextRequest) {
 
     if (userRole !== UserRole.Doctor && userRole !== UserRole.Nurse) {
       return NextResponse.json(apiError(ErrorCodes.ROLE_NOT_PERMITTED), { status: 403 });
+    }
+
+    const rateLimit = await checkRateLimit(
+      userId,
+      "generate",
+      GENERATE_RATE_LIMIT.maxAttempts,
+      GENERATE_RATE_LIMIT.windowMs,
+    );
+    if (rateLimit.limited) {
+      return NextResponse.json(apiError(ErrorCodes.RATE_LIMITED), { status: 429 });
     }
 
     const body = await request.json();

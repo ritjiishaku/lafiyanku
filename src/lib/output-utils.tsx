@@ -172,7 +172,7 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
         border: "none",
         cursor: "pointer",
         fontSize: 12,
-        color: "#64748B",
+        color: "#4B5E73",
         padding: "4px 8px",
         borderRadius: 4,
         minWidth: 44,

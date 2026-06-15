@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   metaRow: {
     fontSize: 10,
-    color: "#64748B",
+    color: "#4B5E73",
     flexDirection: "row",
     gap: 4,
   },
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   fallbackNote: {
     fontStyle: "italic",
-    color: "#64748B",
+    color: "#4B5E73",
     fontSize: 10,
   },
   footer: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
     fontSize: 9,
-    color: "#64748B",
+    color: "#4B5E73",
   },
 });
 

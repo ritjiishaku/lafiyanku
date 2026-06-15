@@ -25,7 +25,7 @@ export function OfflineBanner() {
   if (!isOffline) return null;
 
   return (
-    <Alert variant="destructive" className="rounded-none border-x-0">
+    <Alert variant="destructive" className="rounded-none border-x-0" role="alert" aria-live="assertive">
       <WifiOff className="h-4 w-4" />
       <AlertTitle>You are offline</AlertTitle>
       <AlertDescription>

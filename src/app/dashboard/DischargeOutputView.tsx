@@ -194,9 +194,9 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
     }
   }
 
-  if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><LoadingSpinner /></div>;
+  if (loading) return <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-live="polite"><LoadingSpinner /></div>;
   if (error || !record) return (
-    <div className="flex min-h-[60vh] items-center justify-center">
+    <div className="flex min-h-[60vh] items-center justify-center" role="alert" aria-live="assertive">
       <p className="text-cool-grey">{error ?? "Record not found"}</p>
     </div>
   );
@@ -357,7 +357,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
                   Words: {editClinical.split(/\s+/).filter(Boolean).length} · Characters: {editClinical.length}
                 </span>
               </div>
-              <textarea aria-label="Edit clinical summary" className="min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
+              <textarea aria-label="Edit clinical summary" className="min-h-[300px] sm:min-h-[500px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editClinical} onChange={(e) => setEditClinical(e.target.value)} />
             </div>
           ) : (
             <ClinicalSummaryPanel content={record.clinicalSummary} missingFieldsLog={record.missingFieldsLog} />
@@ -374,7 +374,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
                   Words: {editPatient.split(/\s+/).filter(Boolean).length} · Characters: {editPatient.length}
                 </span>
               </div>
-              <textarea aria-label="Edit patient instructions" className="min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
+              <textarea aria-label="Edit patient instructions" className="min-h-[250px] sm:min-h-[400px] w-full rounded-lg border border-input bg-transparent p-4 font-mono text-sm" value={editPatient} onChange={(e) => setEditPatient(e.target.value)} />
             </div>
           ) : (
             <PatientInstructionsPanel content={record.patientFriendlyOutput} />

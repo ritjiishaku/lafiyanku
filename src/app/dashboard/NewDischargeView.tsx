@@ -59,7 +59,7 @@ export function NewDischargeView({ onNavigate }: NewDischargeViewProps) {
       </div>
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert" aria-live="assertive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

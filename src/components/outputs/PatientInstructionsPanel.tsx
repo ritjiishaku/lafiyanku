@@ -243,12 +243,12 @@ export function PatientInstructionsPanel({
                       </div>
                     )}
                     {(med.timing || med.duration) && (
-                      <div style={{ color: "#64748B", fontSize: 12, marginBottom: 2 }}>
+                      <div style={{ color: "#4B5E73", fontSize: 12, marginBottom: 2 }}>
                         {[med.timing, med.duration].filter(Boolean).join(" · ")}
                       </div>
                     )}
                     {med.notes && (
-                      <div style={{ color: "#64748B", fontStyle: "italic", fontSize: 12 }}>
+                      <div style={{ color: "#4B5E73", fontStyle: "italic", fontSize: 12 }}>
                         {med.notes}
                       </div>
                     )}
@@ -373,7 +373,7 @@ export function PatientInstructionsPanel({
               height: 44,
               minHeight: 44,
               background: "#25D366",
-              color: "#FFFFFF",
+              color: "#0D3B1F",
               fontWeight: 600,
               fontSize: 14,
               border: "none",

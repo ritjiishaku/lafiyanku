@@ -4,6 +4,10 @@ import { apiError, ErrorCodes } from "@/lib/error-codes";
 import { auth } from "@/lib/auth";
 import { UserRole } from "@/types/schemas";
 
+function escapeIlike(input: string): string {
+  return input.replace(/%/g, "\\%").replace(/_/g, "\\_");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
@@ -46,7 +50,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.ilike("patient_input.patient_name", `%${search}%`);
+      query = query.ilike("patient_input.patient_name", `%${escapeIlike(search)}%`);
     }
 
     const { data, error, count } = await query
