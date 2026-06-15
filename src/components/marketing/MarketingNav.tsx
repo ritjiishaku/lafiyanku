@@ -85,7 +85,7 @@ export function MarketingNav() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="flex items-center py-3 px-3 text-base font-medium text-slate-700 rounded-lg hover:bg-slate-50 hover:text-clinical-teal transition-colors"
+                className="flex items-center py-3 px-3 text-base font-medium text-slate-700 rounded-lg hover:bg-slate-50 hover:text-clinical-teal transition-colors touch-target-min"
               >
                 {link.label}
               </Link>
