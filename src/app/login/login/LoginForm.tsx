@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,8 @@ type FieldErrors = Partial<Record<"email" | "password", string>>;
 
 export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
   const [showPassword, setShowPassword] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,6 +28,18 @@ export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (status === "loading" || !session?.user) return;
+    const user = session.user as { role?: string; mustChangePassword?: boolean };
+    if (user.mustChangePassword) {
+      router.push(user.role === "admin" ? "/onboarding/admin" : "/onboarding/clinician");
+    } else if (user.role === "admin" && !localStorage.getItem("lafiyanku-admin-onboarded")) {
+      router.push("/onboarding/admin");
+    } else {
+      router.push(user.role === "admin" ? "/admin" : "/dashboard");
+    }
+  }, [session, status, router]);
 
   function validateField(name: string, value: string): string | undefined {
     const result = loginSchema.shape[name as keyof typeof loginSchema.shape].safeParse(value);
@@ -69,8 +84,6 @@ export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
       } else {
         setServerError("Invalid email or password.");
       }
-    } else {
-      window.location.href = result.url || "/dashboard";
     }
   }
 

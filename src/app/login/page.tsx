@@ -17,16 +17,14 @@ export default function AuthPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (session?.user) {
-      const user = session.user as { role?: string; mustChangePassword?: boolean };
-      if (user.mustChangePassword) {
-        router.push(user.role === "admin" ? "/onboarding/admin" : "/onboarding/clinician");
-      } else if (user.role === "admin" && !localStorage.getItem("lafiyanku-admin-onboarded")) {
-        router.push("/onboarding/admin");
-      } else {
-        router.push(user.role === "admin" ? "/admin" : "/dashboard");
-      }
+    if (status === "loading" || !session?.user) return;
+    const user = session.user as { role?: string; mustChangePassword?: boolean };
+    if (user.mustChangePassword) {
+      router.push(user.role === "admin" ? "/onboarding/admin" : "/onboarding/clinician");
+    } else if (user.role === "admin" && !localStorage.getItem("lafiyanku-admin-onboarded")) {
+      router.push("/onboarding/admin");
+    } else {
+      router.push(user.role === "admin" ? "/admin" : "/dashboard");
     }
   }, [session, status, router]);
 
