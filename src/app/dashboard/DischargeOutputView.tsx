@@ -261,9 +261,7 @@ export function DischargeOutputView({ id }: DischargeOutputViewProps) {
       </div>
 
       {record.flaggedIssues && record.flaggedIssues.length > 0 && (
-        <div className="sticky top-0 z-10">
           <FlaggedIssuesBanner issues={record.flaggedIssues} />
-        </div>
       )}
 
       <div className="flex rounded-lg border border-slate/20 bg-cool-off-white p-1" role="tablist" aria-label="Output view mode">

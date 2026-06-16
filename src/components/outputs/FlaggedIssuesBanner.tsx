@@ -9,7 +9,7 @@ export function FlaggedIssuesBanner({ issues }: FlaggedIssuesBannerProps) {
   if (issues.length === 0) return null;
 
   return (
-    <Alert variant="default" className="border-warm-amber bg-warm-amber/5" role="alert" aria-live="polite">
+    <Alert variant="default" className="border-warm-amber bg-warm-amber/10" role="alert" aria-live="polite">
       <AlertTriangle className="h-4 w-4 text-warm-amber" />
       <AlertTitle className="text-warm-amber">Issues Detected</AlertTitle>
       <AlertDescription>
