@@ -69,6 +69,8 @@ export function LoginForm({ onSwitchToForgotPassword }: LoginFormProps = {}) {
       } else {
         setServerError("Invalid email or password.");
       }
+    } else {
+      window.location.href = result.url || "/dashboard";
     }
   }
 

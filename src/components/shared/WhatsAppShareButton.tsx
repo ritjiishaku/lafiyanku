@@ -9,7 +9,7 @@ interface WhatsAppShareButtonProps {
   onShare?: () => void;
 }
 
-function formatForWhatsApp(source: string): string {
+export function formatForWhatsApp(source: string): string {
   const stripped = source.replace(/─{2,}/g, "").trim();
   const lines = stripped.split("\n").filter((l) => l.trim());
   const formatted: string[] = [];

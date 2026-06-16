@@ -2,6 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { parseSections, parseMedicationLines, renderWithDividers, SectionBadge } from "@/lib/output-utils";
+import { formatForWhatsApp } from "@/components/shared/WhatsAppShareButton";
 
 const PATIENT_HEADERS = [
   "What happened",
@@ -12,57 +13,8 @@ const PATIENT_HEADERS = [
   "Your follow-up appointment",
 ];
 
-function formatWhatsAppText(patientFriendlyOutput: string): string {
-  const stripped = patientFriendlyOutput.replace(/─{2,}/g, "").trim();
-  const lines = stripped.split("\n").filter((l) => l.trim());
-  const formatted: string[] = [];
-  let inTable = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
-      if (!inTable) inTable = true;
-      continue;
-    }
-    if (inTable && !trimmed.startsWith("|")) inTable = false;
-    if (inTable) continue;
-    formatted.push(trimmed);
-  }
-
-  let text = formatted.join("\n");
-  const maxLen = 1500;
-
-  if (text.length > maxLen) {
-    const breakpoints = [
-      "When to return to the hospital",
-      "Your follow-up appointment",
-      "Important home care instructions",
-      "Your medications",
-    ];
-    for (const bp of breakpoints) {
-      const idx = text.indexOf(bp);
-      if (idx !== -1 && idx + bp.length + 200 < maxLen) {
-        text = text.slice(0, maxLen - 30) + "\n\n... continued in full print version.";
-        break;
-      }
-    }
-    if (text.length > maxLen) {
-      text = text.slice(0, maxLen - 30) + "\n\n... continued in full print version.";
-    }
-  }
-
-  return text;
-}
-
 interface PatientInstructionsPanelProps {
   content: string;
-  patientName?: string;
-  facilityName?: string;
-  dischargeDate?: string;
-  clinicianName?: string;
-  translatedOutput?: string | null;
-  translationLanguage?: string | null;
-  translationConfidence?: string | null;
   patientFriendlyOutput?: string;
   isFinalised?: boolean;
 }
@@ -356,7 +308,7 @@ export function PatientInstructionsPanel({
           <button
             type="button"
             onClick={() => {
-              const msg = formatWhatsAppText(effectiveContent);
+              const msg = formatForWhatsApp(effectiveContent);
               const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
               if (isMobile) {
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");

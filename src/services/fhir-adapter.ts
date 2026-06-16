@@ -1,4 +1,4 @@
-import { PatientInput, DischargeRecord, Gender, Medication } from "@/types/schemas";
+import { PatientInput, Gender, Medication } from "@/types/schemas";
 
 // Basic FHIR R4 interfaces for typing
 export interface FHIRPatient {
@@ -191,37 +191,6 @@ export function mapFHIRToPatientInput(
   }
 
   return patientInput;
-}
-
-export function mapDischargeRecordToFHIR(
-  record: DischargeRecord,
-  input: PatientInput
-): FHIRDocumentReference {
-  // TODO: Implement complete FHIR DocumentReference constructor for v1.1
-  return {
-    resourceType: "DocumentReference",
-    status: "current",
-    type: {
-      coding: [
-        {
-          system: "http://loinc.org",
-          code: "11524-6",
-          display: "Hospital Discharge summary",
-        },
-      ],
-    },
-    subject: {
-      reference: `Patient/${input.hospitalNumber}`,
-    },
-    content: [
-      {
-        attachment: {
-          contentType: "text/plain",
-          data: Buffer.from(record.patientFriendlyOutput).toString("base64"),
-        },
-      },
-    ],
-  };
 }
 
 // FHIR Procedure interface

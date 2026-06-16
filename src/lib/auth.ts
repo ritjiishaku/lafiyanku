@@ -55,16 +55,19 @@ async function isRateLimited(email: string): Promise<boolean> {
     return true;
   }
 
+  return false;
+}
+
+async function recordFailedLogin(email: string): Promise<void> {
+  const supabase = getSupabaseClient();
   await supabase.from("rate_limits").insert({
     identifier: email,
     action_type: "login",
     created_at: new Date().toISOString(),
   });
-
-  return false;
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth } = NextAuth({
   providers: [
     Credentials({
       name: "credentials",
@@ -92,6 +95,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (error || !data.user) {
+          await recordFailedLogin(email);
           return null;
         }
 
@@ -103,6 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (profileError || !profile) {
           console.error("User profile not found for user:", data.user.id, profileError ?? "");
+          await recordFailedLogin(email);
           return null;
         }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { SEPARATOR_RE } from "@/lib/output-utils";
+import { SEPARATOR_RE, parseMedicationLines } from "@/lib/output-utils";
 
 interface TranslationPanelProps {
   content: string | null;
@@ -54,7 +54,7 @@ function renderDocumentContent(text: string) {
         </div>,
       );
     } else {
-      const meds = parseTranslationMedications(raw);
+      const meds = parseMedicationLines(raw);
       if (meds.length > 0) {
         nodes.push(
           <div key={`m-${i}`} style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
@@ -103,65 +103,6 @@ function renderDocumentContent(text: string) {
   }
 
   return nodes.length > 0 ? nodes : <div style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6 }}>{text}</div>;
-}
-
-function parseTranslationMedications(text: string): Array<{ name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string }> {
-  const lines = text.split("\n").filter((l) => {
-    const t = l.trim();
-    return t && !isSeparatorLine(t);
-  });
-  const meds: Array<{ name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string }> = [];
-  let current: { name: string; dosage: string; frequency: string; timing: string; duration: string; notes: string } | null = null;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const dashMatch = trimmed.match(/^[-•*]\s*(.+)/);
-    const content = dashMatch ? dashMatch[1].trim() : trimmed;
-
-    const colonIdx = content.indexOf(":");
-    if (colonIdx > 0) {
-      const key = content.slice(0, colonIdx).trim().toLowerCase();
-      const val = content.slice(colonIdx + 1).trim();
-
-      if (key.includes("medication") || key.includes("name") || key === "take" || key === "use") {
-        if (current) meds.push(current);
-        current = { name: val, dosage: "", frequency: "", timing: "", duration: "", notes: "" };
-      } else if (current) {
-        if (key.includes("dose") || key.includes("dosa")) current.dosage = val;
-        else if (key.includes("freq") || key.includes("how often")) current.frequency = val;
-        else if (key.includes("tim") || key.includes("when")) current.timing = val;
-        else if (key.includes("dur") || key.includes("how long")) current.duration = val;
-        else if (key.includes("note")) current.notes = val;
-      }
-    } else {
-      if (current) {
-        if (!current.name) current.name = content;
-        else if (!current.dosage) current.dosage = content;
-        else if (!current.frequency) current.frequency = content;
-      }
-    }
-  }
-
-  if (current) meds.push(current);
-
-  if (meds.length === 0 && lines.length > 0) {
-    const firstLine = lines[0].trim();
-    if (firstLine) {
-      meds.push({ name: firstLine, dosage: "", frequency: "", timing: "", duration: "", notes: "" });
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line) {
-          const last = meds[meds.length - 1];
-          if (!last.dosage) last.dosage = line;
-          else if (!last.frequency) last.frequency = line;
-        }
-      }
-    }
-  }
-
-  return meds;
 }
 
 export function TranslationPanel({

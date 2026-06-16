@@ -2,14 +2,12 @@ import { z } from "zod";
 
 export const emailSchema = z.string().email("Please provide a valid email address.").max(255);
 
-export const uuidSchema = z.string().uuid("Invalid ID format.");
 
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters.")
   .max(128);
 
-export const roleSchema = z.enum(["doctor", "nurse", "admin"]);
 
 export const fullNameSchema = z.string().min(1, "Full name is required.").max(200);
 
