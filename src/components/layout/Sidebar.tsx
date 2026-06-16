@@ -78,6 +78,12 @@ export function Sidebar({ onClose }: SidebarProps) {
 
   const visibleLinks = links.filter((l) => l.roles.includes(role ?? ""));
 
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname, searchParams]);
+
   const roleInfo = role ? ROLE_LABELS[role] : null;
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
@@ -121,7 +127,8 @@ export function Sidebar({ onClose }: SidebarProps) {
           return (
             <button
               key={link.href}
-              onClick={() => { router.push(link.href); onClose?.(); }}
+              onClick={() => { setPendingHref(link.href); router.push(link.href); onClose?.(); }}
+              aria-current={isActive ? "page" : undefined}
               className={`w-full text-left group relative flex items-center gap-3 rounded-lg px-3 py-3 touch-target-min text-sm font-medium transition-all duration-150 ${
                 isActive
                   ? "bg-clinical-teal/15 text-white"
@@ -129,7 +136,11 @@ export function Sidebar({ onClose }: SidebarProps) {
               }`}
             >
               {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-clinical-teal" />}
-              <Icon className={`h-4 w-4 shrink-0 transition-colors duration-150 ${isActive ? "text-clinical-teal" : "text-white/40 group-hover:text-white/70"}`} />
+              {pendingHref === link.href && !isActive ? (
+                <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : (
+                <Icon className={`h-4 w-4 shrink-0 transition-colors duration-150 ${isActive ? "text-clinical-teal" : "text-white/40 group-hover:text-white/70"}`} />
+              )}
               {link.label}
             </button>
           );

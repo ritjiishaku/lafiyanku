@@ -137,3 +137,9 @@
   0%, 100% { box-shadow: 0 0 20px rgba(11,110,110,0.3); }
   50% { box-shadow: 0 0 40px rgba(11,110,110,0.5); }
 }
+
+@keyframes slide {
+  0% { width: 0; opacity: 1; }
+  80% { width: 90%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
