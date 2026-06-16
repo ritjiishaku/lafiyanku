@@ -109,10 +109,15 @@ export function validateContentFidelity(
 ): string[] {
   const issues: string[] = [];
 
-  // Check diagnosis appears in output
+  // Check diagnosis appears in output — split multi-line diagnoses and check each one
   const inputDiagnosis = (input.diagnosis as string)?.toLowerCase() ?? "";
-  if (inputDiagnosis && inputDiagnosis.length > 5 && !clinicalSummary.toLowerCase().includes(inputDiagnosis.slice(0, 30))) {
-    issues.push("The diagnosis from the input may not be reflected in the clinical summary. Please verify.");
+  if (inputDiagnosis && inputDiagnosis.length > 5) {
+    const conditions = inputDiagnosis.split(/[\n,;]+/).map((s) => s.trim()).filter((s) => s.length > 3);
+    const summaryLower = clinicalSummary.toLowerCase();
+    const missing = conditions.filter((c) => !summaryLower.includes(c));
+    if (missing.length > 0 && missing.length === conditions.length) {
+      issues.push("The diagnosis from the input may not be reflected in the clinical summary. Please verify.");
+    }
   }
 
   // Check medications are present in output
