@@ -181,14 +181,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (rpcError) {
-      console.error("[generate] RPC create_discharge_record failed:", {
-        message: rpcError.message,
-        code: rpcError.code,
-        details: rpcError.details,
-        hint: rpcError.hint,
-      });
+      const errDetail = typeof rpcError.message === "object"
+        ? JSON.stringify(rpcError.message)
+        : rpcError.message ?? String(rpcError);
+      console.error("[generate] RPC create_discharge_record failed:", JSON.stringify(rpcError));
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { details: rpcError.message, code: rpcError.code, hint: rpcError.hint }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { details: errDetail, code: rpcError.code, hint: rpcError.hint }),
         { status: 500 },
       );
     }
