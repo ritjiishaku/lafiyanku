@@ -181,10 +181,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (rpcError) {
-      const errStr = (() => { try { return JSON.stringify(rpcError); } catch { return String(rpcError); } })();
-      console.error("[generate] RPC create_discharge_record failed:", errStr);
+      console.error("[generate] RPC create_discharge_record failed:", rpcError.message);
       return NextResponse.json(
-        apiError(ErrorCodes.SUPABASE_ERROR, { details: errStr }),
+        apiError(ErrorCodes.SUPABASE_ERROR, { details: rpcError.message }),
         { status: 500 },
       );
     }
@@ -216,7 +215,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "INTERNAL_SERVER_ERROR";
-    console.error("[generate] Unexpected error:", { message, stack: err instanceof Error ? err.stack : undefined });
+    console.error("[generate] Unexpected error:", message);
 
     if (message === "GENERATION_TIMEOUT") {
       return NextResponse.json(apiError(ErrorCodes.GENERATION_TIMEOUT), { status: 500 });

@@ -40,10 +40,7 @@ export function NewDischargeView({ onNavigate }: NewDischargeViewProps) {
       });
       const json = await res.json();
       if (!res.ok) {
-        const msg = json.error?.details
-          ? `${json.error.message} (${json.error.details})`
-          : json.error?.message ?? "Generation failed. Please try again.";
-        setError(msg);
+        setError(json.error?.message ?? "Generation failed. Please try again.");
         setIsGenerating(false);
         return;
       }
