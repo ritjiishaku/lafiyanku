@@ -26,8 +26,9 @@ import { LanguageSelector } from "./LanguageSelector";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOfflineDraft } from "@/hooks/useOfflineDraft";
 import { useEffect, useCallback, useState, useRef } from "react";
-import { Save, AlertCircle, RefreshCw, X, Cloud, CloudOff } from "lucide-react";
+import { Save, AlertCircle, RefreshCw, X, Cloud, CloudOff, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 const medicationSchema = z.object({
   name: z.string().min(1, "Medication name is required"),
@@ -120,7 +121,7 @@ export function PatientInputForm({
   const [serverSavedAt, setServerSavedAt] = useState<string | null>(null);
   const [serverSaveFailed, setServerSaveFailed] = useState(false);
 
-  const { draft, isOffline, lastSavedAt, autoSave, saveDraft } =
+  const { draft, isOffline, lastSavedAt, autoSave, saveDraft, clearDraft } =
     useOfflineDraft(DRAFT_KEY);
 
   useEffect(() => {
@@ -139,6 +140,14 @@ export function PatientInputForm({
     setDismissRestore(true);
     setRestoredFromDraft(false);
   }
+
+  const handleDiscardDraft = useCallback(async () => {
+    clearDraft();
+    setDismissRestore(true);
+    setRestoredFromDraft(false);
+    try { await fetch("/api/discharge/draft", { method: "DELETE" }); } catch {}
+    toast.success("Draft discarded");
+  }, [clearDraft]);
 
   useEffect(() => {
     if (draft?.data || form.formState.isSubmitSuccessful) return;
@@ -178,11 +187,14 @@ export function PatientInputForm({
       const json = await res.json();
       if (json.success) {
         setServerSavedAt(json.savedAt);
+        toast.success("Draft saved");
       } else {
         setServerSaveFailed(true);
+        toast.error("Could not save to server. Draft saved locally.");
       }
     } catch {
       setServerSaveFailed(true);
+      toast.error("Could not save to server. Draft saved locally.");
     } finally {
       setServerSaving(false);
     }
@@ -220,11 +232,15 @@ export function PatientInputForm({
             <AlertCircle className="h-4 w-4" />
             <span>
               Unsaved draft from{" "}
-              {draft?.savedAt
-                ? new Date(draft.savedAt).toLocaleString("en-NG", {
+              {serverSavedAt
+                ? new Date(serverSavedAt).toLocaleString("en-NG", {
                     timeZone: "Africa/Lagos",
                   })
-                : "previous session"}
+                : draft?.savedAt
+                  ? new Date(draft.savedAt).toLocaleString("en-NG", {
+                      timeZone: "Africa/Lagos",
+                    })
+                  : "previous session"}
             </span>
           </div>
           <div className="flex gap-2">
@@ -237,6 +253,13 @@ export function PatientInputForm({
               className="touch-target-min rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-amber-600"
             >
               Restore
+            </button>
+            <button
+              type="button"
+              onClick={handleDiscardDraft}
+              className="touch-target-min rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+            >
+              Discard
             </button>
             <button
               type="button"

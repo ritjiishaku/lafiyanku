@@ -45,6 +45,9 @@ export function NewDischargeView({ onNavigate }: NewDischargeViewProps) {
         return;
       }
       onNavigate({ name: "output", id: json.data.recordId });
+
+      fetch("/api/discharge/draft", { method: "DELETE" }).catch(() => {});
+      try { localStorage.removeItem("lafiyanku-discharge-draft"); } catch {}
     } catch {
       setError("Network error. Please check your connection and try again.");
       setIsGenerating(false);
