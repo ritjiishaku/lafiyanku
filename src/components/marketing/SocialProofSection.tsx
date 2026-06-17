@@ -57,27 +57,35 @@ export function SocialProofSection() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className="relative min-h-[220px] sm:min-h-[200px]">
+          <div className="relative min-h-[260px] sm:min-h-[240px]">
             {TESTIMONIALS.map(({ quote, name, role, facility }, i) => (
               <blockquote
                 key={name}
                 aria-hidden={i !== activeIndex}
-                className={`absolute inset-0 rounded-2xl bg-white p-6 sm:p-8 shadow-sm border border-slate-100 transition-opacity duration-500 ${
+                className={`absolute inset-0 rounded-2xl bg-white p-6 sm:p-10 shadow-sm border border-slate-100 border-l-4 border-l-clinical-teal hover:shadow-md transition-all duration-500 ${
                   i === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
               >
-                <Quote className="absolute top-4 right-4 h-8 w-8 text-clinical-teal/10" />
-                <p className="text-slate leading-relaxed mb-6 relative z-10">
-                  &ldquo;{quote}&rdquo;
-                </p>
-                <footer className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-clinical-teal/10 text-clinical-teal text-sm font-bold">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-lg bg-clinical-teal/10">
+                    <Quote className="h-5 w-5 text-clinical-teal" />
+                  </div>
+                  <p className="text-slate italic text-base leading-relaxed relative z-10 pt-1.5">
+                    &ldquo;{quote}&rdquo;
+                  </p>
+                </div>
+                <footer className="flex items-center gap-3 ml-14">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-clinical-teal/10 text-clinical-teal text-base font-bold ring-2 ring-clinical-teal/20">
                     {name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                   </div>
                   <div>
                     <cite className="not-italic text-sm font-bold text-deep-navy">{name}</cite>
-                    <p className="text-xs text-cool-grey">{role}</p>
-                    <p className="text-xs text-cool-grey">{facility}</p>
+                    <p className="mt-0.5">
+                      <span className="text-xs font-medium text-clinical-teal bg-clinical-teal/10 rounded-full px-2 py-0.5">
+                        {role}
+                      </span>
+                    </p>
+                    <p className="text-xs text-cool-grey mt-0.5">{facility}</p>
                   </div>
                 </footer>
               </blockquote>
