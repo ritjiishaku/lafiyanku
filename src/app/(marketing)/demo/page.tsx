@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { DemoContent } from "./DemoContent";
 
 export const metadata: Metadata = {
-  title: "See Lafiyanku in Action — AI Playground",
+  title: "Try Lafiyanku — AI Discharge Documentation Playground",
   description:
-    "See how Lafiyanku turns clinical input into a discharge summary and patient instructions — in seconds. Uses sample patient data.",
+    "Experience Lafiyanku first-hand. Edit sample patient data and watch the AI generate a clinical discharge summary and patient-friendly instructions in seconds.",
   robots: { index: false, follow: false },
 };
 
